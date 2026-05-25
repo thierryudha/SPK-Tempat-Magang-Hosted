@@ -193,8 +193,8 @@
             </div>
 
             <div class="mt-12 flex flex-col sm:flex-row justify-start gap-4">
-                <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-center">Kembali ke Dashboard</a>
                 <a href="{{ route('moora.index') }}" class="px-8 py-4 bg-white text-slate-500 font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition text-center">Hitung Ulang</a>
+                <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-center">Kembali ke Dashboard</a>
             </div>
         </div>
     </div>

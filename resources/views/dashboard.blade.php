@@ -83,7 +83,7 @@
                 <div class="lg:col-span-7 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 overflow-hidden relative">
                     <!-- Decorative background icon -->
                     <div class="absolute -right-20 -bottom-20 text-slate-100 pointer-events-none z-0">
-                        <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                        <svg class="w-96 h-96" viewBox="0 0 200 200" fill="currentColor"><path d="M42.7,-73.4C55.9,-65.4,67.6,-53.5,76.3,-39.3C85,-25.1,90.7,-8.7,87.6,6.3C84.4,21.3,72.4,34.9,60.6,47.4C48.8,59.9,37.3,71.2,22.6,76.5C7.9,81.8,-10.1,81.1,-26,75.2C-41.9,69.4,-55.8,58.3,-66.4,44.9C-77,31.4,-84.3,15.7,-84.9,-0.3C-85.5,-16.4,-79.4,-32.8,-69.1,-45.5C-58.7,-58.2,-44,-67.2,-29.4,-72C-14.9,-76.9,0.1,-77.6,15.3,-75.4C30.4,-73.2,42.7,-73.4,42.7,-73.4Z" transform="translate(100 100)"/></svg>
                     </div>
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 relative z-10">
                         <div>
@@ -103,7 +103,7 @@
                 <div class="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 flex flex-col relative overflow-hidden">
                     <!-- Decorative background icon -->
                     <div class="absolute -left-16 -top-16 text-slate-100 rotate-45 pointer-events-none z-0">
-                        <svg class="w-80 h-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        <svg class="w-80 h-80" viewBox="0 0 200 200" fill="currentColor"><path d="M51.5,-67.4C66.1,-58.7,77,-43.3,81.9,-26.4C86.7,-9.5,85.5,8.8,77.7,24.3C69.9,39.9,55.5,52.8,40.1,62C24.7,71.1,8.3,76.6,-7.7,74.7C-23.7,72.8,-39.3,63.5,-51.7,51.1C-64.2,38.7,-73.6,23.1,-76.3,6.3C-78.9,-10.5,-74.8,-28.4,-64.5,-41.8C-54.2,-55.1,-37.6,-63.9,-21.8,-68.8C-6,-73.7,9,-74.7,24.6,-73.4C40.1,-72.1,51.5,-67.4,51.5,-67.4Z" transform="translate(100 100)"/></svg>
                     </div>
                     <div class="mb-10 relative z-10">
                         <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
@@ -132,7 +132,7 @@
                 <div class="bg-white rounded-[2.5rem] shadow-sm p-8 border border-gray-100 relative overflow-hidden">
                     <!-- Decorative background icon -->
                     <div class="absolute -right-10 -top-10 text-slate-100 -rotate-12 pointer-events-none z-0">
-                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <svg class="w-64 h-64" viewBox="0 0 200 200" fill="currentColor"><path d="M39.9,-65.7C52.8,-59,65.3,-50.2,74.1,-38.2C82.9,-26.1,88.1,-10.9,85.1,3.1C82.1,17.2,70.9,30.1,60.1,41.9C49.3,53.8,38.9,64.6,25.4,70.6C11.9,76.6,-4.8,77.9,-21.3,73.8C-37.8,69.7,-54.1,60.3,-65.4,47C-76.7,33.7,-83.1,16.8,-83.9,-0.4C-84.7,-17.6,-79.9,-35.3,-69.1,-48.5C-58.3,-61.7,-41.6,-70.5,-26.1,-72.9C-10.6,-75.3,3.7,-71.4,17.5,-68.6C31.3,-65.8,39.9,-65.7,39.9,-65.7Z" transform="translate(100 100)"/></svg>
                     </div>
                     <h3 class="font-black text-slate-900 text-sm mb-8 flex items-center gap-2 relative z-10">
                         <span class="w-1.5 h-4 bg-yellow-400 rounded-full"></span>

@@ -48,7 +48,7 @@
                                  class="p-4 sm:p-5 md:p-6 border-2 rounded-3xl transition duration-300 group">
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-6">
                                     <div class="flex items-center gap-3 md:gap-4 overflow-hidden w-full sm:w-auto">
-                                        <div class="relative inline-flex items-center cursor-pointer scale-90 md:scale-100 flex-shrink-0">
+                                        <label for="c-{{ $criteria->id }}" class="relative inline-flex items-center cursor-pointer scale-90 md:scale-100 flex-shrink-0 m-0">
                                             <input type="checkbox" 
                                                    name="criteria[{{ $criteria->id }}]" 
                                                    id="c-{{ $criteria->id }}"
@@ -56,9 +56,9 @@
                                                    @change="balanceWeights()"
                                                    class="sr-only peer">
                                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                        </div>
+                                        </label>
                                         <div class="min-w-0 flex-1">
-                                            <label for="c-{{ $criteria->id }}" class="font-black text-gray-900 text-sm md:text-base leading-tight truncate tracking-tight block cursor-pointer">{{ $criteria->name }}</label>
+                                            <label for="c-{{ $criteria->id }}" class="font-black text-gray-900 text-sm md:text-base leading-tight truncate tracking-tight block cursor-pointer group-hover:text-blue-600 transition">{{ $criteria->name }}</label>
                                             <p class="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate mt-1">
                                                 <span class="{{ strtolower($criteria->type) === 'benefit' ? 'text-emerald-500' : 'text-rose-500' }}">{{ $criteria->type }}</span>
                                             </p>
