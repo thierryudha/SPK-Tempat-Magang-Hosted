@@ -31,7 +31,8 @@ class MooraService
         // 2 & 3. Normalization and Weighted Normalization
         $results = [];
         foreach ($alternatives as $alt) {
-            $optimizationValue = 0;
+            $sumBenefit = 0;
+            $sumCost = 0;
             $normalizedScores = [];
 
             foreach ($criteria as $c) {
@@ -46,18 +47,22 @@ class MooraService
                     'weighted' => $weighted
                 ];
 
-                if ($c['type'] === 'benefit') {
-                    $optimizationValue += $weighted;
+                if (strtolower($c['type']) === 'benefit') {
+                    $sumBenefit += $weighted;
                 } else {
-                    $optimizationValue -= $weighted;
+                    $sumCost += $weighted;
                 }
             }
+
+            $optimizationValue = $sumBenefit - $sumCost;
 
             $results[] = [
                 'id' => $alt['id'],
                 'name' => $alt['name'],
                 'scores' => $alt['scores'],
                 'normalized_scores' => $normalizedScores,
+                'sum_benefit' => $sumBenefit,
+                'sum_cost' => $sumCost,
                 'optimization_value' => $optimizationValue
             ];
         }

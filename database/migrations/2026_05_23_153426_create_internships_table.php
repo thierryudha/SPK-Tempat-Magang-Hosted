@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('internships', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('name');
+            $table->string('name')->unique(); // Make name unique globally
             $table->string('city');
             $table->string('category');
             $table->text('description')->nullable();

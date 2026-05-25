@@ -85,23 +85,6 @@
                     </a>
                 @endauth
             </div>
-            
-            <!-- Mockup Preview -->
-            <div class="mt-24 relative max-w-5xl mx-auto">
-                <div class="bg-white rounded-3xl shadow-2xl p-4 border border-gray-100 transform rotate-1">
-                    <div class="bg-gray-50 rounded-2xl overflow-hidden aspect-video flex items-center justify-center border border-gray-200">
-                        <div class="text-center p-8">
-                            <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <p class="text-gray-400 font-medium">Dashboard Preview & Analytics</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Floating Elements -->
-                <div class="absolute -top-10 -left-10 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 animate-bounce">
-                    <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold">🥇</div>
-                    <div class="text-left"><p class="text-[10px] text-gray-400 font-bold uppercase">Rekomendasi #1</p><p class="text-sm font-bold">PT Gojek Tokopedia</p></div>
-                </div>
-            </div>
         </div>
     </header>
 

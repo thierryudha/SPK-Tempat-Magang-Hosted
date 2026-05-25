@@ -18,18 +18,26 @@
                     <div class="flex-1 z-10">
                         <div class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg mb-6">Analisis Personal</div>
                         <h3 class="text-3xl lg:text-4xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
-                            {{ $bestInternshipData->name ?? 'Mulai Petualanganmu' }}
+                            {{ $bestInternshipData->name ?? 'Mulai Pilih Tempat Magang Mu' }}
                         </h3>
                         <p class="text-slate-500 text-sm mb-10 max-w-md leading-relaxed">Profil ini dirangkum berdasarkan preferensi bobot unik Anda terhadap {{ $criterias->count() }} kriteria penilaian profesional.</p>
                         
                         <div class="flex flex-wrap gap-4">
                             <div class="px-6 py-4 bg-slate-50 rounded-3xl border border-slate-100">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Skor Rata-rata</p>
-                                <p class="text-2xl font-black text-blue-600">⭐{{ number_format($bestInternshipData->avg_score ?? 0, 2) }}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Evaluasi</p>
+                                <div class="flex items-end gap-2">
+                                    <span class="text-2xl font-black text-slate-800">{{ $myInternshipsCount }}</span>
+                                    <span class="text-[10px] text-slate-400 font-bold mb-1.5 uppercase">Perusahaan</span>
+                                </div>
+                                <p class="text-[9px] text-slate-400 mt-1 italic">Internship yang Anda simpan</p>
                             </div>
-                            <div class="px-6 py-4 bg-slate-50 rounded-3xl border border-slate-100 min-w-[140px]">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Data Tersimpan</p>
-                                <p class="text-2xl font-black text-slate-800">{{ $myInternshipsCount }} <span class="text-xs text-slate-400 font-bold uppercase ml-1">Unit</span></p>
+                            <div class="px-6 py-4 bg-blue-50 rounded-3xl border border-blue-100">
+                                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-1">Skor Rata-Rata</p>
+                                <div class="flex items-end gap-2">
+                                    <span class="text-2xl font-black text-blue-600">{{ $bestInternshipData ? number_format($bestInternshipData->avg_score, 1) : '0.0' }}</span>
+                                    <span class="text-[10px] text-blue-400 font-bold mb-1.5 uppercase">/ 5.0</span>
+                                </div>
+                                <p class="text-[9px] text-blue-400 mt-1 italic">Rerata kriteria terbaik Anda</p>
                             </div>
                         </div>
                     </div>
@@ -192,8 +200,8 @@
                         r: { 
                             min: 1, max: 5, 
                             ticks: { display: false, stepSize: 1 },
-                            grid: { color: '#F1F5F9' },
-                            angleLines: { color: '#F1F5F9' },
+                            grid: { color: '#CBD5E1', lineWidth: 2 },
+                            angleLines: { color: '#CBD5E1', lineWidth: 2 },
                             pointLabels: { font: { size: 9, weight: 'bold' }, color: '#64748B' }
                         } 
                     }
@@ -205,7 +213,7 @@
             new Chart(document.getElementById('userGrowthChart'), {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode($registrationTrends->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('d M'))) !!},
+                    labels: {!! json_encode($registrationTrends->pluck('label')) !!},
                     datasets: [{
                         label: 'Total Users',
                         data: {!! json_encode($registrationTrends->pluck('count')) !!},
@@ -247,14 +255,14 @@
                             ticks: { 
                                 color: 'rgba(255,255,255,0.4)', 
                                 font: { size: 9 },
-                                stepSize: 1,
-                                callback: function(value) { if (value % 1 === 0) return value; }
+                                stepSize: 5,
+                                callback: function(value) { if (value % 5 === 0) return value; }
                             }
                         },
                         x: { 
                             display: true, 
                             grid: { display: false }, 
-                            ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 9, weight: 'bold' } } 
+                            ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 8, weight: 'bold' } } 
                         }
                     }
                 }

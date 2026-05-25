@@ -9,7 +9,12 @@ class InternshipEvaluation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['internship_id', 'criteria_id', 'score'];
+    protected $fillable = ['user_id', 'internship_id', 'criteria_id', 'score'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function internship()
     {

@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Criteria;
-use App\Models\Internship;
 use App\Models\UserCriteriaWeight;
 use App\Models\InternshipEvaluation;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
-class MooraController extends Controller
+class MooraApiController extends Controller
 {
     protected $mooraService;
 
@@ -20,13 +19,22 @@ class MooraController extends Controller
         $this->mooraService = $mooraService;
     }
 
-    public function index()
+    public function getCriterias()
     {
         $criterias = Criteria::with('scales')->get();
-        $internships = Internship::all(); // Show all global internships
-        $userWeights = Auth::user()->weights->pluck('weight', 'criteria_id');
+        return response()->json([
+            'success' => true,
+            'data' => $criterias
+        ]);
+    }
 
-        return view('moora.index', compact('criterias', 'internships', 'userWeights'));
+    public function getUserWeights()
+    {
+        $weights = Auth::user()->weights->pluck('weight', 'criteria_id');
+        return response()->json([
+            'success' => true,
+            'data' => $weights
+        ]);
     }
 
     public function calculate(Request $request)
@@ -43,13 +51,14 @@ class MooraController extends Controller
         $selectedInternshipIds = $request->internships;
         $scores = $request->scores;
 
-        // Verify total weight is 100%
         $totalWeight = array_sum(array_intersect_key($weights, array_flip($selectedCriteriaIds)));
         if (abs($totalWeight - 100) > 0.01) {
-            return back()->withErrors(['weights' => 'Total bobot harus tepat 100%. Sekarang: ' . $totalWeight . '%'])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Total bobot harus tepat 100%. Sekarang: ' . $totalWeight . '%'
+            ], 422);
         }
 
-        // Save weights to DB
         foreach ($selectedCriteriaIds as $cId) {
             UserCriteriaWeight::updateOrCreate(
                 ['user_id' => Auth::id(), 'criteria_id' => $cId],
@@ -57,7 +66,6 @@ class MooraController extends Controller
             );
         }
 
-        // Save scores and prepare data for MOORA
         $mooraAlternatives = [];
         $mooraCriteria = [];
 
@@ -72,12 +80,14 @@ class MooraController extends Controller
         }
 
         foreach ($selectedInternshipIds as $iId) {
-            $internship = Internship::find($iId);
+            $internship = Auth::user()->internships()->find($iId);
+            if (!$internship) continue;
+
             $altScores = [];
             foreach ($selectedCriteriaIds as $cId) {
                 $scoreValue = $scores[$iId][$cId];
                 InternshipEvaluation::updateOrCreate(
-                    ['user_id' => Auth::id(), 'internship_id' => $iId, 'criteria_id' => $cId],
+                    ['internship_id' => $iId, 'criteria_id' => $cId],
                     ['score' => $scoreValue]
                 );
                 $altScores[$cId] = $scoreValue;
@@ -92,14 +102,9 @@ class MooraController extends Controller
 
         $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
 
-        // Map original scores back into results for display in Step 1 of Detail Perhitungan
-        foreach ($results as &$res) {
-            $res['original_scores'] = [];
-            foreach ($selectedCriteriaIds as $cId) {
-                $res['original_scores'][$cId] = $scores[$res['id']][$cId];
-            }
-        }
-
-        return view('moora.results', compact('results', 'criterias'));
+        return response()->json([
+            'success' => true,
+            'data' => $results
+        ]);
     }
 }

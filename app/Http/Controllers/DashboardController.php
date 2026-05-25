@@ -18,12 +18,18 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // 1. Personal Stats
-        $myInternshipsCount = $user->internships()->count();
+        $myEvaluatedIds = DB::table('internship_evaluations')
+            ->where('user_id', $user->id)
+            ->distinct()
+            ->pluck('internship_id');
+        
+        $myInternshipsCount = $myEvaluatedIds->count();
+
         $bestInternshipData = DB::table('internships')
             ->join('internship_evaluations', 'internships.id', '=', 'internship_evaluations.internship_id')
             ->select('internships.*', DB::raw('AVG(internship_evaluations.score) as avg_score'))
-            ->where('internships.user_id', $user->id)
-            ->groupBy('internships.id', 'internships.user_id', 'internships.name', 'internships.city', 'internships.category', 'internships.description', 'internships.created_at', 'internships.updated_at')
+            ->where('internship_evaluations.user_id', $user->id)
+            ->groupBy('internships.id', 'internships.name', 'internships.city', 'internships.category', 'internships.description', 'internships.created_at', 'internships.updated_at')
             ->orderBy('avg_score', 'desc')
             ->first();
 
@@ -33,6 +39,8 @@ class DashboardController extends Controller
             $evaluations = DB::table('internship_evaluations')
                 ->join('criterias', 'internship_evaluations.criteria_id', '=', 'criterias.id')
                 ->where('internship_evaluations.internship_id', $bestInternshipData->id)
+                ->where('internship_evaluations.user_id', $user->id)
+                ->where('internship_evaluations.score', '>', 0)
                 ->select('criterias.name', 'internship_evaluations.score')
                 ->get();
             
@@ -46,20 +54,30 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalInternships = Internship::count();
         
-        // 4. Treemap Data: Industry Distribution (Count of Internships per Category)
+        // 4. Treemap Data
         $treemapData = Internship::select('category', DB::raw('count(*) as value'))
             ->groupBy('category')
             ->orderBy('value', 'desc')
             ->get();
 
-        // 5. Area Chart Data: Registration Trends (Last 7 days)
-        $registrationTrends = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+        // 5. Growth Trend Data: Last 1 Year, grouped by 2 Months
+        $registrationTrends = collect();
+        $now = Carbon::now();
+        // Go back 12 months, steps of 2 months
+        for ($i = 5; $i >= 0; $i--) {
+            $date = $now->copy()->subMonths($i * 2);
+            $start = $date->copy()->startOfMonth();
+            $end = $date->copy()->endOfMonth();
+            
+            $count = User::where('created_at', '<=', $end)->count();
+            
+            $registrationTrends->push([
+                'label' => $date->format('M Y'),
+                'count' => $count
+            ]);
+        }
 
-        // 6. Multi-Line Chart: Average Scores per Criteria over 5 Categories
+        // 6. Benchmark Data
         $top5Categories = Internship::select('category', DB::raw('count(*) as total'))
             ->groupBy('category')
             ->orderBy('total', 'desc')
@@ -69,7 +87,6 @@ class DashboardController extends Controller
         $criterias = Criteria::all();
         $criteriaIds = $criterias->pluck('id');
 
-        // Optimized single query for all averages
         $allAverages = DB::table('internship_evaluations')
             ->join('internships', 'internship_evaluations.internship_id', '=', 'internships.id')
             ->whereIn('internships.category', $top5Categories)
@@ -83,12 +100,10 @@ class DashboardController extends Controller
         foreach ($top5Categories as $cat) {
             $catScores = [];
             $catData = $allAverages->get($cat) ? $allAverages->get($cat)->keyBy('criteria_id') : collect();
-            
             foreach ($criterias as $crit) {
                 $score = $catData->get($crit->id);
                 $catScores[] = $score ? round($score->avg_score, 2) : null;
             }
-
             $criteriaComparison[] = [
                 'label' => $cat,
                 'data' => $catScores

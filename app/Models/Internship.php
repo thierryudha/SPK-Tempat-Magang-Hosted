@@ -9,12 +9,7 @@ class Internship extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'name', 'city', 'category', 'description'];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $fillable = ['name', 'city', 'category', 'description'];
 
     public function evaluations()
     {

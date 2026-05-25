@@ -7,6 +7,10 @@
 
     <div class="py-12" x-data="internshipForm()">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <x-breadcrumbs :links="[
+                ['label' => 'Daftar Tempat Magang', 'url' => route('internships.index')],
+                ['label' => 'Tambah Tempat Magang']
+            ]" />
             
             <!-- Global Suggestions -->
             @if($globalInternships->isNotEmpty())
