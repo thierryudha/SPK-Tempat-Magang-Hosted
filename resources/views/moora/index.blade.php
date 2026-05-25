@@ -15,11 +15,11 @@
                     <template x-for="i in 3">
                         <div class="flex flex-col items-center">
                             <div :class="step >= i ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-gray-400 border border-gray-200'"
-                                 class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold transition duration-500 text-sm md:text-base">
+                                 class="w-10 h-10 md:w-16 md:h-16 rounded-full flex items-center justify-center font-bold transition duration-500 text-sm md:text-xl">
                                 <span x-text="i"></span>
                             </div>
                             <span :class="step >= i ? 'text-blue-600 font-bold' : 'text-gray-400 font-medium'"
-                                  class="text-[8px] md:text-[10px] uppercase mt-2 tracking-widest transition duration-500 text-center"
+                                  class="text-[8px] md:text-xs uppercase mt-3 tracking-widest transition duration-500 text-center font-black"
                                   x-text="['Kriteria', 'Alternatif', 'Penilaian'][i-1]"></span>
                         </div>
                     </template>
@@ -35,7 +35,7 @@
                 
                 <!-- Step 1: Smart Weight Balancer -->
                 <div x-show="step === 1" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-10">
-                    <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-gray-100">
+                    <div class="bg-white p-5 sm:p-6 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl border border-gray-100">
                         <div class="mb-8 md:mb-10">
                             <div class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg mb-4">Langkah 01</div>
                             <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-2 tracking-tight">Tentukan Prioritas Kriteria</h3>
@@ -45,9 +45,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             @foreach($criterias as $criteria)
                             <div :class="selectedCriterias['{{ $criteria->id }}'] ? 'border-blue-500 ring-4 ring-blue-50 bg-blue-50/30' : 'border-gray-100 hover:border-blue-200 bg-white'"
-                                 class="p-5 md:p-6 border-2 rounded-3xl transition duration-300 group">
-                                <div class="flex items-center justify-between mb-4 md:mb-6">
-                                    <div class="flex items-center gap-3 md:gap-4 overflow-hidden">
+                                 class="p-4 sm:p-5 md:p-6 border-2 rounded-3xl transition duration-300 group">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-6">
+                                    <div class="flex items-center gap-3 md:gap-4 overflow-hidden w-full sm:w-auto">
                                         <div class="relative inline-flex items-center cursor-pointer scale-90 md:scale-100 flex-shrink-0">
                                             <input type="checkbox" 
                                                    name="criteria[{{ $criteria->id }}]" 
@@ -57,15 +57,15 @@
                                                    class="sr-only peer">
                                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                         </div>
-                                        <div class="min-w-0">
-                                            <label for="c-{{ $criteria->id }}" class="font-black text-gray-900 text-base md:text-lg leading-tight mb-2 group-hover:text-blue-600 transition truncate tracking-tight block cursor-pointer">{{ $criteria->name }}</label>
-                                            <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest truncate">
+                                        <div class="min-w-0 flex-1">
+                                            <label for="c-{{ $criteria->id }}" class="font-black text-gray-900 text-sm md:text-base leading-tight truncate tracking-tight block cursor-pointer">{{ $criteria->name }}</label>
+                                            <p class="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate mt-1">
                                                 <span class="{{ strtolower($criteria->type) === 'benefit' ? 'text-emerald-500' : 'text-rose-500' }}">{{ $criteria->type }}</span>
                                             </p>
                                         </div>
 
                                     </div>
-                                    <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                                    <div class="flex items-center gap-2 md:gap-3 flex-shrink-0 self-end sm:self-auto">
                                         <button type="button" 
                                                 x-show="selectedCriterias['{{ $criteria->id }}']"
                                                 @click="toggleLock('{{ $criteria->id }}')"
@@ -113,7 +113,7 @@
 
                 <!-- Step 2: Pilih Tempat Magang -->
                 <div x-show="step === 2" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-10">
-                    <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-gray-100">
+                    <div class="bg-white p-5 sm:p-6 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl border border-gray-100">
                         <div class="mb-8 md:mb-10">
                             <div class="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg mb-4">Langkah 02</div>
                             <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-2 tracking-tight">Pilih Alternatif Tempat Magang</h3>
@@ -129,8 +129,8 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
                                 @foreach($internships as $internship)
                                 <label :class="selectedInternships.includes('{{ $internship->id }}') ? 'border-emerald-500 ring-4 ring-emerald-50 bg-emerald-50/20' : 'border-gray-100 hover:border-emerald-200 bg-white'"
-                                       class="p-5 md:p-6 border-2 rounded-3xl cursor-pointer transition relative group flex items-start gap-4">
-                                    <div class="pt-1">
+                                       class="p-4 sm:p-5 md:p-6 border-2 rounded-3xl cursor-pointer transition relative group flex items-start gap-4">
+                                    <div class="pt-1 flex-shrink-0">
                                         <input type="checkbox" 
                                                name="internships[]" 
                                                value="{{ $internship->id }}" 
@@ -160,7 +160,7 @@
 
                 <!-- Step 3: Input Nilai -->
                 <div x-show="step === 3" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-10">
-                    <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
+                    <div class="bg-white p-5 sm:p-6 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
                         <div class="mb-8 md:mb-10">
                             <div class="inline-flex items-center px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg mb-4">Langkah 03</div>
                             <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-2 tracking-tight">Skoring & Evaluasi Objektif</h3>
@@ -183,7 +183,7 @@
                                             @foreach($criterias as $criteria)
                                                 <template x-if="selectedCriterias['{{ $criteria->id }}']">
                                                     <div class="space-y-2">
-                                                        <div class="ml-1">
+                                                        <div class="ml-1 mb-2">
                                                             <label class="font-black text-gray-900 text-sm md:text-base leading-tight truncate tracking-tight block">
                                                                 {{ $criteria->name }}
                                                             </label>

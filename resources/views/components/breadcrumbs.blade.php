@@ -1,6 +1,6 @@
 @props(['links' => []])
 
-<nav class="flex px-4 sm:px-0 py-5 mb-10" aria-label="Breadcrumb">
+<nav class="flex px-4 sm:px-0 pt-1 pb-3 mb-2" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
             <a href="{{ route('dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200">

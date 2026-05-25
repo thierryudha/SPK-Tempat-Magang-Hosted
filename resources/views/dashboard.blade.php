@@ -80,8 +80,12 @@
             <!-- SECTION 2: Benchmarking & Distribution -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
                 <!-- BENCHMARK RADAR (Replacement for Line Chart) -->
-                <div class="lg:col-span-7 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 overflow-hidden">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                <div class="lg:col-span-7 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 overflow-hidden relative">
+                    <!-- Decorative background icon -->
+                    <div class="absolute -right-20 -bottom-20 text-slate-50 pointer-events-none z-0">
+                        <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 relative z-10">
                         <div>
                             <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
                                 <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
@@ -96,8 +100,12 @@
                 </div>
 
                 <!-- DISTRIBUTION DOUGHNUT -->
-                <div class="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 flex flex-col">
-                    <div class="mb-10">
+                <div class="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 flex flex-col relative overflow-hidden">
+                    <!-- Decorative background icon -->
+                    <div class="absolute -left-16 -top-16 text-slate-50 rotate-45 pointer-events-none z-0">
+                        <svg class="w-80 h-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </div>
+                    <div class="mb-10 relative z-10">
                         <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
                             <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
                             Distribusi Bidang
@@ -121,8 +129,12 @@
             <!-- SECTION 3: Rankings & Market Insight -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- TOP 5 ELITE -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm p-8 border border-gray-100">
-                    <h3 class="font-black text-slate-900 text-sm mb-8 flex items-center gap-2">
+                <div class="bg-white rounded-[2.5rem] shadow-sm p-8 border border-gray-100 relative overflow-hidden">
+                    <!-- Decorative background icon -->
+                    <div class="absolute -right-10 -top-10 text-slate-50 -rotate-12 pointer-events-none z-0">
+                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <h3 class="font-black text-slate-900 text-sm mb-8 flex items-center gap-2 relative z-10">
                         <span class="w-1.5 h-4 bg-yellow-400 rounded-full"></span>
                         Top 5 Elite Companies
                     </h3>

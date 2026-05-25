@@ -27,14 +27,15 @@
 <body class="bg-[#F8FAFC] text-[#1E293B] antialiased" x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)">
     
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass" x-show="show" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 -translate-y-4">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+    <nav class="fixed top-0 w-full z-50 glass" x-show="show" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 -translate-y-4" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center relative z-20">
             <div class="flex items-center gap-2">
                 <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200 text-white font-bold text-xl">M</div>
                 <span class="text-xl font-extrabold tracking-tight">Moora<span class="text-blue-600">Project</span></span>
             </div>
             
-            <div class="flex items-center gap-6">
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-6">
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="font-bold text-gray-700 hover:text-blue-600 transition">Dashboard</a>
@@ -48,6 +49,30 @@
                     @endauth
                 @endif
             </div>
+
+            <!-- Mobile Hamburger Button -->
+            <div class="md:hidden flex items-center">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-600 hover:text-blue-600 focus:outline-none p-2">
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg x-show="mobileMenuOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div x-show="mobileMenuOpen" x-transition x-cloak class="absolute top-20 left-0 w-full glass border-t border-white/40 shadow-xl flex flex-col p-6 gap-4 md:hidden z-10">
+            @if (Route::has('login'))
+                @auth
+                    <a href="{{ url('/dashboard') }}" class="font-bold text-gray-700 text-center py-3 bg-white/50 rounded-xl">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="font-bold text-gray-700 text-center py-3 bg-white/50 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition">Masuk</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition text-center">
+                            Daftar Gratis
+                        </a>
+                    @endif
+                @endauth
+            @endif
         </div>
     </nav>
 
@@ -61,7 +86,7 @@
             <span class="inline-block px-4 py-1.5 mb-6 bg-blue-50 text-blue-600 text-sm font-bold rounded-full border border-blue-100 uppercase tracking-widest">
                 🚀 Temukan Karir Impianmu
             </span>
-            <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
+            <h1 class="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
                 Pilih Tempat Magang <br> 
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Jauh Lebih Objektif.</span>
             </h1>
@@ -128,6 +153,13 @@
                 <div class="flex gap-6">
                     <a href="#" class="text-gray-400 hover:text-blue-600 transition">Twitter</a>
                     <a href="#" class="text-gray-400 hover:text-blue-600 transition">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+
                 </div>
             </div>
         </div>

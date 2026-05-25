@@ -27,7 +27,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                         @foreach(collect($results)->take(3) as $index => $res)
                         <div class="relative p-8 border-2 {{ $index == 0 ? 'border-amber-400 bg-amber-50/30 ring-4 ring-amber-50' : 'border-slate-100 bg-white' }} rounded-[2.5rem] shadow-sm transition hover:scale-[1.02]">
-                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white px-5 py-1.5 border border-slate-100 shadow-sm rounded-full font-black text-xs uppercase tracking-widest text-slate-500">
+                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white px-8 py-1.5 border border-slate-100 shadow-sm rounded-full font-black text-xs uppercase tracking-widest text-slate-500">
                                 Rank #{{ $res['rank'] }}
                             </div>
                             <div class="text-4xl mb-4 text-center">{{ $index == 0 ? '🥇' : ($index == 1 ? '🥈' : '🥉') }}</div>
@@ -65,12 +65,12 @@
 
             <!-- Detailed Steps -->
             <div x-data="{ open: false }" class="mt-12">
-                <button @click="open = !open" class="flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition font-black text-xs uppercase tracking-widest shadow-sm">
-                    <svg class="w-4 h-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                <button @click="open = !open" class="flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition font-black text-xs uppercase tracking-widest shadow-sm">
+                    <svg class="w-4 h-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     <span x-text="open ? 'Sembunyikan Detail Perhitungan' : 'Tampilkan Detail Perhitungan'"></span>
                 </button>
 
-                <div x-show="open" x-transition class="mt-8 space-y-12 pb-12">
+                <div x-show="open" x-transition class="mt-8 flex flex-col gap-10 md:gap-16 pb-12">
                     <!-- Step 1: Decision Matrix -->
                     <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden">
                         <div class="mb-8">
