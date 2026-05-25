@@ -94,7 +94,7 @@
                             <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Analisis Komparasi: Top 5 Sektor vs 10 Kriteria</p>
                         </div>
                     </div>
-                    <div class="h-[450px] lg:h-[500px]">
+                    <div class="h-[450px] lg:h-[500px] relative z-10">
                         <canvas id="benchmarkBarChart"></canvas>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                         </h3>
                         <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Industry Landscape Analysis</p>
                     </div>
-                    <div class="h-64 lg:h-72 mb-8">
+                    <div class="h-64 lg:h-72 mb-8 relative z-10">
                         <canvas id="categoryDoughnutChart"></canvas>
                     </div>
                     <div class="mt-auto grid grid-cols-2 gap-4">
