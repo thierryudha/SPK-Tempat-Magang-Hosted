@@ -74,12 +74,20 @@ class MooraController extends Controller
         foreach ($selectedInternshipIds as $iId) {
             $internship = Internship::find($iId);
             $altScores = [];
+            
+            // Delete old evaluations for this user and this internship
+            InternshipEvaluation::where('user_id', Auth::id())
+                ->where('internship_id', $iId)
+                ->delete();
+
             foreach ($selectedCriteriaIds as $cId) {
                 $scoreValue = $scores[$iId][$cId];
-                InternshipEvaluation::updateOrCreate(
-                    ['user_id' => Auth::id(), 'internship_id' => $iId, 'criteria_id' => $cId],
-                    ['score' => $scoreValue]
-                );
+                InternshipEvaluation::create([
+                    'user_id' => Auth::id(), 
+                    'internship_id' => $iId, 
+                    'criteria_id' => $cId,
+                    'score' => $scoreValue
+                ]);
                 $altScores[$cId] = $scoreValue;
             }
 

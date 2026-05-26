@@ -31,7 +31,24 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->fill($request->validated());
 
-        if ($request->hasFile('photo')) {
+        if ($request->filled('photo_cropped')) {
+            // Handle cropped photo (base64)
+            $photoData = $request->input('photo_cropped');
+            $photoData = str_replace('data:image/jpeg;base64,', '', $photoData);
+            $photoData = str_replace('data:image/png;base64,', '', $photoData);
+            $photoData = str_replace(' ', '+', $photoData);
+            $photoBinary = base64_decode($photoData);
+            
+            $filename = 'profile-photos/' . uniqid() . '.jpg';
+            
+            // Delete old photo if exists
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            
+            Storage::disk('public')->put($filename, $photoBinary);
+            $user->photo = $filename;
+        } elseif ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($user->photo) {
                 Storage::disk('public')->delete($user->photo);

@@ -6,6 +6,7 @@ use App\Models\Internship;
 use App\Models\User;
 use App\Models\Criteria;
 use App\Models\InternshipEvaluation;
+use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,41 +14,114 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    protected $mooraService;
+
+    public function __construct(MooraService $mooraService)
+    {
+        $this->mooraService = $mooraService;
+    }
+
     public function index()
     {
         $user = Auth::user();
 
-        // 1. Personal Stats
-        $myEvaluatedIds = DB::table('internship_evaluations')
+        // 1. Get the latest evaluations session (most recent timestamp)
+        $latestEval = DB::table('internship_evaluations')
             ->where('user_id', $user->id)
-            ->distinct()
-            ->pluck('internship_id');
-        
-        $myInternshipsCount = $myEvaluatedIds->count();
-
-        $bestInternshipData = DB::table('internships')
-            ->join('internship_evaluations', 'internships.id', '=', 'internship_evaluations.internship_id')
-            ->select('internships.*', DB::raw('AVG(internship_evaluations.score) as avg_score'))
-            ->where('internship_evaluations.user_id', $user->id)
-            ->groupBy('internships.id', 'internships.name', 'internships.city', 'internships.category', 'internships.description', 'internships.created_at', 'internships.updated_at')
-            ->orderBy('avg_score', 'desc')
+            ->orderBy('created_at', 'desc')
             ->first();
 
-        // 2. Personal Evaluation Profile (Radar)
+        $bestInternshipData = null;
+        $evaluationsCount = 0;
         $personalChartData = [];
-        if ($bestInternshipData) {
-            $evaluations = DB::table('internship_evaluations')
-                ->join('criterias', 'internship_evaluations.criteria_id', '=', 'criterias.id')
-                ->where('internship_evaluations.internship_id', $bestInternshipData->id)
-                ->where('internship_evaluations.user_id', $user->id)
-                ->where('internship_evaluations.score', '>', 0)
-                ->select('criterias.name', 'internship_evaluations.score')
+
+        if ($latestEval) {
+            // Find all internships evaluated in the same "session" (within 2 seconds of the latest evaluation)
+            $sessionTime = Carbon::parse($latestEval->created_at);
+            $allEvaluations = DB::table('internship_evaluations')
+                ->where('user_id', $user->id)
+                ->whereBetween('created_at', [
+                    $sessionTime->copy()->subSeconds(2), 
+                    $sessionTime->copy()->addSeconds(2)
+                ])
                 ->get();
             
-            $personalChartData = [
-                'labels' => $evaluations->pluck('name'),
-                'values' => $evaluations->pluck('score'),
-            ];
+            $groupedByInternship = $allEvaluations->groupBy('internship_id');
+            $evaluationsCount = $groupedByInternship->count();
+            
+            $criteriaIds = $allEvaluations->pluck('criteria_id')->unique();
+            $weights = DB::table('user_criteria_weights')
+                ->where('user_id', $user->id)
+                ->whereIn('criteria_id', $criteriaIds)
+                ->get()
+                ->keyBy('criteria_id');
+            
+            $criteriaModels = Criteria::whereIn('id', $criteriaIds)->get();
+
+            // Prepare data for MOORA
+            $mooraAlternatives = [];
+            foreach ($groupedByInternship as $iId => $evals) {
+                $internship = Internship::find($iId);
+                if (!$internship) continue;
+                
+                $altScores = [];
+                foreach ($evals as $e) {
+                    $altScores[$e->criteria_id] = $e->score;
+                }
+                $mooraAlternatives[] = [
+                    'id' => $iId,
+                    'name' => $internship->name,
+                    'scores' => $altScores
+                ];
+            }
+
+            $mooraCriteria = [];
+            foreach ($criteriaModels as $c) {
+                $mooraCriteria[] = [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'type' => $c->type,
+                    'weight' => $weights[$c->id]->weight ?? 0
+                ];
+            }
+
+            // Run MOORA ranking
+            $mooraResults = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
+
+            if (!empty($mooraResults)) {
+                $winner = $mooraResults[0];
+                
+                // Mock the internship data for the view
+                $bestInternshipData = (object) [
+                    'id' => $winner['id'],
+                    'name' => $winner['name'],
+                    'avg_score' => collect($winner['scores'])->avg(),
+                    'optimization_value' => $winner['optimization_value']
+                ];
+
+                // 2. Personal Evaluation Profile (Radar)
+                $labels = [];
+                $values = [];
+                foreach ($criteriaModels as $c) {
+                    $score = $winner['scores'][$c->id] ?? 0;
+                    $labels[] = $c->name;
+                    
+                    // Logic: If Benefit, score 5 = 5. If Cost, score 1 = 5 (Inverted)
+                    if (strtolower($c->type) === 'cost') {
+                        $values[] = 6 - $score;
+                    } else {
+                        $values[] = $score;
+                    }
+                }
+
+                $personalChartData = [
+                    'labels' => $labels,
+                    'values' => $values,
+                ];
+
+                // Update avg_score to be the average of the radar values (with inverted cost)
+                $bestInternshipData->avg_score = collect($values)->avg();
+            }
         }
 
         // 3. Global Stats
@@ -69,7 +143,8 @@ class DashboardController extends Controller
             $start = $date->copy()->startOfMonth();
             $end = $date->copy()->endOfMonth();
             
-            $count = User::where('created_at', '<=', $end)->count();
+            // Count new users in this specific period to create a non-monotonic trend
+            $count = User::whereBetween('created_at', [$start, $end])->count();
             
             $registrationTrends->push([
                 'label' => $date->format('M Y'),
@@ -120,7 +195,7 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard', compact(
-            'myInternshipsCount', 
+            'evaluationsCount', 
             'bestInternshipData', 
             'personalChartData',
             'totalUsers', 

@@ -24,12 +24,12 @@
                         
                         <div class="flex flex-wrap gap-4">
                             <div class="px-6 py-4 bg-slate-50 rounded-3xl border border-slate-100">
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Evaluasi</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Evaluasi</p>
                                 <div class="flex items-end gap-2">
-                                    <span class="text-2xl font-black text-slate-800">{{ $myInternshipsCount }}</span>
+                                    <span class="text-2xl font-black text-slate-800">{{ $evaluationsCount }}</span>
                                     <span class="text-[10px] text-slate-400 font-bold mb-1.5 uppercase">Perusahaan</span>
                                 </div>
-                                <p class="text-[9px] text-slate-400 mt-1 italic">Internship yang Anda simpan</p>
+                                <p class="text-[9px] text-slate-400 mt-1 italic">yang Anda bandingkan</p>
                             </div>
                             <div class="px-6 py-4 bg-blue-50 rounded-3xl border border-blue-100">
                                 <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-1">Skor Rata-Rata</p>
@@ -42,15 +42,15 @@
                         </div>
                     </div>
                     
-                    <div class="w-full md:w-80 h-80 flex-shrink-0 z-10 bg-white/50 backdrop-blur-sm rounded-[2rem] p-4 border border-slate-50 shadow-inner">
+                    <div class="w-full md:w-80 h-80 flex-shrink-0 z-10 bg-white/50 backdrop-blur-sm rounded-[2rem] p-4 border border-slate-50 shadow-inner relative overflow-hidden">
                         @if($bestInternshipData)
-                            <canvas id="personalRadarChart"></canvas>
+                            <canvas id="personalRadarChart" class="relative z-10"></canvas>
                         @else
                             <div class="h-full w-full flex items-center justify-center text-center p-6 italic text-slate-300 text-xs">Tambah & nilai tempat magang <br> untuk melihat grafik radar profil.</div>
                         @endif
                     </div>
 
-                    <!-- Decorative background icon -->
+                    <!-- Decorative background icons (Triangle Ornaments) -->
                     <div class="absolute -right-16 -bottom-16 text-slate-100 rotate-12 pointer-events-none z-0">
                         <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     </div>
@@ -71,7 +71,7 @@
                                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Total Users</p>
                                 <p class="text-3xl font-black text-white">{{ $totalUsers }}</p>
                             </div>
-                            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 font-black text-xs">+{{ $registrationTrends->last()->count ?? 0 }}</div>
+                            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 font-black text-xs">+{{ $registrationTrends->last()['count'] ?? 0 }}</div>
                         </div>
                     </div>
                 </div>
@@ -81,12 +81,6 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
                 <!-- BENCHMARK RADAR (Replacement for Line Chart) -->
                 <div class="lg:col-span-7 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 overflow-hidden relative">
-                    <!-- Decorative background icon -->
-                    <div class="absolute -right-20 -bottom-20 text-slate-100 pointer-events-none z-0">
-                        <svg class="w-96 h-96 absolute top-0 left-0 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <svg class="w-64 h-64 absolute -top-20 -left-32 opacity-30 rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <svg class="w-48 h-48 absolute top-40 -left-10 opacity-70 -rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    </div>
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 relative z-10">
                         <div>
                             <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
@@ -103,11 +97,6 @@
 
                 <!-- DISTRIBUTION DOUGHNUT -->
                 <div class="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 lg:p-10 flex flex-col relative overflow-hidden">
-                    <!-- Decorative background icon -->
-                    <div class="absolute -left-16 -top-16 text-slate-100 pointer-events-none z-0">
-                        <svg class="w-80 h-80 absolute top-0 left-0 opacity-50 -rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <svg class="w-40 h-40 absolute top-40 left-40 opacity-40 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    </div>
                     <div class="mb-10 relative z-10">
                         <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
                             <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
@@ -133,12 +122,6 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- TOP 5 ELITE -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm p-8 border border-gray-100 relative overflow-hidden">
-                    <!-- Decorative background icon -->
-                    <div class="absolute -right-10 -top-10 text-slate-100 pointer-events-none z-0">
-                        <svg class="w-64 h-64 absolute top-0 right-0 opacity-50 rotate-90" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <svg class="w-32 h-32 absolute top-40 right-40 opacity-60 -rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        <svg class="w-20 h-20 absolute top-10 right-60 opacity-30 rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    </div>
                     <h3 class="font-black text-slate-900 text-sm mb-8 flex items-center gap-2 relative z-10">
                         <span class="w-1.5 h-4 bg-yellow-400 rounded-full"></span>
                         Top 5 Elite Companies
@@ -215,12 +198,34 @@
                     plugins: { legend: { display: false } },
                     scales: { 
                         r: { 
-                            min: 1, max: 5, 
-                            ticks: { display: false, stepSize: 1 },
-                            grid: { color: '#CBD5E1', lineWidth: 2 },
-                            angleLines: { color: '#CBD5E1', lineWidth: 2 },
-                            pointLabels: { font: { size: 9, weight: 'bold' }, color: '#64748B' }
+                            min: 0, 
+                            max: 5, 
+                            ticks: { 
+                                display: false, 
+                                stepSize: 1
+                            },
+                            grid: { color: '#E2E8F0', lineWidth: 1 },
+                            angleLines: { color: '#E2E8F0', lineWidth: 1 },
+                            pointLabels: { 
+                                font: { size: 10, weight: 'bold' }, 
+                                color: '#64748B',
+                                padding: 10
+                            }
                         } 
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 4,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                        },
+                        point: {
+                            radius: 5,
+                            hoverRadius: 8,
+                            backgroundColor: '#fff',
+                            borderWidth: 3,
+                            borderColor: '#3b82f6',
+                        }
                     }
                 }
             });
