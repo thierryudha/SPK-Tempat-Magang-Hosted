@@ -1,29 +1,26 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\InternshipApiController;
 use App\Http\Controllers\Api\MooraApiController;
-use Illuminate\Support\Facades\Route;
 
-// Public routes
+// Public Routes
 Route::post('/login', [AuthApiController::class, 'login']);
 
-// Protected routes
+// Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
+    // Auth
     Route::get('/me', [AuthApiController::class, 'me']);
     Route::post('/logout', [AuthApiController::class, 'logout']);
 
-    // Internship CRUD
-    Route::apiResource('internships', InternshipApiController::class)->names([
-        'index' => 'api.internships.index',
-        'store' => 'api.internships.store',
-        'show' => 'api.internships.show',
-        'update' => 'api.internships.update',
-        'destroy' => 'api.internships.destroy',
-    ]);
+    // Internships
+    Route::get('/internships', [InternshipApiController::class, 'index']);
+    Route::get('/internships/{internship}', [InternshipApiController::class, 'show']);
 
     // MOORA
     Route::get('/criterias', [MooraApiController::class, 'getCriterias']);
     Route::get('/weights', [MooraApiController::class, 'getUserWeights']);
-    Route::post('/moora/calculate', [MooraApiController::class, 'calculate']);
+    Route::post('/calculate', [MooraApiController::class, 'calculate']);
 });

@@ -17,26 +17,49 @@ class MooraService
             return [];
         }
 
-        // 1. Prepare Decision Matrix and calculate Square Sum for each criteria
+        // 1. Prepare Decision Matrix with score inversion for 'Cost'
+        $processedAlternatives = [];
+        foreach ($alternatives as $alt) {
+            $processedScores = [];
+            foreach ($criteria as $c) {
+                $originalScore = $alt['scores'][$c['id']] ?? 0;
+                
+                // Logic inversion for MOORA: 
+                // For 'Benefit', high score is good (5 = 5).
+                // For 'Cost', low input is good (1 = 5, 5 = 1).
+                if (strtolower($c['type']) === 'cost') {
+                    $processedScores[$c['id']] = 6 - $originalScore;
+                } else {
+                    $processedScores[$c['id']] = $originalScore;
+                }
+            }
+            $processedAlternatives[] = [
+                'id' => $alt['id'],
+                'name' => $alt['name'],
+                'original_scores' => $alt['scores'], // keep for reference
+                'scores' => $processedScores // used for calculation
+            ];
+        }
+
+        // 2. Calculate Square Sum for each criteria (using processed scores)
         $squareSums = [];
         foreach ($criteria as $c) {
             $sum = 0;
-            foreach ($alternatives as $alt) {
-                $score = $alt['scores'][$c['id']] ?? 0;
-                $sum += pow($score, 2);
+            foreach ($processedAlternatives as $alt) {
+                $sum += pow($alt['scores'][$c['id']], 2);
             }
             $squareSums[$c['id']] = sqrt($sum);
         }
 
-        // 2 & 3. Normalization and Weighted Normalization
+        // 3. Normalization and Weighted Normalization
         $results = [];
-        foreach ($alternatives as $alt) {
+        foreach ($processedAlternatives as $alt) {
             $sumBenefit = 0;
             $sumCost = 0;
             $normalizedScores = [];
 
             foreach ($criteria as $c) {
-                $score = $alt['scores'][$c['id']] ?? 0;
+                $score = $alt['scores'][$c['id']];
                 
                 // Avoid division by zero
                 $normalized = ($squareSums[$c['id']] != 0) ? ($score / $squareSums[$c['id']]) : 0;
@@ -47,22 +70,21 @@ class MooraService
                     'weighted' => $weighted
                 ];
 
-                if (strtolower($c['type']) === 'benefit') {
-                    $sumBenefit += $weighted;
-                } else {
-                    $sumCost += $weighted;
-                }
+                // NOTE: Since we already inverted Cost scores in Step 1, 
+                // all criteria are now treated as "more is better" (Benefit-like).
+                // So we add all weighted scores to sumBenefit.
+                $sumBenefit += $weighted;
             }
 
-            $optimizationValue = $sumBenefit - $sumCost;
+            $optimizationValue = $sumBenefit; // No subtraction needed because costs are already inverted
 
             $results[] = [
                 'id' => $alt['id'],
                 'name' => $alt['name'],
-                'scores' => $alt['scores'],
+                'scores' => $alt['original_scores'],
                 'normalized_scores' => $normalizedScores,
                 'sum_benefit' => $sumBenefit,
-                'sum_cost' => $sumCost,
+                'sum_cost' => 0,
                 'optimization_value' => $optimizationValue
             ];
         }

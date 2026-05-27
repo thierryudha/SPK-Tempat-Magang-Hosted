@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Criteria;
 use App\Models\UserCriteriaWeight;
 use App\Models\InternshipEvaluation;
+use App\Models\Internship;
+use App\Models\MooraSession;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +53,11 @@ class MooraApiController extends Controller
         $selectedInternshipIds = $request->internships;
         $scores = $request->scores;
 
-        $totalWeight = array_sum(array_intersect_key($weights, array_flip($selectedCriteriaIds)));
+        $totalWeight = 0;
+        foreach ($selectedCriteriaIds as $cId) {
+            $totalWeight += $weights[$cId] ?? 0;
+        }
+
         if (abs($totalWeight - 100) > 0.01) {
             return response()->json([
                 'success' => false,
@@ -80,14 +86,14 @@ class MooraApiController extends Controller
         }
 
         foreach ($selectedInternshipIds as $iId) {
-            $internship = Auth::user()->internships()->find($iId);
+            $internship = Internship::find($iId);
             if (!$internship) continue;
 
             $altScores = [];
             foreach ($selectedCriteriaIds as $cId) {
-                $scoreValue = $scores[$iId][$cId];
+                $scoreValue = $scores[$iId][$cId] ?? 1;
                 InternshipEvaluation::updateOrCreate(
-                    ['internship_id' => $iId, 'criteria_id' => $cId],
+                    ['user_id' => Auth::id(), 'internship_id' => $iId, 'criteria_id' => $cId],
                     ['score' => $scoreValue]
                 );
                 $altScores[$cId] = $scoreValue;
@@ -102,8 +108,24 @@ class MooraApiController extends Controller
 
         $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
 
+        // Create Session
+        $session = MooraSession::create([
+            'user_id' => Auth::id(),
+            'winner_name' => !empty($results) ? $results[0]['name'] : null,
+            'max_optimization_value' => !empty($results) ? $results[0]['optimization_value'] : null,
+            'criteria_used' => $selectedCriteriaIds,
+        ]);
+
+        // Link evaluations to session
+        InternshipEvaluation::where('user_id', Auth::id())
+            ->whereIn('internship_id', $selectedInternshipIds)
+            ->whereIn('criteria_id', $selectedCriteriaIds)
+            ->whereNull('moora_session_id')
+            ->update(['moora_session_id' => $session->id]);
+
         return response()->json([
             'success' => true,
+            'session_id' => $session->id,
             'data' => $results
         ]);
     }

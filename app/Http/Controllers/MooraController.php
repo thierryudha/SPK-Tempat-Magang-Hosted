@@ -6,6 +6,7 @@ use App\Models\Criteria;
 use App\Models\Internship;
 use App\Models\UserCriteriaWeight;
 use App\Models\InternshipEvaluation;
+use App\Models\MooraSession;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -100,11 +101,26 @@ class MooraController extends Controller
 
         $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
 
-        // Map original scores back into results for display in Step 1 of Detail Perhitungan
+        // Create a new MOORA Session
+        $session = MooraSession::create([
+            'user_id' => Auth::id(),
+            'winner_name' => !empty($results) ? $results[0]['name'] : null,
+            'max_optimization_value' => !empty($results) ? $results[0]['optimization_value'] : null,
+            'criteria_used' => $selectedCriteriaIds,
+        ]);
+
+        // Map original scores back into results and save evaluations with session_id
         foreach ($results as &$res) {
             $res['original_scores'] = [];
             foreach ($selectedCriteriaIds as $cId) {
-                $res['original_scores'][$cId] = $scores[$res['id']][$cId];
+                $scoreValue = $scores[$res['id']][$cId];
+                $res['original_scores'][$cId] = $scoreValue;
+
+                // Update evaluations to link with the new session
+                InternshipEvaluation::where('user_id', Auth::id())
+                    ->where('internship_id', $res['id'])
+                    ->where('criteria_id', $cId)
+                    ->update(['moora_session_id' => $session->id]);
             }
         }
 

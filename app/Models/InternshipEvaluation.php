@@ -9,7 +9,12 @@ class InternshipEvaluation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'internship_id', 'criteria_id', 'score'];
+    protected $fillable = ['user_id', 'moora_session_id', 'internship_id', 'criteria_id', 'score'];
+
+    public function mooraSession()
+    {
+        return $this->belongsTo(MooraSession::class);
+    }
 
     public function user()
     {

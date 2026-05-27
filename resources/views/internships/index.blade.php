@@ -42,11 +42,11 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach($internships as $internship)
                                         <tr class="hover:bg-gray-50 transition">
-                                            <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{{ $internship->name }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ $internship->city }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900 capitalize">{{ $internship->name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 capitalize">{{ $internship->city }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-black rounded-full bg-blue-100 text-blue-800 uppercase tracking-tight">
-                                                    {{ $internship->category }}
+                                                <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-black rounded-full bg-blue-100 text-blue-800 uppercase tracking-tight capitalize">
+                                                    {{ $internship->category->name ?? 'Umum' }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -69,11 +69,11 @@
                             <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-sm">
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="flex-1">
-                                        <h4 class="font-black text-slate-900 text-lg leading-tight truncate">{{ $internship->name }}</h4>
-                                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">{{ $internship->city }}</p>
+                                        <h4 class="font-black text-slate-900 text-lg leading-tight truncate capitalize">{{ $internship->name }}</h4>
+                                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1 capitalize">{{ $internship->city }}</p>
                                     </div>
-                                    <span class="ml-2 px-3 py-1 text-[9px] font-black rounded-xl bg-blue-100 text-blue-700 uppercase whitespace-nowrap">
-                                        {{ $internship->category }}
+                                    <span class="ml-2 px-3 py-1 text-[9px] font-black rounded-xl bg-blue-100 text-blue-700 uppercase whitespace-nowrap capitalize">
+                                        {{ $internship->category->name ?? 'Umum' }}
                                     </span>
                                 </div>
                                 <div class="flex gap-3 mt-6">
@@ -85,7 +85,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="w-full flex items-center justify-center py-3 bg-red-50 text-red-600 font-black text-xs rounded-2xl active:scale-95 transition" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14"></path></svg>
                                             Hapus
                                         </button>
                                     </form>

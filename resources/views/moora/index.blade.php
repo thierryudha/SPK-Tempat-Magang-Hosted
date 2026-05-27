@@ -138,8 +138,8 @@
                                                class="w-5 h-5 rounded-full border-gray-300 text-emerald-600 focus:ring-emerald-500">
                                     </div>
                                     <div class="flex-1 overflow-hidden">
-                                        <div class="font-black text-gray-900 text-base md:text-lg leading-tight mb-2 group-hover:text-blue-600 transition truncate tracking-tight">{{ $internship->name }}</div>
-                                        <div class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest truncate">{{ $internship->city }} • {{ $internship->category }}</div>
+                                        <div class="font-black text-gray-900 text-base md:text-lg leading-tight mb-2 group-hover:text-blue-600 transition truncate tracking-tight capitalize">{{ $internship->name }}</div>
+                                        <div class="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest truncate capitalize">{{ $internship->city }} • {{ $internship->category->name ?? 'Umum' }}</div>
                                     </div>
                                 </label>
                                 @endforeach
@@ -171,18 +171,18 @@
                             @foreach($internships as $internship)
                                 <template x-if="selectedInternships.includes('{{ $internship->id }}')">
                                     <div class="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 md:p-10 transition-all hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/50 group">
-                                        <div class="mb-8 pb-6 border-b border-slate-100">
+                                        <div class="mb-8 pb-6 border-b border-slate-100 text-capitalize">
                                             <h4 class="text-xl md:text-2xl font-black text-slate-900 leading-tight tracking-tight group-hover:text-blue-600 transition">{{ $internship->name }}</h4>
                                             <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
                                                 <span class="w-1.5 h-1.5 bg-slate-300 rounded-full"></span>
-                                                {{ $internship->city }} • {{ $internship->category }}
+                                                {{ $internship->city }} • {{ $internship->category->name ?? 'Umum' }}
                                             </p>
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-6 md:gap-8">
                                             @foreach($criterias as $criteria)
                                                 <template x-if="selectedCriterias['{{ $criteria->id }}']">
-                                                    <div class="space-y-2">
+                                                    <div class="space-y-2 text-capitalize">
                                                         <div class="ml-1 mb-2">
                                                             <label class="font-black text-gray-900 text-sm md:text-base leading-tight truncate tracking-tight block">
                                                                 {{ $criteria->name }}

@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class AdministratorController extends Controller
+{
+    public function index()
+    {
+        $admins = User::where('role', 'admin')->get();
+        return view('admin.administrators.index', compact('admins'));
+    }
+
+    public function create()
+    {
+        return view('admin.administrators.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'admin',
+        ]);
+
+        return redirect()->route('admin.administrators.index')->with('success', 'Administrator baru berhasil ditambahkan.');
+    }
+
+    public function edit(User $administrator)
+    {
+        if ($administrator->role !== 'admin') abort(404);
+        return view('admin.administrators.edit', ['admin' => $administrator]);
+    }
+
+    public function update(Request $request, User $administrator)
+    {
+        if ($administrator->role !== 'admin') abort(404);
+
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $administrator->id,
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
+
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'min:8']);
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $administrator->update($data);
+        return redirect()->route('admin.administrators.index')->with('success', 'Data administrator berhasil diperbarui.');
+    }
+
+    public function destroy(User $administrator)
+    {
+        if ($administrator->role !== 'admin' || $administrator->id === auth()->id()) {
+            abort(403, 'Anda tidak bisa menghapus akun ini.');
+        }
+        $administrator->delete();
+        return redirect()->route('admin.administrators.index')->with('success', 'Administrator berhasil dihapus.');
+    }
+}

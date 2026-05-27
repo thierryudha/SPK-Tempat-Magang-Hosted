@@ -31,30 +31,32 @@
                                 Rank #{{ $res['rank'] }}
                             </div>
                             <div class="text-4xl mb-4 text-center">{{ $index == 0 ? '🥇' : ($index == 1 ? '🥈' : '🥉') }}</div>
-                            <div class="text-xl font-black text-slate-900 text-center mb-2 truncate">{{ $res['name'] }}</div>
+                            <div class="text-xl font-black text-slate-900 text-center mb-2 truncate capitalize">{{ $res['name'] }}</div>
                             <div class="text-[10px] font-black text-blue-600 text-center uppercase tracking-[0.2em] bg-blue-50 py-2 rounded-xl">Yi: {{ number_format($res['optimization_value'], 4) }}</div>
                         </div>
                         @endforeach
                     </div>
 
-                    <!-- Table (Restored Design) -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-slate-100">
+                    <!-- Table (Unified Style with Tempat Magang) -->
+                    <div class="bg-white overflow-hidden border border-slate-100 rounded-2xl">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-slate-100">
+                                <thead class="bg-slate-900">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Tempat Magang</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai Akhir (Yi)</th>
+                                        <th class="px-8 py-6 text-left text-[11px] font-black text-slate-300 uppercase tracking-widest">Rank</th>
+                                        <th class="px-8 py-6 text-left text-[11px] font-black text-slate-300 uppercase tracking-widest">Nama Tempat Magang</th>
+                                        <th class="px-8 py-6 text-right text-[11px] font-black text-slate-300 uppercase tracking-widest">Nilai Akhir (Yi)</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-white divide-y divide-slate-50">
                                     @foreach($results as $res)
-                                    <tr class="{{ $res['rank'] == 1 ? 'bg-yellow-50' : '' }}">
-                                        <td class="px-6 py-4 whitespace-nowrap font-bold">#{{ $res['rank'] }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap font-semibold">{{ $res['name'] }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap font-bold text-blue-600">{{ number_format($res['optimization_value'], 4) }}</td>
-                                    </tr>
+                                        <tr class="{{ $res['rank'] == 1 ? 'bg-yellow-50/50' : '' }} hover:bg-slate-50 transition group">
+                                            <td class="px-8 py-5 whitespace-nowrap font-black text-slate-400">#{{ $res['rank'] }}</td>
+                                            <td class="px-8 py-5 whitespace-nowrap font-bold text-slate-700 capitalize">{{ $res['name'] }}</td>
+                                            <td class="px-8 py-5 whitespace-nowrap text-right font-black text-blue-600 font-mono italic">
+                                                {{ number_format($res['optimization_value'], 4) }}
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -72,11 +74,11 @@
 
                 <div x-show="open" x-transition class="mt-8 flex flex-col gap-10 md:gap-16 pb-12">
                     <!-- Step 1: Decision Matrix -->
-                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden text-capitalize">
                         <div class="mb-8">
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-lg">Langkah 1</span>
                             <h4 class="text-xl font-black text-slate-900 mt-3">Matriks Keputusan (X)</h4>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Menampilkan nilai skor asli untuk setiap kriteria pada setiap alternatif.</p>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed italic">Menampilkan nilai skor asli untuk setiap kriteria pada setiap alternatif.</p>
                         </div>
                         <div class="overflow-x-auto rounded-2xl border border-slate-100">
                             <table class="min-w-full text-xs text-left">
@@ -91,7 +93,7 @@
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach($results as $res)
                                     <tr>
-                                        <td class="p-4 font-bold text-slate-700">{{ $res['name'] }}</td>
+                                        <td class="p-4 font-bold text-slate-700 capitalize">{{ $res['name'] }}</td>
                                         @foreach($criterias as $c)
                                             <td class="p-4 font-mono text-center text-slate-600">{{ $res['original_scores'][$c->id] }}</td>
                                         @endforeach
@@ -103,11 +105,11 @@
                     </div>
 
                     <!-- Step 2: Normalization -->
-                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden text-capitalize">
                         <div class="mb-8">
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-lg">Langkah 2</span>
                             <h4 class="text-xl font-black text-slate-900 mt-3">Normalisasi Matriks (r<sub>ij</sub>)</h4>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Menghitung nilai normalisasi dengan rumus: <strong>r<sub>ij</sub> = x<sub>ij</sub> / √[Σ(x<sub>ij</sub>)²]</strong>.</p>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed italic">Menghitung nilai normalisasi dengan rumus standar MOORA.</p>
                         </div>
                         <div class="overflow-x-auto rounded-2xl border border-slate-100">
                             <table class="min-w-full text-xs text-left">
@@ -122,7 +124,7 @@
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach($results as $res)
                                     <tr>
-                                        <td class="p-4 font-bold text-slate-700">{{ $res['name'] }}</td>
+                                        <td class="p-4 font-bold text-slate-700 capitalize">{{ $res['name'] }}</td>
                                         @foreach($criterias as $c)
                                             <td class="p-4 font-mono text-center text-slate-500">{{ number_format($res['normalized_scores'][$c->id]['normalized'], 4) }}</td>
                                         @endforeach
@@ -134,11 +136,11 @@
                     </div>
 
                     <!-- Step 3: Weighted Normalization -->
-                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden text-capitalize">
                         <div class="mb-8">
                             <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-lg">Langkah 3</span>
                             <h4 class="text-xl font-black text-slate-900 mt-3">Matriks Terbobot (y<sub>ij</sub>)</h4>
-                            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Mengalikan nilai normalisasi dengan bobot kriteria: <strong>y<sub>ij</sub> = r<sub>ij</sub> * W<sub>j</sub></strong>.</p>
+                            <p class="text-sm text-slate-500 mt-2 leading-relaxed italic">Mengalikan nilai normalisasi dengan bobot kepentingan kriteria.</p>
                         </div>
                         <div class="overflow-x-auto rounded-2xl border border-slate-100">
                             <table class="min-w-full text-xs text-left">
@@ -153,9 +155,9 @@
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach($results as $res)
                                     <tr>
-                                        <td class="p-4 font-bold text-slate-700">{{ $res['name'] }}</td>
+                                        <td class="p-4 font-bold text-slate-700 capitalize">{{ $res['name'] }}</td>
                                         @foreach($criterias as $c)
-                                            <td class="p-4 font-mono text-center text-emerald-600 font-bold">{{ number_format($res['normalized_scores'][$c->id]['weighted'], 4) }}</td>
+                                            <td class="p-4 font-mono text-center text-emerald-600 font-black">{{ number_format($res['normalized_scores'][$c->id]['weighted'], 4) }}</td>
                                         @endforeach
                                     </tr>
                                     @endforeach
@@ -165,21 +167,21 @@
                     </div>
 
                     <!-- Step 4: Optimization Value -->
-                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden text-capitalize">
                         <div class="mb-8">
                             <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest rounded-lg">Langkah 4</span>
                             <h4 class="text-xl font-black text-slate-900 mt-3">Nilai Optimasi (Yi)</h4>
-                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Mengurangi total nilai kriteria <strong>Benefit</strong> dengan total nilai kriteria <strong>Cost</strong>: <strong>Yi = Σy<sub>benefit</sub> - Σy<sub>cost</sub></strong>.</p>
+                            <p class="text-sm text-gray-500 mt-2 leading-relaxed italic italic">Finalisasi skor untuk menentukan urutan rekomendasi terbaik.</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             @foreach($results as $res)
                             <div class="p-6 bg-slate-50 rounded-[1.5rem] border border-slate-100 flex flex-col justify-between hover:bg-white transition hover:shadow-md">
                                 <div class="flex justify-between items-start mb-4">
-                                    <p class="font-black text-slate-900">{{ $res['name'] }}</p>
+                                    <p class="font-black text-slate-900 capitalize">{{ $res['name'] }}</p>
                                     <span class="px-2 py-1 bg-white border border-slate-100 rounded-lg text-[9px] font-black text-slate-400">Rank #{{ $res['rank'] }}</span>
                                 </div>
                                 <div class="flex items-end justify-between">
-                                    <div class="text-[9px] text-slate-400 font-bold uppercase">
+                                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
                                         <div class="text-emerald-500">ΣB: {{ number_format($res['sum_benefit'], 4) }}</div>
                                         <div class="text-rose-500">ΣC: {{ number_format($res['sum_cost'], 4) }}</div>
                                     </div>
@@ -193,8 +195,8 @@
             </div>
 
             <div class="mt-12 flex flex-col sm:flex-row justify-start gap-4">
-                <a href="{{ route('moora.index') }}" class="px-8 py-4 bg-white text-slate-500 font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition text-center">Hitung Ulang</a>
-                <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-center">Kembali ke Dashboard</a>
+                <a href="{{ route('moora.index') }}" class="px-8 py-4 bg-white text-slate-500 font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition text-center uppercase text-[10px] tracking-widest">Hitung Ulang</a>
+                <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-center uppercase text-[10px] tracking-widest">Dashboard</a>
             </div>
         </div>
     </div>

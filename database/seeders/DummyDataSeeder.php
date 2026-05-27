@@ -7,6 +7,8 @@ use App\Models\Internship;
 use App\Models\InternshipEvaluation;
 use App\Models\Criteria;
 use App\Models\UserCriteriaWeight;
+use App\Models\Category;
+use App\Models\MooraSession;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -16,129 +18,148 @@ class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $criterias = Criteria::all(); // C1 - C10
-        
-        $realCompanies = [
-            ['name' => 'Gojek', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'Tokopedia', 'city' => 'Jakarta Barat', 'cat' => 'E-commerce'],
-            ['name' => 'Traveloka', 'city' => 'Tangerang', 'cat' => 'Fintech Startup'],
-            ['name' => 'Bukalapak', 'city' => 'Jakarta Selatan', 'cat' => 'E-commerce'],
-            ['name' => 'Dana', 'city' => 'Jakarta Pusat', 'cat' => 'Fintech Startup'],
-            ['name' => 'Shopee', 'city' => 'Jakarta Selatan', 'cat' => 'E-commerce'],
-            ['name' => 'Lazada', 'city' => 'Jakarta Selatan', 'cat' => 'E-commerce'],
-            ['name' => 'Blibli', 'city' => 'Jakarta Pusat', 'cat' => 'E-commerce'],
-            ['name' => 'eFishery', 'city' => 'Bandung', 'cat' => 'Agriculture Tech'],
-            ['name' => 'Ruangguru', 'city' => 'Jakarta Selatan', 'cat' => 'Edutech'],
-            ['name' => 'Halodoc', 'city' => 'Jakarta Selatan', 'cat' => 'Healthtech'],
-            ['name' => 'Ajaib', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'Xendit', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'Bibit', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'Kopi Kenangan', 'city' => 'Jakarta Selatan', 'cat' => 'Retail'],
-            ['name' => 'J&T Express', 'city' => 'Jakarta Barat', 'cat' => 'Logistics'],
-            ['name' => 'SiCepat', 'city' => 'Jakarta Utara', 'cat' => 'Logistics'],
-            ['name' => 'GITS Indonesia', 'city' => 'Bandung', 'cat' => 'Software House'],
-            ['name' => 'Agate International', 'city' => 'Bandung', 'cat' => 'Game Development'],
-            ['name' => 'TIX ID', 'city' => 'Jakarta Pusat', 'cat' => 'Fintech Startup'],
-            ['name' => 'Payfazz', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'Moka POS', 'city' => 'Jakarta Selatan', 'cat' => 'Software House'],
-            ['name' => 'Flip', 'city' => 'Depok', 'cat' => 'Fintech Startup'],
-            ['name' => 'Pahamify', 'city' => 'Bogor', 'cat' => 'Edutech'],
-            ['name' => 'Kredivo', 'city' => 'Jakarta Selatan', 'cat' => 'Fintech Startup'],
-            ['name' => 'BCA', 'city' => 'Jakarta Pusat', 'cat' => 'Banking & Finance'],
-            ['name' => 'Bank Mandiri', 'city' => 'Jakarta Pusat', 'cat' => 'Banking & Finance'],
-            ['name' => 'Bank BRI', 'city' => 'Jakarta Pusat', 'cat' => 'Banking & Finance'],
-            ['name' => 'Bank BNI', 'city' => 'Jakarta Pusat', 'cat' => 'Banking & Finance'],
-            ['name' => 'Telkom Indonesia', 'city' => 'Bandung', 'cat' => 'Telecommunications'],
-            ['name' => 'Pertamina', 'city' => 'Jakarta Pusat', 'cat' => 'Oil & Gas'],
-            ['name' => 'Astra International', 'city' => 'Jakarta Utara', 'cat' => 'Automotive'],
-            ['name' => 'Unilever Indonesia', 'city' => 'Tangerang', 'cat' => 'FMCG'],
-            ['name' => 'Indofood', 'city' => 'Jakarta Selatan', 'cat' => 'FMCG'],
-            ['name' => 'Mayora', 'city' => 'Tangerang', 'cat' => 'FMCG'],
-            ['name' => 'Adaro Energy', 'city' => 'Jakarta Selatan', 'cat' => 'Oil & Gas'],
-            ['name' => 'Garuda Indonesia', 'city' => 'Tangerang', 'cat' => 'Aviation'],
-            ['name' => 'Gudang Garam', 'city' => 'Kediri', 'cat' => 'Manufacturing'],
-            ['name' => 'HMSP (Sampoerna)', 'city' => 'Surabaya', 'cat' => 'Manufacturing'],
-            ['name' => 'PLN', 'city' => 'Jakarta Selatan', 'cat' => 'BUMN'],
-            ['name' => 'Bank Indonesia', 'city' => 'Jakarta Pusat', 'cat' => 'Lembaga Negara'],
-            ['name' => 'OJK', 'city' => 'Jakarta Pusat', 'cat' => 'Lembaga Negara'],
-            ['name' => 'Kemenkeu RI', 'city' => 'Jakarta Pusat', 'cat' => 'Lembaga Negara'],
-            ['name' => 'Narasi', 'city' => 'Jakarta Selatan', 'cat' => 'Media & Broadcasting'],
-            ['name' => 'IDN Media', 'city' => 'Jakarta Selatan', 'cat' => 'Media & Broadcasting'],
-            ['name' => 'Kumparan', 'city' => 'Jakarta Selatan', 'cat' => 'Media & Broadcasting'],
-            ['name' => 'Metro TV', 'city' => 'Jakarta Barat', 'cat' => 'Media & Broadcasting'],
-            ['name' => 'Kompas Gramedia', 'city' => 'Jakarta Pusat', 'cat' => 'Media & Broadcasting'],
-            ['name' => 'BPJS Kesehatan', 'city' => 'Jakarta Pusat', 'cat' => 'BUMN'],
-            ['name' => 'Telkomsel', 'city' => 'Jakarta Selatan', 'cat' => 'Telecommunications'],
+        // 1. Categories (10 Categories)
+        $catNames = [
+            'Fintech Startup', 'E-Commerce', 'BUMN / Government', 'Software House', 
+            'Creative Agency', 'Healthtech', 'Edutech', 'Energy & Mining', 
+            'Telecommunication', 'Retail & FMCG'
         ];
-
-        // Create Global Internships
-        $internshipModels = [];
-        foreach ($realCompanies as $company) {
-            $internshipModels[] = Internship::updateOrCreate(
-                ['name' => $company['name']],
-                [
-                    'city' => $company['city'],
-                    'category' => $company['cat'],
-                    'description' => "Program magang profesional di " . $company['name'],
-                ]
-            );
+        $categories = [];
+        foreach ($catNames as $name) {
+            $categories[$name] = Category::updateOrCreate(['name' => $name])->id;
         }
 
-        // Personas with Varying Dates for Trend
+        // 2. Real Personas (20 Users) with wave-like registration dates
         $personas = [
-            ['name' => 'Rizky', 'email' => 'rizky@example.com', 'days' => 360],
-            ['name' => 'Siti', 'email' => 'siti@example.com', 'days' => 350],
-            ['name' => 'Budi', 'email' => 'budi@example.com', 'days' => 270],
-            ['name' => 'Dewi', 'email' => 'dewi@example.com', 'days' => 260],
-            ['name' => 'Ahmad', 'email' => 'ahmad@example.com', 'days' => 250],
-            ['name' => 'Putri', 'email' => 'putri@example.com', 'days' => 180],
-            ['name' => 'Fajar', 'email' => 'fajar@example.com', 'days' => 170],
-            ['name' => 'Lestari', 'email' => 'lestari@example.com', 'days' => 160],
-            ['name' => 'Eko', 'email' => 'eko@example.com', 'days' => 90],
-            ['name' => 'Sari', 'email' => 'sari@example.com', 'days' => 80],
-            ['name' => 'Aditya', 'email' => 'aditya@example.com', 'days' => 70],
-            ['name' => 'Neni', 'email' => 'neni@example.com', 'days' => 30],
-            ['name' => 'Hendra', 'email' => 'hendra@example.com', 'days' => 20],
-            ['name' => 'Rina', 'email' => 'rina@example.com', 'days' => 10],
-            ['name' => 'Agus', 'email' => 'agus@example.com', 'days' => 5],
-            ['name' => 'Maya', 'email' => 'maya@example.com', 'days' => 2],
+            ['name' => 'Rizky Amalia', 'email' => 'rizky@example.com', 'days' => 170],
+            ['name' => 'Siti Aminah', 'email' => 'siti@example.com', 'days' => 165],
+            ['name' => 'Budi Santoso', 'email' => 'budi@example.com', 'days' => 162],
+            ['name' => 'Dewi Lestari', 'email' => 'dewi@example.com', 'days' => 140],
+            ['name' => 'Eko Prasetyo', 'email' => 'eko@example.com', 'days' => 135],
+            ['name' => 'Fitriani', 'email' => 'fitri@example.com', 'days' => 110],
+            ['name' => 'Guntur Ginting', 'email' => 'guntur@example.com', 'days' => 105],
+            ['name' => 'Hani Handayani', 'email' => 'hani@example.com', 'days' => 90],
+            ['name' => 'Irfan Bachdim', 'email' => 'irfan@example.com', 'days' => 88],
+            ['name' => 'Joko Widodo', 'email' => 'joko@example.com', 'days' => 85],
+            ['name' => 'Kiki Fatmala', 'email' => 'kiki@example.com', 'days' => 70],
+            ['name' => 'Lutfi Agizal', 'email' => 'lutfi@example.com', 'days' => 65],
+            ['name' => 'Mamat Alkatiri', 'email' => 'mamat@example.com', 'days' => 50],
+            ['name' => 'Neni', 'email' => 'neni@example.com', 'days' => 45],
+            ['name' => 'Agus', 'email' => 'agus@example.com', 'days' => 42],
+            ['name' => 'Maya', 'email' => 'maya@example.com', 'days' => 30],
+            ['name' => 'Andi Saputra', 'email' => 'andi.saputra@example.com', 'days' => 25],
+            ['name' => 'Bambang Hermawan', 'email' => 'bams.hermawan@example.com', 'days' => 20],
+            ['name' => 'Citra Lestari', 'email' => 'citra.lestari@example.com', 'days' => 10],
+            ['name' => 'Dedi Kusnadi', 'email' => 'dedi.kusnadi@example.com', 'days' => 5],
         ];
 
         foreach ($personas as $p) {
-            $user = User::updateOrCreate(
+            User::updateOrCreate(
                 ['email' => $p['email']],
                 [
                     'name' => $p['name'],
                     'password' => Hash::make('password123'),
-                    'created_at' => Carbon::now()->subDays($p['days'])
+                    'role' => 'user',
+                    'created_at' => Carbon::now()->subDays($p['days']),
                 ]
             );
+        }
 
-            // Randomize criteria weights
-            $selectedCriteria = $criterias->random(rand(4, 8));
-            $totalWeight = 100;
-            $count = $selectedCriteria->count();
-            foreach ($selectedCriteria as $index => $c) {
-                if ($index === $count - 1) { $weight = $totalWeight; } 
-                else { 
-                    $max = max(5, floor($totalWeight - (($count - $index - 1) * 5)));
-                    $weight = rand(5, min(40, $max)); 
-                    $totalWeight -= $weight; 
-                }
+        // 3. Internships (25 Internships)
+        $internshipsData = [
+            ['name' => 'Tokopedia', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
+            ['name' => 'Gojek', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
+            ['name' => 'Shopee', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
+            ['name' => 'Bukalapak', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
+            ['name' => 'Traveloka', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
+            ['name' => 'Bank Mandiri', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
+            ['name' => 'Telkom Indonesia', 'city' => 'Bandung', 'category' => 'Telecommunication'],
+            ['name' => 'Pertamina', 'city' => 'Jakarta', 'category' => 'Energy & Mining'],
+            ['name' => 'Astra International', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
+            ['name' => 'Traveloka Paylaters', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
+            ['name' => 'Dana', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
+            ['name' => 'OVO', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
+            ['name' => 'BCA', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
+            ['name' => 'Indomie (ICBP)', 'city' => 'Jakarta', 'category' => 'Retail & FMCG'],
+            ['name' => 'Unilever', 'city' => 'Tangerang', 'category' => 'Retail & FMCG'],
+            ['name' => 'Ruangguru', 'city' => 'Jakarta', 'category' => 'Edutech'],
+            ['name' => 'Zenius', 'city' => 'Jakarta', 'category' => 'Edutech'],
+            ['name' => 'Halodoc', 'city' => 'Jakarta', 'category' => 'Healthtech'],
+            ['name' => 'Alodokter', 'city' => 'Jakarta', 'category' => 'Healthtech'],
+            ['name' => 'PLN', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
+            ['name' => 'Bukit Asam', 'city' => 'Palembang', 'category' => 'Energy & Mining'],
+            ['name' => 'Adaro Energy', 'city' => 'Jakarta', 'category' => 'Energy & Mining'],
+            ['name' => 'Kumparan', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
+            ['name' => 'IDN Times', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
+            ['name' => 'Detikcom', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
+        ];
+
+        foreach ($internshipsData as $data) {
+            Internship::updateOrCreate(
+                ['name' => $data['name']],
+                [
+                    'city' => $data['city'],
+                    'category_id' => $categories[$data['category']],
+                    'description' => 'Dummy description for ' . $data['name']
+                ]
+            );
+        }
+
+        // 4. Randomized Activity for Dotted Line Charts (5-8 sessions per user)
+        $users = User::where('role', 'user')->get();
+        $internships = Internship::all();
+        $criterias = Criteria::all();
+
+        foreach ($users as $user) {
+            // Set user weights
+            foreach ($criterias as $c) {
                 UserCriteriaWeight::updateOrCreate(
                     ['user_id' => $user->id, 'criteria_id' => $c->id],
-                    ['weight' => $weight]
+                    ['weight' => rand(1, 5)]
                 );
             }
 
-            // Each user evaluates 3-5 random companies
-            $userCompanies = collect($internshipModels)->random(rand(3, 5));
-            foreach ($userCompanies as $internship) {
-                foreach ($criterias as $c) {
-                    InternshipEvaluation::updateOrCreate(
-                        ['user_id' => $user->id, 'internship_id' => $internship->id, 'criteria_id' => $c->id],
-                        ['score' => rand(1, 5)]
-                    );
+            // Perform 5-8 MOORA sessions per user spread across last 30 days
+            $sessionCount = rand(5, 8);
+            for ($s = 0; $s < $sessionCount; $s++) {
+                $sessionDate = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
+                
+                $session = MooraSession::create([
+                    'user_id' => $user->id,
+                    'winner_name' => $internships->random()->name,
+                    'max_optimization_value' => rand(50, 95) / 100,
+                    'criteria_used' => $criterias->pluck('id')->toArray(),
+                    'created_at' => $sessionDate,
+                    'updated_at' => $sessionDate
+                ]);
+
+                // Evaluations for this session
+                $internshipSample = $internships->random(rand(4, 6));
+                foreach ($internshipSample as $intern) {
+                    foreach ($criterias as $crit) {
+                        // Use raw insert to bypass model event or just unique check if needed
+                        // But since session_id is new for every session, it should be fine 
+                        // as long as user-intern-crit is unique per session if that was the constraint.
+                        // Wait, the unique index is eval_user_intern_crit_unique.
+                        // I must DELETE old evaluations for this user-intern-crit combo to simulate the 
+                        // "most recent state" or just avoid the duplicate key error.
+                        
+                        DB::table('internship_evaluations')
+                            ->where('user_id', $user->id)
+                            ->where('internship_id', $intern->id)
+                            ->where('criteria_id', $crit->id)
+                            ->delete();
+
+                        DB::table('internship_evaluations')->insert([
+                            'user_id' => $user->id,
+                            'moora_session_id' => $session->id,
+                            'internship_id' => $intern->id,
+                            'criteria_id' => $crit->id,
+                            'score' => rand(1, 5),
+                            'created_at' => $sessionDate,
+                            'updated_at' => $sessionDate
+                        ]);
+                    }
                 }
             }
         }

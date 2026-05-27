@@ -12,7 +12,7 @@ class InternshipApiController extends Controller
 {
     public function index()
     {
-        $internships = Auth::user()->internships()->latest()->get();
+        $internships = Internship::with('category')->latest()->get();
         return response()->json([
             'success' => true,
             'data' => $internships
@@ -22,25 +22,13 @@ class InternshipApiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:internships',
             'city' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
         ]);
 
-        $exists = Auth::user()->internships()
-            ->where('name', $validated['name'])
-            ->where('city', $validated['city'])
-            ->exists();
-
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda sudah menambahkan tempat magang ini sebelumnya di kota yang sama.'
-            ], 422);
-        }
-
-        $internship = Auth::user()->internships()->create($validated);
+        $internship = Internship::create($validated);
 
         return response()->json([
             'success' => true,

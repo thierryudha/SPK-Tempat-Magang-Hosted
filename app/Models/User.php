@@ -22,7 +22,13 @@ class User extends Authenticatable
         'email',
         'password',
         'photo',
+        'role',
     ];
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 
     public function weights()
     {
