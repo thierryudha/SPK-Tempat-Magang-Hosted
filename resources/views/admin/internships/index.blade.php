@@ -19,32 +19,33 @@
         @endif
 
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full">
                     <thead>
                         <tr class="bg-slate-900 border-b border-slate-800">
-                            <th class="px-8 py-5 text-[11px] font-bold text-slate-300 tracking-widest">Nama Perusahaan</th>
-                            <th class="px-8 py-5 text-[11px] font-bold text-slate-300 tracking-widest">Bidang / Sektor</th>
-                            <th class="px-8 py-5 text-[11px] font-bold text-slate-300 tracking-widest">Kota</th>
-                            <th class="px-8 py-5 text-[11px] font-bold text-slate-300 tracking-widest text-right">Tindakan</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Nama Perusahaan</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Bidang / Sektor</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Kota</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @foreach($internships as $i)
                         <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <p class="text-sm font-bold text-slate-700 capitalize tracking-tight">{{ $i->name }}</p>
                             </td>
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg border border-blue-100 italic capitalize">
                                     {{ $i->category->name ?? 'Umum' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <p class="text-xs font-bold text-slate-500 capitalize tracking-tight">{{ $i->city }}</p>
                             </td>
-                            <td class="px-8 py-5">
-                                <div class="flex justify-end gap-3">
+                            <td class="px-8 py-5 text-center">
+                                <div class="flex justify-center gap-3">
                                     <a href="{{ route('admin.internships.edit', $i) }}" class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
@@ -61,6 +62,35 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden divide-y divide-slate-50">
+                @foreach($internships as $i)
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <h4 class="font-black text-slate-900 text-base leading-tight capitalize">{{ $i->name }}</h4>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 capitalize">{{ $i->city }}</p>
+                        </div>
+                        <span class="ml-2 px-2 py-1 text-[8px] font-black rounded-lg bg-blue-100 text-blue-700 uppercase whitespace-nowrap capitalize">
+                            {{ $i->category->name ?? 'Umum' }}
+                        </span>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                        <a href="{{ route('admin.internships.edit', $i) }}" class="flex-1 flex items-center justify-center py-2.5 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-xl shadow-sm active:scale-95 transition">
+                            Edit
+                        </a>
+                        <form action="{{ route('admin.internships.destroy', $i) }}" method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full flex items-center justify-center py-2.5 bg-red-50 text-red-600 font-black text-[10px] uppercase tracking-widest rounded-xl active:scale-95 transition" onclick="return confirm('Yakin ingin menghapus perusahaan ini?')">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>

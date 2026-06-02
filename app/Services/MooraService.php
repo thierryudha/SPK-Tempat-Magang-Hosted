@@ -17,41 +17,28 @@ class MooraService
             return [];
         }
 
-        // 1. Prepare Decision Matrix with score inversion for 'Cost'
+        // 1. Prepare Decision Matrix (Using original scores)
         $processedAlternatives = [];
         foreach ($alternatives as $alt) {
-            $processedScores = [];
-            foreach ($criteria as $c) {
-                $originalScore = $alt['scores'][$c['id']] ?? 0;
-                
-                // Logic inversion for MOORA: 
-                // For 'Benefit', high score is good (5 = 5).
-                // For 'Cost', low input is good (1 = 5, 5 = 1).
-                if (strtolower($c['type']) === 'cost') {
-                    $processedScores[$c['id']] = 6 - $originalScore;
-                } else {
-                    $processedScores[$c['id']] = $originalScore;
-                }
-            }
             $processedAlternatives[] = [
                 'id' => $alt['id'],
                 'name' => $alt['name'],
-                'original_scores' => $alt['scores'], // keep for reference
-                'scores' => $processedScores // used for calculation
+                'scores' => $alt['scores']
             ];
         }
 
-        // 2. Calculate Square Sum for each criteria (using processed scores)
+        // 2. Calculate Square Sum for each criteria (Normalization denominator)
         $squareSums = [];
         foreach ($criteria as $c) {
             $sum = 0;
             foreach ($processedAlternatives as $alt) {
-                $sum += pow($alt['scores'][$c['id']], 2);
+                $score = $alt['scores'][$c['id']] ?? 0;
+                $sum += pow($score, 2);
             }
             $squareSums[$c['id']] = sqrt($sum);
         }
 
-        // 3. Normalization and Weighted Normalization
+        // 3. Normalization, Weighting, and Yi Calculation
         $results = [];
         foreach ($processedAlternatives as $alt) {
             $sumBenefit = 0;
@@ -59,37 +46,48 @@ class MooraService
             $normalizedScores = [];
 
             foreach ($criteria as $c) {
-                $score = $alt['scores'][$c['id']];
+                $score = $alt['scores'][$c['id']] ?? 0;
                 
-                // Avoid division by zero
-                $normalized = ($squareSums[$c['id']] != 0) ? ($score / $squareSums[$c['id']]) : 0;
-                $weighted = $normalized * ($c['weight'] / 100);
+                // Use original scores as requested in standard MOORA
+                $calculationScore = $score;
+
+                // Normalization: x / sqrt(sum(x^2))
+                $normalized = ($squareSums[$c['id']] != 0) ? ($calculationScore / $squareSums[$c['id']]) : 0;
+                
+                // Weighting: normalized * weight
+                // In your example: $normal * $bobot
+                $weighted = $normalized * ($c['weight']);
                 
                 $normalizedScores[$c['id']] = [
                     'normalized' => $normalized,
                     'weighted' => $weighted
                 ];
 
-                // NOTE: Since we already inverted Cost scores in Step 1, 
-                // all criteria are now treated as "more is better" (Benefit-like).
-                // So we add all weighted scores to sumBenefit.
-                $sumBenefit += $weighted;
+                // Standard MOORA Optimization: 
+                // Sum Benefit and Sum Cost separately
+                if (strtolower($c['type']) === 'cost') {
+                    $sumCost += $weighted;
+                } else {
+                    $sumBenefit += $weighted;
+                }
             }
 
-            $optimizationValue = $sumBenefit; // No subtraction needed because costs are already inverted
+            // Optimization Value (Yi) = SUM(Benefit) - SUM(Cost)
+            // As per your example step 9: optimasi += normal * (type == 'benefit' ? 1 : -1) * bobot
+            $optimizationValue = $sumBenefit - $sumCost;
 
             $results[] = [
                 'id' => $alt['id'],
                 'name' => $alt['name'],
-                'scores' => $alt['original_scores'],
+                'scores' => $alt['scores'],
                 'normalized_scores' => $normalizedScores,
                 'sum_benefit' => $sumBenefit,
-                'sum_cost' => 0,
+                'sum_cost' => $sumCost,
                 'optimization_value' => $optimizationValue
             ];
         }
 
-        // 4. Ranking
+        // 4. Ranking based on Optimization Value (Yi)
         usort($results, function ($a, $b) {
             return $b['optimization_value'] <=> $a['optimization_value'];
         });

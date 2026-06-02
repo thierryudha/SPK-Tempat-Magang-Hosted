@@ -19,32 +19,33 @@
         @endif
 
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full">
                     <thead>
                         <tr class="bg-slate-900 border-b border-slate-800">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Kode</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Nama Kriteria Penilaian</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Tipe</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-right">Aksi</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Kode</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Nama Kriteria Penilaian</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Tipe</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @foreach($criterias as $c)
                         <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <span class="px-3 py-1 bg-slate-100 text-slate-700 text-[10px] font-black rounded-lg border border-slate-200">{{ $c->code }}</span>
                             </td>
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <p class="text-sm font-bold text-slate-700">{{ $c->name }}</p>
                             </td>
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <span class="px-3 py-1 {{ $c->type == 'benefit' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }} text-[9px] font-black uppercase rounded-lg border italic">
                                     {{ $c->type }}
                                 </span>
                             </td>
-                            <td class="px-8 py-5">
-                                <div class="flex justify-end gap-3">
+                            <td class="px-8 py-5 text-center">
+                                <div class="flex justify-center gap-3">
                                     <a href="{{ route('admin.criterias.edit', $c) }}" class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
@@ -61,6 +62,35 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden divide-y divide-slate-50">
+                @foreach($criterias as $c)
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 text-[9px] font-black rounded-md border border-slate-200 mb-2 inline-block">{{ $c->code }}</span>
+                            <h4 class="font-black text-slate-900 text-base leading-tight">{{ $c->name }}</h4>
+                        </div>
+                        <span class="px-2 py-1 {{ $c->type == 'benefit' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }} text-[8px] font-black uppercase rounded-lg border italic">
+                            {{ $c->type }}
+                        </span>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                        <a href="{{ route('admin.criterias.edit', $c) }}" class="flex-1 flex items-center justify-center py-2.5 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-xl shadow-sm active:scale-95 transition">
+                            Edit
+                        </a>
+                        <form action="{{ route('admin.criterias.destroy', $c) }}" method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full flex items-center justify-center py-2.5 bg-red-50 text-red-600 font-black text-[10px] uppercase tracking-widest rounded-xl active:scale-95 transition" onclick="return confirm('Yakin ingin menghapus kriteria ini?')">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>

@@ -19,22 +19,23 @@
         @endif
 
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden w-full">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full">
                     <thead>
                         <tr class="bg-slate-900 border-b border-slate-800">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Nama Bidang / Sektor Industri</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-right">Tindakan Pengelola</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Nama Bidang / Sektor Industri</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Tindakan Pengelola</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @foreach($categories as $cat)
                         <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5">
+                            <td class="px-8 py-5 text-center">
                                 <p class="text-sm font-bold text-slate-700">{{ $cat->name }}</p>
                             </td>
-                            <td class="px-8 py-5">
-                                <div class="flex justify-end gap-3">
+                            <td class="px-8 py-5 text-center">
+                                <div class="flex justify-center gap-3">
                                     <a href="{{ route('admin.categories.edit', $cat) }}" class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
@@ -51,6 +52,27 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden divide-y divide-slate-50">
+                @foreach($categories as $cat)
+                <div class="p-6 text-center">
+                    <h4 class="font-black text-slate-900 text-base leading-tight mb-4">{{ $cat->name }}</h4>
+                    <div class="flex gap-3 mt-4">
+                        <a href="{{ route('admin.categories.edit', $cat) }}" class="flex-1 flex items-center justify-center py-2.5 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-xl shadow-sm active:scale-95 transition">
+                            Edit
+                        </a>
+                        <form action="{{ route('admin.categories.destroy', $cat) }}" method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full flex items-center justify-center py-2.5 bg-red-50 text-red-600 font-black text-[10px] uppercase tracking-widest rounded-xl active:scale-95 transition" onclick="return confirm('Hapus bidang ini?')">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>

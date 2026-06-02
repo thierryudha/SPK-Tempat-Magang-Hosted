@@ -43,17 +43,17 @@
                             <table class="min-w-full divide-y divide-slate-100">
                                 <thead class="bg-slate-900">
                                     <tr>
-                                        <th class="px-8 py-6 text-left text-[11px] font-black text-slate-300 uppercase tracking-widest">Rank</th>
-                                        <th class="px-8 py-6 text-left text-[11px] font-black text-slate-300 uppercase tracking-widest">Nama Tempat Magang</th>
-                                        <th class="px-8 py-6 text-right text-[11px] font-black text-slate-300 uppercase tracking-widest">Nilai Akhir (Yi)</th>
+                                        <th class="px-8 py-5 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Rank</th>
+                                        <th class="px-8 py-5 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Nama Tempat Magang</th>
+                                        <th class="px-8 py-5 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Nilai Akhir (Yi)</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-slate-50">
                                     @foreach($results as $res)
                                         <tr class="{{ $res['rank'] == 1 ? 'bg-yellow-50/50' : '' }} hover:bg-slate-50 transition group">
-                                            <td class="px-8 py-5 whitespace-nowrap font-black text-slate-400">#{{ $res['rank'] }}</td>
-                                            <td class="px-8 py-5 whitespace-nowrap font-bold text-slate-700 capitalize">{{ $res['name'] }}</td>
-                                            <td class="px-8 py-5 whitespace-nowrap text-right font-black text-blue-600 font-mono italic">
+                                            <td class="px-8 py-5 whitespace-nowrap font-black text-slate-400 text-center">#{{ $res['rank'] }}</td>
+                                            <td class="px-8 py-5 whitespace-nowrap font-bold text-slate-700 capitalize text-center">{{ $res['name'] }}</td>
+                                            <td class="px-8 py-5 whitespace-nowrap text-center font-black text-blue-600 font-mono italic">
                                                 {{ number_format($res['optimization_value'], 4) }}
                                             </td>
                                         </tr>
@@ -195,8 +195,8 @@
             </div>
 
             <div class="mt-12 flex flex-col sm:flex-row justify-start gap-4">
-                <a href="{{ route('moora.index') }}" class="px-8 py-4 bg-white text-slate-500 font-black rounded-2xl border-2 border-slate-100 hover:bg-slate-50 transition text-center uppercase text-[10px] tracking-widest">Hitung Ulang</a>
-                <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-center uppercase text-[10px] tracking-widest">Dashboard</a>
+                <a href="{{ route('moora.index') }}" class="px-8 py-4 text-slate-500 font-black hover:text-slate-700 transition text-sm md:text-base">Kembali</a>
+                <a href="{{ route('dashboard') }}" class="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition transform active:scale-95 text-sm md:text-base text-center">Kembali ke Dashboard</a>
             </div>
         </div>
     </div>

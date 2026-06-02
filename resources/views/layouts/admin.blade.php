@@ -21,31 +21,63 @@
         
         [x-cloak] { display: none !important; }
         
-        /* Rigid Clean Layout */
-        .admin-wrapper {
-            display: grid;
-            grid-template-columns: 250px 1fr; /* Narrower Sidebar */
+        /* Layout Structure */
+        .admin-layout {
+            display: flex;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            background-color: #f8fafc;
         }
 
         .admin-sidebar {
+            width: 280px;
             background-color: #ffffff;
             border-right: 1px solid #f1f5f9;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            overflow: hidden;
+            height: 100vh;
+            flex-shrink: 0;
+            transition: all 0.3s ease-in-out;
+            z-index: 50;
         }
 
         .admin-main {
-            background-color: #f8fafc;
-            height: 100%;
-            overflow-y: auto;
+            flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+            position: relative;
         }
+
+        .admin-header {
+            height: 80px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            flex-shrink: 0;
+        }
+
+        .admin-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background-color: #f8fafc;
+        }
+
+        /* Center all table content */
+        table th, table td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        /* Keep action columns or specific columns if needed, but user requested all */
+        .text-right { text-align: right !important; }
+        .text-left { text-align: left !important; }
 
         /* Standardized Action Icons */
         .action-btn {
@@ -61,16 +93,39 @@
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
+
+        /* Responsive Fixes */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+            }
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            .admin-header {
+                padding: 0 24px;
+            }
+            .admin-content {
+                padding: 24px;
+            }
+        }
     </style>
 </head>
-<body class="h-full antialiased text-slate-900 overflow-hidden">
+<body class="h-full antialiased text-slate-900 overflow-hidden" x-data="{ sidebarOpen: false }">
     
-    <div class="admin-wrapper">
+    <div class="admin-layout">
         
-        <!-- SIDEBAR (CLEAN STYLE) -->
-        <aside class="admin-sidebar">
-            <div class="h-20 flex items-center px-8 border-b border-slate-50 flex-shrink-0">
+        <!-- SIDEBAR -->
+        <aside :class="sidebarOpen ? 'open' : ''" class="admin-sidebar">
+            <div class="h-20 flex items-center justify-between px-8 border-b border-slate-50 flex-shrink-0">
                 <span class="text-lg font-black tracking-tighter italic text-slate-900">Moora<span class="text-blue-600">Project</span></span>
+                <!-- Close Button (Mobile Only) -->
+                <button @click="sidebarOpen = false" class="lg:hidden text-slate-500 p-2 hover:bg-slate-50 rounded-xl transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             
             <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto custom-scrollbar">
@@ -114,7 +169,11 @@
             <div class="p-6 border-t border-slate-50 bg-slate-50/30">
                 <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 mb-6 group">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-blue-500/20 border-2 border-white transform rotate-3 group-hover:rotate-0 transition-transform">
-                        {{ substr(Auth::user()->name, 0, 1) }}
+                        @if(Auth::user()->photo)
+                            <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="w-full h-full object-cover rounded-xl">
+                        @else
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        @endif
                     </div>
                     <div class="overflow-hidden">
                         <p class="text-[11px] font-black text-slate-900 truncate uppercase tracking-tight">{{ Auth::user()->name }}</p>
@@ -123,7 +182,7 @@
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-red-500 bg-white border border-red-100 rounded-xl hover:bg-red-50 transition-all active:scale-95">
+                    <button type="submit" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-white bg-red-500 rounded-xl hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95">
                         Logout
                     </button>
                 </form>
@@ -132,23 +191,32 @@
 
         <!-- MAIN CONTENT -->
         <div class="admin-main">
-            <header class="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-10 flex-shrink-0 sticky top-0 z-30">
-                <div>
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1 italic">Moora System</h2>
-                    <p class="text-xs font-black text-slate-900 uppercase tracking-widest">Admin Control Panel</p>
+            <header class="admin-header">
+                <div class="flex items-center gap-4">
+                    <!-- Hamburger Mobile -->
+                    <button @click="sidebarOpen = true" class="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div>
+                        <h2 class="hidden md:block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1 italic">Moora System</h2>
+                        <p class="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest">Admin Control Panel</p>
+                    </div>
                 </div>
                 
-                <div class="flex items-center gap-6">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
+                <div class="flex items-center gap-4 lg:gap-6">
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        Switch to User View
+                        <span class="hidden sm:inline">Switch to User View</span>
                     </a>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ now()->format('d M Y') }}</span>
+                    <span class="hidden md:inline text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ now()->format('d M Y') }}</span>
                 </div>
             </header>
 
-            <main class="flex-1 p-10 custom-scrollbar">
-                <div class="max-w-[1400px]">
+            <!-- Overlay Mobile -->
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="lg:hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity"></div>
+
+            <main class="admin-content custom-scrollbar">
+                <div class="max-w-[1400px] mx-auto">
                     {{ $slot }}
                 </div>
             </main>
