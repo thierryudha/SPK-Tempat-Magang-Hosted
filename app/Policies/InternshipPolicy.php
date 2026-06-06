@@ -15,16 +15,16 @@ class InternshipPolicy
 
     public function view(User $user, Internship $internship): bool
     {
-        return $user->id === $internship->user_id;
+        return $user->role === 'admin' || $user->id === $internship->user_id;
     }
 
     public function update(User $user, Internship $internship): bool
     {
-        return $user->id === $internship->user_id;
+        return $user->role === 'admin' || $user->id === $internship->user_id;
     }
 
     public function delete(User $user, Internship $internship): bool
     {
-        return $user->id === $internship->user_id;
+        return $user->role === 'admin' || $user->id === $internship->user_id;
     }
 }

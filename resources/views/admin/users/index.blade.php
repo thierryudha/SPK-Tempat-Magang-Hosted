@@ -33,18 +33,18 @@
                     <tbody class="divide-y divide-slate-50">
                         @foreach($users as $u)
                         <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5 text-center">
-                                <div class="flex items-center justify-center gap-4">
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs overflow-hidden border-2 border-white shadow-md flex-shrink-0" style="aspect-ratio: 1/1;">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-4 max-w-xs mx-auto">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs overflow-hidden border-2 border-white shadow-md flex-shrink-0">
                                         @if($u->photo)
-                                            <img src="{{ asset('storage/'.$u->photo) }}" class="w-full h-full object-cover rounded-full">
+                                            <img src="{{ asset('storage/'.$u->photo) }}" class="w-full h-full object-cover">
                                         @else
-                                            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-black italic rounded-full">
+                                            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-black italic">
                                                 {{ substr($u->name, 0, 1) }}
                                             </div>
                                         @endif
                                     </div>
-                                    <p class="text-sm font-bold text-slate-700 capitalize tracking-tight">{{ $u->name }}</p>
+                                    <p class="text-sm font-bold text-slate-700 capitalize tracking-tight truncate">{{ $u->name }}</p>
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-sm text-slate-500 lowercase tracking-tight text-center">{{ $u->email }}</td>

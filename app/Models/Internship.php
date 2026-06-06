@@ -10,7 +10,12 @@ class Internship extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'city', 'category_id', 'description'];
+    protected $fillable = ['name', 'city', 'category_id', 'description', 'user_id'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function category()
     {

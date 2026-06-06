@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Internship Management
+    Route::post('internships/bulk', [\App\Http\Controllers\InternshipController::class, 'bulkStore'])->name('internships.bulk');
     Route::resource('internships', \App\Http\Controllers\InternshipController::class);
     
     // MOORA Calculation

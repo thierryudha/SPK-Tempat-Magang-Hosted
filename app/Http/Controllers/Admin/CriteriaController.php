@@ -22,12 +22,18 @@ class CriteriaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|unique:criterias',
             'name' => 'required',
             'type' => 'required|in:benefit,cost',
         ]);
 
-        Criteria::create($request->all());
+        $nextNumber = Criteria::count() + 1;
+        
+        Criteria::create([
+            'code' => 'C' . $nextNumber,
+            'name' => $request->name,
+            'type' => $request->type,
+        ]);
+
         return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil ditambahkan.');
     }
 
@@ -39,7 +45,6 @@ class CriteriaController extends Controller
     public function update(Request $request, Criteria $criteria)
     {
         $request->validate([
-            'code' => 'required|unique:criterias,code,' . $criteria->id,
             'name' => 'required',
             'type' => 'required|in:benefit,cost',
         ]);
@@ -51,6 +56,13 @@ class CriteriaController extends Controller
     public function destroy(Criteria $criteria)
     {
         $criteria->delete();
-        return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil dihapus.');
+
+        // Re-generate codes for all criteria to ensure no gaps
+        $allCriteria = Criteria::orderBy('id')->get();
+        foreach ($allCriteria as $index => $c) {
+            $c->update(['code' => 'C' . ($index + 1)]);
+        }
+
+        return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil dihapus dan kode telah diperbarui.');
     }
 }

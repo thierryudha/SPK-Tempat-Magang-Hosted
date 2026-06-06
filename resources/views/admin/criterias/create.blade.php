@@ -12,17 +12,10 @@
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 md:p-12">
             <form action="{{ route('admin.criterias.store') }}" method="POST" class="space-y-8">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <x-input-label for="code" value="Kode Kriteria (Contoh: C1)" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <x-text-input id="code" name="code" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('code')" required />
-                        <x-input-error :messages="$errors->get('code')" class="mt-2" />
-                    </div>
-                    <div>
-                        <x-input-label for="name" value="Nama Kriteria" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <x-text-input id="name" name="name" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('name')" required />
-                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                    </div>
+                <div>
+                    <x-input-label for="name" value="Nama Kriteria" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
+                    <x-text-input id="name" name="name" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('name')" required placeholder="Contoh: Biaya Hidup" />
+                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
                 <div>

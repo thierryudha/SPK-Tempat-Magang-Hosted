@@ -13,7 +13,10 @@ class InternshipController extends Controller
 {
     public function index()
     {
-        $internships = Internship::with('category')->latest()->get();
+        $internships = Internship::where('user_id', Auth::id())
+            ->with('category')
+            ->latest()
+            ->get();
         return view('internships.index', compact('internships'));
     }
 
@@ -26,19 +29,59 @@ class InternshipController extends Controller
         ];
 
         // Fetch all existing internships to show in the UI list if needed
-        $globalInternships = Internship::with('category')->latest()->get();
+        $globalInternships = Internship::whereNull('user_id')->with('category')->latest()->get();
 
         return view('internships.create', compact('categories', 'indonesianCities', 'globalInternships'));
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:internships,id',
+        ]);
+
+        $count = 0;
+        foreach ($request->ids as $id) {
+            $global = Internship::find($id);
+            
+            // Check if user already has it (by name)
+            $exists = Internship::where('user_id', Auth::id())
+                ->where('name', $global->name)
+                ->exists();
+                
+            if (!$exists) {
+                Internship::create([
+                    'name' => $global->name,
+                    'city' => $global->city,
+                    'category_id' => $global->category_id,
+                    'description' => $global->description,
+                    'user_id' => Auth::id(),
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->route('internships.index')->with('success', $count . ' tempat magang berhasil ditambahkan ke daftar Anda.');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:internships',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('internships')->where(function ($query) {
+                    return $query->where('user_id', Auth::id());
+                }),
+            ],
             'city' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
         ]);
+
+        $validated['user_id'] = Auth::id();
 
         Internship::create($validated);
 
@@ -47,6 +90,8 @@ class InternshipController extends Controller
 
     public function edit(Internship $internship)
     {
+        $this->authorize('update', $internship);
+
         $categories = Category::all();
         return view('internships.edit', compact('internship', 'categories'));
     }
@@ -54,8 +99,17 @@ class InternshipController extends Controller
 
     public function update(Request $request, Internship $internship)
     {
+        $this->authorize('update', $internship);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:internships,name,' . $internship->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('internships')->where(function ($query) {
+                    return $query->where('user_id', Auth::id());
+                })->ignore($internship->id),
+            ],
             'city' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
@@ -68,6 +122,8 @@ class InternshipController extends Controller
 
     public function destroy(Internship $internship)
     {
+        $this->authorize('delete', $internship);
+
         $internship->delete();
 
         return redirect()->route('internships.index')->with('success', 'Tempat magang berhasil dihapus.');
