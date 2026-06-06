@@ -18,7 +18,7 @@ class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Categories (Industrial Sectors only)
+        // 1. Categories
         $catNames = [
             'Teknologi Informasi', 'E-Commerce', 'Layanan Keuangan & Perbankan', 
             'Energi & Sumber Daya Alam', 'Media & Kreatif', 'Kesehatan', 
@@ -29,7 +29,7 @@ class DummyDataSeeder extends Seeder
             $categories[$name] = Category::updateOrCreate(['name' => $name])->id;
         }
 
-        // 2. Real Personas (20 Users)
+        // 2. Real Personas
         $personas = [
             ['name' => 'Rizky Amalia', 'email' => 'rizky@example.com', 'days' => 170],
             ['name' => 'Siti Aminah', 'email' => 'siti@example.com', 'days' => 165],
@@ -61,11 +61,12 @@ class DummyDataSeeder extends Seeder
                     'password' => Hash::make('password123'),
                     'role' => 'user',
                     'created_at' => Carbon::now()->subDays($p['days']),
+                    'email_verified_at' => now(),
                 ]
             );
         }
 
-        // 3. Internships (25 Actual Companies)
+        // 3. Internships (Global)
         $internshipsData = [
             ['name' => 'PT Tokopedia', 'category' => 'E-Commerce', 'link' => 'https://www.tokopedia.com/careers'],
             ['name' => 'PT Gojek Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.gojek.io/careers'],
@@ -79,19 +80,19 @@ class DummyDataSeeder extends Seeder
             ['name' => 'PT Grab Teknologi Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.grab.com/id/careers'],
             ['name' => 'PT Dana Indonesia', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.dana.id/careers'],
             ['name' => 'PT Visionet Internasional (OVO)', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.ovo.id/career'],
-            ['name' => 'PT Bank Central Asia Tbk', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://karir.bca.co.id'],
+            ['name' => 'PT Bank Central Asia Tbk (BCA)', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://karir.bca.co.id'],
             ['name' => 'PT Indofood CBP Sukses Makmur', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.indofood.com/career'],
             ['name' => 'PT Unilever Indonesia Tbk', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.unilever.co.id/careers'],
-            ['name' => 'PT Ruang Raya Indonesia', 'category' => 'Pendidikan', 'link' => 'https://career.ruangguru.com'],
+            ['name' => 'PT Ruang Raya Indonesia (Ruangguru)', 'category' => 'Pendidikan', 'link' => 'https://career.ruangguru.com'],
             ['name' => 'PT Zenius Education', 'category' => 'Pendidikan', 'link' => 'https://www.zenius.net/career'],
-            ['name' => 'PT Media Dokter Investama', 'category' => 'Kesehatan', 'link' => 'https://www.halodoc.com/career'],
+            ['name' => 'PT Media Dokter Investama (Halodoc)', 'category' => 'Kesehatan', 'link' => 'https://www.halodoc.com/career'],
             ['name' => 'PT Alodokter', 'category' => 'Kesehatan', 'link' => 'https://www.alodokter.com/career'],
             ['name' => 'PT PLN (Persero)', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://rekrutmen.pln.co.id'],
             ['name' => 'PT Bukit Asam Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://www.ptba.co.id/sdm/karir'],
             ['name' => 'PT Adaro Energy Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://adaro.com/pages/read/11/careers'],
             ['name' => 'PT Kumparan (Media)', 'category' => 'Media & Kreatif', 'link' => 'https://kumparan.com/career'],
             ['name' => 'PT IDN Media', 'category' => 'Media & Kreatif', 'link' => 'https://www.idntimes.com/career'],
-            ['name' => 'PT Trans Digital Media', 'category' => 'Media & Kreatif', 'link' => 'https://www.detik.com/karir'],
+            ['name' => 'PT Trans Digital Media (Detikcom)', 'category' => 'Media & Kreatif', 'link' => 'https://www.detik.com/karir'],
         ];
 
         foreach ($internshipsData as $data) {
@@ -99,55 +100,72 @@ class DummyDataSeeder extends Seeder
                 ['name' => $data['name']],
                 [
                     'category_id' => $categories[$data['category']],
-                    'website_link' => $data['link']
+                    'website_link' => $data['link'],
+                    'user_id' => null
                 ]
             );
         }
 
-        // 4. Randomized Activity ... (unchanged)
+        // 4. User Contributions & Activity
         $users = User::where('role', 'user')->get();
-        $internships = Internship::all();
+        $globalInternships = Internship::whereNull('user_id')->get();
         $criterias = Criteria::all();
 
         foreach ($users as $user) {
+            // Contributions
+            $contributionCount = rand(1, 2);
+            $userInternships = collect();
+            for ($i = 0; $i < $contributionCount; $i++) {
+                $compName = "PT Private " . fake()->company . " " . rand(1, 9999);
+                $newInt = Internship::create([
+                    'name' => $compName,
+                    'category_id' => $categories[array_rand($categories)],
+                    'website_link' => rand(0, 1) ? fake()->url : null,
+                    'user_id' => $user->id,
+                ]);
+                $userInternships->push($newInt);
+            }
+
             foreach ($criterias as $c) {
-                UserCriteriaWeight::updateOrCreate(
-                    ['user_id' => $user->id, 'criteria_id' => $c->id],
-                    ['weight' => rand(1, 5)]
-                );
+                UserCriteriaWeight::updateOrCreate(['user_id' => $user->id, 'criteria_id' => $c->id], ['weight' => rand(1, 5)]);
             }
 
             $sessionCount = rand(5, 8);
             for ($s = 0; $s < $sessionCount; $s++) {
-                $sessionDate = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
-                
+                $sessionDate = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23));
+                $available = $globalInternships->concat($userInternships);
+
                 $session = MooraSession::create([
                     'user_id' => $user->id,
-                    'winner_name' => $internships->random()->name,
+                    'winner_name' => $available->random()->name,
                     'max_optimization_value' => rand(50, 95) / 100,
                     'criteria_used' => $criterias->pluck('id')->toArray(),
                     'created_at' => $sessionDate,
                     'updated_at' => $sessionDate
                 ]);
 
-                $internshipSample = $internships->random(rand(4, 6));
+                // Ensure unique internship-criteria combo for this USER in this SESSION
+                $internshipSample = $available->shuffle()->take(rand(4, 6));
                 foreach ($internshipSample as $intern) {
                     foreach ($criterias as $crit) {
-                        DB::table('internship_evaluations')
+                        // Use raw insert ignore logic by checking if it exists
+                        $exists = DB::table('internship_evaluations')
                             ->where('user_id', $user->id)
                             ->where('internship_id', $intern->id)
                             ->where('criteria_id', $crit->id)
-                            ->delete();
-
-                        DB::table('internship_evaluations')->insert([
-                            'user_id' => $user->id,
-                            'moora_session_id' => $session->id,
-                            'internship_id' => $intern->id,
-                            'criteria_id' => $crit->id,
-                            'score' => rand(1, 5),
-                            'created_at' => $sessionDate,
-                            'updated_at' => $sessionDate
-                        ]);
+                            ->exists();
+                        
+                        if (!$exists) {
+                            DB::table('internship_evaluations')->insert([
+                                'user_id' => $user->id,
+                                'moora_session_id' => $session->id,
+                                'internship_id' => $intern->id,
+                                'criteria_id' => $crit->id,
+                                'score' => rand(1, 5),
+                                'created_at' => $sessionDate,
+                                'updated_at' => $sessionDate
+                            ]);
+                        }
                     }
                 }
             }

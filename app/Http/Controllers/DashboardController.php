@@ -186,8 +186,8 @@ class DashboardController extends Controller
         // 7. Global Top Ranking
         $globalTopInternships = Internship::with('category')
             ->join('internship_evaluations', 'internships.id', '=', 'internship_evaluations.internship_id')
-            ->select('internships.*', DB::raw('AVG(internship_evaluations.score) as avg_score'))
-            ->groupBy('internships.id', 'internships.name', 'internships.city', 'internships.category_id', 'internships.description', 'internships.created_at', 'internships.updated_at', 'internships.deleted_at')
+            ->select('internships.id', 'internships.name', 'internships.category_id', DB::raw('AVG(internship_evaluations.score) as avg_score'))
+            ->groupBy('internships.id', 'internships.name', 'internships.category_id')
             ->orderBy('avg_score', 'desc')
             ->limit(5)
             ->get()

@@ -1,7 +1,19 @@
 <x-admin-layout>
-    <div class="mb-10">
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Admin Intelligence Dashboard</h1>
-        <p class="text-slate-500 text-sm mt-1 font-bold uppercase tracking-widest text-[10px]">Pusat Kendali Analitik dan Tren Magang Mahasiswa.</p>
+    <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Admin Intelligence Dashboard</h1>
+            <p class="text-slate-500 text-sm mt-1 font-bold uppercase tracking-widest text-[10px]">Pusat Kendali Analitik dan Tren Magang Mahasiswa.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('admin.export.users') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Export Mhs
+            </a>
+            <a href="{{ route('admin.export.sessions') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Export Hasil
+            </a>
+        </div>
     </div>
 
     <!-- Stats Grid -->
@@ -75,22 +87,33 @@
     </div>
 
     <!-- STRATEGIC ANALYTICS -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <!-- Most Compared Companies -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-lg">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="w-2 h-4 bg-blue-600 rounded-full"></span>
-                    Top 5 Most Compared Companies
-                </h3>
-            </div>
-            <div class="h-80">
+        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-lg">
+            <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3 mb-8">
+                <span class="w-2 h-4 bg-blue-600 rounded-full"></span>
+                Top Compared Companies
+            </h3>
+            <div class="h-64">
                 <canvas id="topComparedChart"></canvas>
             </div>
         </div>
 
-        <!-- Criteria Weight Priorities -->
+        <!-- Potential Winners Trend -->
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-lg">
+            <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3 mb-8">
+                <span class="w-2 h-4 bg-rose-500 rounded-full"></span>
+                Potential Winners (Appearances)
+            </h3>
+            <div class="h-64">
+                <canvas id="potentialWinnersChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <!-- Criteria Weight Priorities -->
+        <div class="lg:col-span-1 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-lg">
             <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
                 <span class="w-2 h-4 bg-amber-500 rounded-full"></span>
                 Prioritas Kriteria (Rata-rata Bobot)
@@ -109,10 +132,7 @@
                 @endforeach
             </div>
         </div>
-    </div>
 
-    <!-- RECENT DATA -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Win Rate Leaderboard -->
         <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-xl">
             <div class="p-8 border-b border-slate-50 bg-slate-900">
@@ -137,29 +157,20 @@
         </div>
 
         <!-- Latest Activities -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-xl">
+        <div class="lg:col-span-1 bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-xl">
             <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Riwayat Perhitungan Terbaru</h3>
+                <h3 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Aktivitas Terbaru</h3>
             </div>
-            <div class="p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($latest_sessions as $session)
-                    <div class="flex items-center gap-4 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-all group">
-                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 flex-shrink-0">
-                            @if($session->user->photo)
-                                <img src="{{ asset('storage/'.$session->user->photo) }}" class="w-full h-full object-cover rounded-full">
-                            @else
-                                <span class="font-black text-xs">{{ substr($session->user->name, 0, 1) }}</span>
-                            @endif
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[11px] font-black text-slate-700 truncate uppercase">{{ $session->user->name }}</p>
-                            <p class="text-[9px] font-bold text-slate-400 truncate uppercase mt-0.5">Winner: <span class="text-blue-600">{{ $session->winner_name }}</span></p>
-                        </div>
-                        <span class="text-[9px] font-black text-slate-300 uppercase">{{ $session->created_at->diffForHumans() }}</span>
+            <div class="p-4 space-y-3">
+                @foreach($latest_sessions as $session)
+                <div class="p-3 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-all group">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-[10px] font-black text-slate-700 truncate uppercase">{{ $session->user->name }}</p>
+                        <span class="text-[8px] font-black text-slate-300 uppercase shrink-0">{{ $session->created_at->diffForHumans() }}</span>
                     </div>
-                    @endforeach
+                    <p class="text-[9px] font-bold text-slate-400 uppercase truncate">Winner: <span class="text-blue-600">{{ $session->winner_name }}</span></p>
                 </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -189,15 +200,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: '#f1f5f9', drawBorder: false }, 
-                            ticks: { 
-                                precision: 0,
-                                font: { size: 9, weight: 'bold' }, 
-                                color: '#94a3b8' 
-                            } 
-                        },
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9', drawBorder: false }, ticks: { precision: 0, font: { size: 9, weight: 'bold' }, color: '#94a3b8' } },
                         x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } }
                     }
                 }
@@ -223,21 +226,13 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: '#f1f5f9', drawBorder: false }, 
-                            ticks: { 
-                                precision: 0,
-                                font: { size: 9, weight: 'bold' }, 
-                                color: '#94a3b8' 
-                            } 
-                        },
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9', drawBorder: false }, ticks: { precision: 0, font: { size: 9, weight: 'bold' }, color: '#94a3b8' } },
                         x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } }
                     }
                 }
             });
 
-            // 3. Top Compared Companies Chart (Horizontal Bar)
+            // 3. Top Compared Companies Chart
             new Chart(document.getElementById('topComparedChart'), {
                 type: 'bar',
                 indexAxis: 'y',
@@ -247,16 +242,36 @@
                         data: {!! json_encode($topCompared->pluck('total')) !!},
                         backgroundColor: '#3b82f6',
                         borderRadius: 8,
-                        barThickness: 20
+                        barThickness: 15
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } },
-                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } }
+                        x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 8, weight: 'bold' }, color: '#94a3b8' } },
+                        y: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#475569' } }
                     }
+                }
+            });
+
+            // 4. Potential Winners Chart
+            new Chart(document.getElementById('potentialWinnersChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($potentialWinners->pluck('name')) !!},
+                    datasets: [{
+                        data: {!! json_encode($potentialWinners->pluck('top_appearance')) !!},
+                        backgroundColor: ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { font: { size: 8, weight: 'bold' }, usePointStyle: true, padding: 10 } } 
+                    },
+                    cutout: '70%'
                 }
             });
         });

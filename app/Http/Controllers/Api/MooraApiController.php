@@ -11,6 +11,7 @@ use App\Models\MooraSession;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MooraApiController extends Controller
 {
@@ -21,6 +22,9 @@ class MooraApiController extends Controller
         $this->mooraService = $mooraService;
     }
 
+    /**
+     * Get criterias with their 1-5 scale descriptions for "Smart Scoring Guide" in Flutter.
+     */
     public function getCriterias()
     {
         $criterias = Criteria::with('scales')->get();
@@ -39,13 +43,23 @@ class MooraApiController extends Controller
         ]);
     }
 
+    /**
+     * Unified calculation: saves weights, scores, and returns results.
+     */
     public function calculate(Request $request)
     {
         $request->validate([
             'criteria' => 'required|array|min:3',
+            'criteria.*' => 'exists:criterias,id',
             'weights' => 'required|array',
-            'internships' => 'required|array|min:1',
+            'weights.*' => 'required|numeric|min:5|max:80',
+            'internships' => 'required|array|min:2',
+            'internships.*' => [
+                'required',
+                Rule::exists('internships', 'id')->where(fn($q) => $q->where('user_id', Auth::id()))
+            ],
             'scores' => 'required|array',
+            'scores.*.*' => 'required|integer|min:1|max:5',
         ]);
 
         $selectedCriteriaIds = array_keys($request->criteria);
@@ -53,6 +67,7 @@ class MooraApiController extends Controller
         $selectedInternshipIds = $request->internships;
         $scores = $request->scores;
 
+        // 1. Validate total weight
         $totalWeight = 0;
         foreach ($selectedCriteriaIds as $cId) {
             $totalWeight += $weights[$cId] ?? 0;
@@ -65,6 +80,7 @@ class MooraApiController extends Controller
             ], 422);
         }
 
+        // 2. Save weights
         foreach ($selectedCriteriaIds as $cId) {
             UserCriteriaWeight::updateOrCreate(
                 ['user_id' => Auth::id(), 'criteria_id' => $cId],
@@ -72,11 +88,12 @@ class MooraApiController extends Controller
             );
         }
 
+        // 3. Prepare MOORA data
         $mooraAlternatives = [];
         $mooraCriteria = [];
 
-        $criterias = Criteria::whereIn('id', $selectedCriteriaIds)->get();
-        foreach ($criterias as $c) {
+        $criteriaModels = Criteria::whereIn('id', $selectedCriteriaIds)->get();
+        foreach ($criteriaModels as $c) {
             $mooraCriteria[] = [
                 'id' => $c->id,
                 'name' => $c->name,
@@ -87,15 +104,23 @@ class MooraApiController extends Controller
 
         foreach ($selectedInternshipIds as $iId) {
             $internship = Internship::find($iId);
-            if (!$internship) continue;
+            if (!$internship || $internship->user_id !== Auth::id()) continue;
 
             $altScores = [];
+            
+            // Clean old evaluations for this internship (per user)
+            InternshipEvaluation::where('user_id', Auth::id())
+                ->where('internship_id', $iId)
+                ->delete();
+
             foreach ($selectedCriteriaIds as $cId) {
                 $scoreValue = $scores[$iId][$cId] ?? 1;
-                InternshipEvaluation::updateOrCreate(
-                    ['user_id' => Auth::id(), 'internship_id' => $iId, 'criteria_id' => $cId],
-                    ['score' => $scoreValue]
-                );
+                InternshipEvaluation::create([
+                    'user_id' => Auth::id(),
+                    'internship_id' => $iId,
+                    'criteria_id' => $cId,
+                    'score' => $scoreValue
+                ]);
                 $altScores[$cId] = $scoreValue;
             }
 
@@ -106,9 +131,14 @@ class MooraApiController extends Controller
             ];
         }
 
+        if (count($mooraAlternatives) < 2) {
+            return response()->json(['success' => false, 'message' => 'Minimal pilih 2 perusahaan milik Anda.'], 422);
+        }
+
+        // 4. Execute MOORA
         $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
 
-        // Create Session
+        // 5. Create Session
         $session = MooraSession::create([
             'user_id' => Auth::id(),
             'winner_name' => !empty($results) ? $results[0]['name'] : null,
@@ -116,7 +146,7 @@ class MooraApiController extends Controller
             'criteria_used' => $selectedCriteriaIds,
         ]);
 
-        // Link evaluations to session
+        // 6. Link evaluations to session
         InternshipEvaluation::where('user_id', Auth::id())
             ->whereIn('internship_id', $selectedInternshipIds)
             ->whereIn('criteria_id', $selectedCriteriaIds)
@@ -125,8 +155,10 @@ class MooraApiController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'Perhitungan MOORA berhasil.',
             'session_id' => $session->id,
-            'data' => $results
+            'data' => $results,
+            'criterias' => $criteriaModels // Send criteria for radar chart labels in Flutter
         ]);
     }
 }

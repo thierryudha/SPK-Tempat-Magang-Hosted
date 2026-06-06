@@ -24,10 +24,8 @@ class MooraController extends Controller
     public function index()
     {
         $criterias = Criteria::with('scales')->get();
-        // Show global internships + user's own internships
-        $internships = Internship::whereNull('user_id')
-            ->orWhere('user_id', Auth::id())
-            ->get();
+        // Show ONLY user's own internships for calculation
+        $internships = Internship::where('user_id', Auth::id())->get();
         $userWeights = Auth::user()->weights->pluck('weight', 'criteria_id');
 
         return view('moora.index', compact('criterias', 'internships', 'userWeights'));

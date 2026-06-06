@@ -40,11 +40,23 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class);
     Route::resource('internships', AdminInternshipController::class);
     
+    // User Contributed Internships
+    Route::get('user-internships', [\App\Http\Controllers\Admin\UserInternshipController::class, 'index'])->name('user-internships.index');
+    Route::post('user-internships/{internship}/promote', [\App\Http\Controllers\Admin\UserInternshipController::class, 'promote'])->name('user-internships.promote');
+    
     // Split Management
     Route::resource('users', UserController::class);
     Route::resource('administrators', AdministratorController::class);
 
-    // Admin Profile
+    // Data Export
+    Route::get('export/users', [\App\Http\Controllers\Admin\ExportController::class, 'exportUsers'])->name('export.users');
+    Route::get('export/internships', [\App\Http\Controllers\Admin\ExportController::class, 'exportInternships'])->name('export.internships');
+    Route::get('export/sessions', [\App\Http\Controllers\Admin\ExportController::class, 'exportSessions'])->name('export.sessions');
+
+    // Activity Logs
+    Route::get('logs', [ActivityLogController::class, 'index'])->name('logs.index');
+
+    // User Profile
     Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 });

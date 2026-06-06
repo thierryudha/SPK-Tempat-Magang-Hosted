@@ -10,10 +10,14 @@ use App\Http\Controllers\Api\CategoryApiController;
 // Public Routes
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/register', [AuthApiController::class, 'register']);
+Route::post('/google-login', [AuthApiController::class, 'googleLogin']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgotPassword']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
+    // Dashboard Data
+    Route::get('/dashboard', [\App\Http\Controllers\Api\DashboardApiController::class, 'index']);
+
     // Auth & Profile
     Route::get('/me', [AuthApiController::class, 'me']);
     Route::post('/logout', [AuthApiController::class, 'logout']);
@@ -24,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/categories', [CategoryApiController::class, 'index']);
 
     // Internships
+    Route::get('/internships/global', [InternshipApiController::class, 'global']);
+    Route::post('/internships/bulk', [InternshipApiController::class, 'bulkStore']);
     Route::apiResource('internships', InternshipApiController::class)->names('api.internships');
 
     // MOORA

@@ -87,8 +87,8 @@ class AuthApiController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|min:2|max:100',
+            'email' => 'required|string|email:rfc,dns|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'device_name' => 'required',
         ]);
@@ -154,6 +154,43 @@ class AuthApiController extends Controller
         return response()->json([
             'success' => true,
             'data' => $request->user()
+        ]);
+    }
+
+    /**
+     * Handle Google Login from Flutter/Mobile.
+     */
+    public function googleLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'name' => 'required|string',
+            'google_id' => 'required|string',
+            'device_name' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $user->update([
+                'google_id' => $request->google_id,
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
+        } else {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'google_id' => $request->google_id,
+                'password' => Hash::make(\Illuminate\Support\Str::random(24)),
+                'role' => 'user',
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'token' => $user->createToken($request->device_name)->plainTextToken,
+            'user' => $user
         ]);
     }
 

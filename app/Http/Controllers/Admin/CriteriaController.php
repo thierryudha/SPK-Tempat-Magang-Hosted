@@ -43,6 +43,8 @@ class CriteriaController extends Controller
             ]);
         }
 
+        \App\Providers\ActivityLogServiceProvider::log('Created', 'Kriteria', "Menambah kriteria baru: {$criteria->name}.");
+
         return redirect()->route('admin.criterias.index')->with('success', 'Kriteria dan skala berhasil ditambahkan.');
     }
 
@@ -70,11 +72,14 @@ class CriteriaController extends Controller
             );
         }
 
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Kriteria', "Memperbarui kriteria: {$criteria->name}.");
+
         return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil diperbarui.');
     }
 
     public function destroy(Criteria $criteria)
     {
+        $name = $criteria->name;
         $criteria->delete();
 
         // Re-generate codes for all criteria to ensure no gaps
@@ -82,6 +87,8 @@ class CriteriaController extends Controller
         foreach ($allCriteria as $index => $c) {
             $c->update(['code' => 'C' . ($index + 1)]);
         }
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'Kriteria', "Menghapus kriteria: {$name}.");
 
         return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil dihapus dan kode telah diperbarui.');
     }
