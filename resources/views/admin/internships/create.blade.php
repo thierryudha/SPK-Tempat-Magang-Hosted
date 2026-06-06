@@ -18,29 +18,22 @@
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <x-input-label for="category_id" value="Bidang/Sektor Industri" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <select id="category_id" name="category_id" class="block w-full bg-slate-50 border-transparent focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition py-3 px-4 text-sm font-bold text-slate-700">
-                            <option value="">Pilih Bidang</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                        <p class="mt-2 text-[9px] text-slate-400 italic">Bidang tidak ada? <a href="{{ route('admin.categories.create') }}" class="text-blue-600 font-bold underline">Tambah di sini</a></p>
-                    </div>
-                    <div>
-                        <x-input-label for="city" value="Kota Lokasi" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <x-text-input id="city" name="city" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('city')" required placeholder="Contoh: Jakarta Selatan" />
-                        <x-input-error :messages="$errors->get('city')" class="mt-2" />
-                    </div>
+                <div>
+                    <x-input-label for="category_id" value="Bidang/Sektor Industri" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
+                    <select id="category_id" name="category_id" class="block w-full bg-slate-50 border-transparent focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition py-3 px-4 text-sm font-bold text-slate-700">
+                        <option value="">Pilih Bidang</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                 </div>
 
                 <div>
-                    <x-input-label for="description" value="Deskripsi Singkat (Opsional)" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                    <textarea id="description" name="description" rows="4" class="block w-full bg-slate-50 border-transparent focus:border-blue-500 focus:ring-blue-500 rounded-[1.5rem] shadow-sm transition py-3 px-4 text-sm font-bold text-slate-700">{{ old('description') }}</textarea>
-                    <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                    <x-input-label for="website_link" value="Link Website / Lowongan" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
+                    <x-text-input id="website_link" name="website_link" type="url" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('website_link')" required placeholder="https://perusahaan.com/karir" />
+                    <x-input-error :messages="$errors->get('website_link')" class="mt-2" />
+                    <p class="mt-2 text-[9px] text-slate-400 italic">Wajib diisi oleh Admin untuk data global.</p>
                 </div>
 
                 <div class="pt-4">

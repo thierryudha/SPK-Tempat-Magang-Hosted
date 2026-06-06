@@ -24,21 +24,31 @@ class CriteriaController extends Controller
         $request->validate([
             'name' => 'required',
             'type' => 'required|in:benefit,cost',
+            'scales' => 'required|array|min:5|max:5',
+            'scales.*' => 'required|string',
         ]);
 
         $nextNumber = Criteria::count() + 1;
         
-        Criteria::create([
+        $criteria = Criteria::create([
             'code' => 'C' . $nextNumber,
             'name' => $request->name,
             'type' => $request->type,
         ]);
 
-        return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil ditambahkan.');
+        foreach ($request->scales as $score => $description) {
+            $criteria->scales()->create([
+                'score' => $score,
+                'description' => $description,
+            ]);
+        }
+
+        return redirect()->route('admin.criterias.index')->with('success', 'Kriteria dan skala berhasil ditambahkan.');
     }
 
     public function edit(Criteria $criteria)
     {
+        $criteria->load('scales');
         return view('admin.criterias.edit', compact('criteria'));
     }
 
@@ -47,9 +57,19 @@ class CriteriaController extends Controller
         $request->validate([
             'name' => 'required',
             'type' => 'required|in:benefit,cost',
+            'scales' => 'required|array|min:5|max:5',
+            'scales.*' => 'required|string',
         ]);
 
-        $criteria->update($request->all());
+        $criteria->update($request->only(['name', 'type']));
+
+        foreach ($request->scales as $score => $description) {
+            $criteria->scales()->updateOrCreate(
+                ['score' => $score],
+                ['description' => $description]
+            );
+        }
+
         return redirect()->route('admin.criterias.index')->with('success', 'Kriteria berhasil diperbarui.');
     }
 

@@ -13,6 +13,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @stack('styles')
     
     <style>
         body {
@@ -204,10 +205,6 @@
                 </div>
                 
                 <div class="flex items-center gap-4 lg:gap-6">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        <span class="hidden sm:inline">Switch to User View</span>
-                    </a>
                     <span class="hidden md:inline text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ now()->format('d M Y') }}</span>
                 </div>
             </header>
@@ -223,5 +220,6 @@
         </div>
     </div>
 
+    @stack('scripts')
 </body>
 </html>

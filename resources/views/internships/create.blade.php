@@ -13,7 +13,7 @@
             ]" />
             
             <!-- Global Suggestions (Collapsible) -->
-            @if($globalInternships->isNotEmpty())
+            @if(isset($globalInternships) && $globalInternships->isNotEmpty())
             <div class="mb-8 bg-white overflow-hidden rounded-3xl shadow-sm border border-slate-100" x-data="{ open: false }">
                 <button @click="open = !open" 
                         class="w-full flex items-center justify-between p-6 hover:bg-slate-50 transition-colors">
@@ -44,9 +44,8 @@
                                 <div class="relative flex items-center p-4 bg-white border border-slate-100 rounded-2xl hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group"
                                      @click="fillForm({ 
                                          name: '{{ $global->name }}', 
-                                         city: '{{ $global->city }}', 
                                          category_id: '{{ $global->category_id }}', 
-                                         description: '{{ $global->description }}' 
+                                         website_link: '{{ $global->website_link }}'
                                      })">
                                     <input type="checkbox" name="ids[]" value="{{ $global->id }}" 
                                            class="w-5 h-5 text-blue-600 border-slate-200 rounded-lg focus:ring-blue-500 transition cursor-pointer"
@@ -54,7 +53,7 @@
                                            @change="updateSelectedCount()">
                                     <div class="ml-4 flex-1">
                                         <div class="font-black text-sm text-slate-800 capitalize group-hover:text-blue-600">{{ $global->name }}</div>
-                                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-1">{{ $global->city }} • {{ $global->category->name ?? 'Umum' }}</div>
+                                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-1">{{ $global->category->name ?? 'Umum' }}</div>
                                     </div>
                                 </div>
                             @endforeach
@@ -89,59 +88,32 @@
                     <form action="{{ route('internships.store') }}" method="POST">
                         @csrf
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="space-y-8">
                             <div>
                                 <x-input-label for="name" value="Nama Perusahaan" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
                                 <x-text-input id="name" name="name" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" x-model="formData.name" required placeholder="Contoh: PT Teknologi Maju" />
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
-                            <div class="relative" x-data="{ open: false }">
-                                <x-input-label for="city" value="Kota Lokasi" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                                <div class="relative">
-                                    <input type="text" 
-                                           id="city" 
-                                           name="city" 
-                                           x-model="formData.city"
-                                           @focus="open = true"
-                                           @click.away="open = false"
-                                           autocomplete="off"
-                                           class="block w-full rounded-xl border-transparent bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 shadow-sm transition py-3 px-4 text-sm font-bold text-slate-700"
-                                           placeholder="Ketik kota..."
-                                           required>
-                                    <div x-show="open" 
-                                         class="absolute z-20 mt-2 w-full bg-white shadow-2xl border border-slate-100 max-h-60 rounded-2xl py-2 text-base overflow-auto focus:outline-none sm:text-sm custom-scrollbar"
-                                         x-transition>
-                                        <template x-for="city in filteredCities" :key="city">
-                                            <div @click="formData.city = city; open = false" 
-                                                 class="cursor-pointer select-none relative py-2.5 px-5 hover:bg-blue-600 hover:text-white transition-colors text-xs font-bold text-slate-600">
-                                                <span class="block truncate" x-text="city"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-                                <x-input-error :messages="$errors->get('city')" class="mt-2" />
+                            <div>
+                                <x-input-label for="category_id" value="Bidang Perusahaan" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
+                                <select id="category_id" name="category_id" x-model="formData.category_id" class="block w-full border-transparent bg-slate-50 focus:bg-white rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 transition py-3 px-4 text-sm font-bold text-slate-700">
+                                    <option value="">Pilih Bidang</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <x-input-label for="website_link" value="Link Website / Lowongan (Opsional)" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
+                                <x-text-input id="website_link" name="website_link" type="url" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" x-model="formData.website_link" placeholder="https://perusahaan.com/karir" />
+                                <x-input-error :messages="$errors->get('website_link')" class="mt-2" />
                             </div>
                         </div>
 
-                        <div class="mb-8">
-                            <x-input-label for="category_id" value="Bidang Perusahaan" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                            <select id="category_id" name="category_id" x-model="formData.category_id" class="block w-full border-transparent bg-slate-50 focus:bg-white rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 transition py-3 px-4 text-sm font-bold text-slate-700">
-                                <option value="">Pilih Bidang</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                        </div>
-
-                        <div class="mb-10">
-                            <x-input-label for="description" value="Deskripsi Singkat" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                            <textarea id="description" name="description" x-model="formData.description" class="block w-full border-transparent bg-slate-50 focus:bg-white rounded-[1.5rem] shadow-sm focus:border-blue-500 focus:ring-blue-500 transition py-3 px-4 text-sm font-bold text-slate-700" rows="4" placeholder="Apa yang menarik dari tempat ini?"></textarea>
-                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
-                        </div>
-
-                        <div class="flex items-center justify-end gap-6 border-t border-slate-50 pt-10">
+                        <div class="flex items-center justify-end gap-6 border-t border-slate-50 pt-10 mt-10">
                             <a href="{{ route('internships.index') }}" class="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition">Batal</a>
                             <x-primary-button class="bg-blue-600 hover:bg-blue-700 px-10 py-4 rounded-2xl shadow-xl shadow-blue-500/20 transition transform active:scale-95 text-[10px] font-black uppercase tracking-[0.2em]">
                                 Simpan Tempat Magang
@@ -157,23 +129,19 @@
         function internshipForm() {
             return {
                 formData: {
-                    name: '',
-                    city: '',
-                    category_id: '',
-                    description: ''
+                    name: '{{ old('name', '') }}',
+                    category_id: '{{ old('category_id', '') }}',
+                    website_link: '{{ old('website_link', '') }}'
                 },
                 selectedCount: 0,
-                cities: {!! json_encode($indonesianCities) !!},
                 fillForm(data) {
-                    this.formData = data;
+                    this.formData.name = data.name;
+                    this.formData.category_id = data.category_id;
+                    this.formData.website_link = data.website_link;
                     window.scrollTo({ top: document.querySelector('form').offsetTop - 100, behavior: 'smooth' });
                 },
                 updateSelectedCount() {
                     this.selectedCount = document.querySelectorAll('input[name="ids[]"]:checked').length;
-                },
-                get filteredCities() {
-                    if (!this.formData.city) return this.cities;
-                    return this.cities.filter(c => c.toLowerCase().includes(this.formData.city.toLowerCase()));
                 }
             }
         }

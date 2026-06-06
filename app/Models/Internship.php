@@ -10,7 +10,7 @@ class Internship extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'city', 'category_id', 'description', 'user_id'];
+    protected $fillable = ['name', 'category_id', 'website_link', 'user_id'];
 
     public function user()
     {

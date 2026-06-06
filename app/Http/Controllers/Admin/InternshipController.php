@@ -25,8 +25,8 @@ class InternshipController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:internships',
-            'city' => 'required',
             'category_id' => 'required|exists:categories,id',
+            'website_link' => 'required|url',
         ]);
 
         Internship::create($request->all());
@@ -43,8 +43,8 @@ class InternshipController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:internships,name,' . $internship->id,
-            'city' => 'required',
             'category_id' => 'required|exists:categories,id',
+            'website_link' => 'required|url',
         ]);
 
         $internship->update($request->all());

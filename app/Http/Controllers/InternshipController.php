@@ -53,9 +53,8 @@ class InternshipController extends Controller
             if (!$exists) {
                 Internship::create([
                     'name' => $global->name,
-                    'city' => $global->city,
                     'category_id' => $global->category_id,
-                    'description' => $global->description,
+                    'website_link' => $global->website_link,
                     'user_id' => Auth::id(),
                 ]);
                 $count++;
@@ -76,9 +75,8 @@ class InternshipController extends Controller
                     return $query->where('user_id', Auth::id());
                 }),
             ],
-            'city' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
+            'website_link' => 'nullable|url',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -110,9 +108,8 @@ class InternshipController extends Controller
                     return $query->where('user_id', Auth::id());
                 })->ignore($internship->id),
             ],
-            'city' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
+            'website_link' => 'nullable|url',
         ]);
 
         $internship->update($validated);

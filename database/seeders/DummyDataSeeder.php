@@ -18,18 +18,18 @@ class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Categories (10 Categories)
+        // 1. Categories (Industrial Sectors only)
         $catNames = [
-            'Fintech Startup', 'E-Commerce', 'BUMN / Government', 'Software House', 
-            'Creative Agency', 'Healthtech', 'Edutech', 'Energy & Mining', 
-            'Telecommunication', 'Retail & FMCG'
+            'Teknologi Informasi', 'E-Commerce', 'Layanan Keuangan & Perbankan', 
+            'Energi & Sumber Daya Alam', 'Media & Kreatif', 'Kesehatan', 
+            'Pendidikan', 'Telekomunikasi', 'Konsumsi & Ritel', 'Logistik & Transportasi'
         ];
         $categories = [];
         foreach ($catNames as $name) {
             $categories[$name] = Category::updateOrCreate(['name' => $name])->id;
         }
 
-        // 2. Real Personas (20 Users) with wave-like registration dates
+        // 2. Real Personas (20 Users)
         $personas = [
             ['name' => 'Rizky Amalia', 'email' => 'rizky@example.com', 'days' => 170],
             ['name' => 'Siti Aminah', 'email' => 'siti@example.com', 'days' => 165],
@@ -65,53 +65,51 @@ class DummyDataSeeder extends Seeder
             );
         }
 
-        // 3. Internships (25 Internships)
+        // 3. Internships (25 Actual Companies)
         $internshipsData = [
-            ['name' => 'Tokopedia', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
-            ['name' => 'Gojek', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
-            ['name' => 'Shopee', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
-            ['name' => 'Bukalapak', 'city' => 'Jakarta', 'category' => 'E-Commerce'],
-            ['name' => 'Traveloka', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
-            ['name' => 'Bank Mandiri', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
-            ['name' => 'Telkom Indonesia', 'city' => 'Bandung', 'category' => 'Telecommunication'],
-            ['name' => 'Pertamina', 'city' => 'Jakarta', 'category' => 'Energy & Mining'],
-            ['name' => 'Astra International', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
-            ['name' => 'Traveloka Paylaters', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
-            ['name' => 'Dana', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
-            ['name' => 'OVO', 'city' => 'Jakarta', 'category' => 'Fintech Startup'],
-            ['name' => 'BCA', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
-            ['name' => 'Indomie (ICBP)', 'city' => 'Jakarta', 'category' => 'Retail & FMCG'],
-            ['name' => 'Unilever', 'city' => 'Tangerang', 'category' => 'Retail & FMCG'],
-            ['name' => 'Ruangguru', 'city' => 'Jakarta', 'category' => 'Edutech'],
-            ['name' => 'Zenius', 'city' => 'Jakarta', 'category' => 'Edutech'],
-            ['name' => 'Halodoc', 'city' => 'Jakarta', 'category' => 'Healthtech'],
-            ['name' => 'Alodokter', 'city' => 'Jakarta', 'category' => 'Healthtech'],
-            ['name' => 'PLN', 'city' => 'Jakarta', 'category' => 'BUMN / Government'],
-            ['name' => 'Bukit Asam', 'city' => 'Palembang', 'category' => 'Energy & Mining'],
-            ['name' => 'Adaro Energy', 'city' => 'Jakarta', 'category' => 'Energy & Mining'],
-            ['name' => 'Kumparan', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
-            ['name' => 'IDN Times', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
-            ['name' => 'Detikcom', 'city' => 'Jakarta', 'category' => 'Creative Agency'],
+            ['name' => 'PT Tokopedia', 'category' => 'E-Commerce', 'link' => 'https://www.tokopedia.com/careers'],
+            ['name' => 'PT Gojek Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.gojek.io/careers'],
+            ['name' => 'PT Shopee International', 'category' => 'E-Commerce', 'link' => 'https://careers.shopee.co.id'],
+            ['name' => 'PT Bukalapak.com', 'category' => 'E-Commerce', 'link' => 'https://careers.bukalapak.com'],
+            ['name' => 'PT Traveloka Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.traveloka.com/en-id/careers'],
+            ['name' => 'PT Bank Mandiri (Persero) Tbk', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.bankmandiri.co.id/en/karir'],
+            ['name' => 'PT Telkom Indonesia Tbk', 'category' => 'Telekomunikasi', 'link' => 'https://itdr.telkom.co.id/careers'],
+            ['name' => 'PT Pertamina (Persero)', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://recruitment.pertamina.com'],
+            ['name' => 'PT Astra International Tbk', 'category' => 'Logistik & Transportasi', 'link' => 'https://career.astra.co.id'],
+            ['name' => 'PT Grab Teknologi Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.grab.com/id/careers'],
+            ['name' => 'PT Dana Indonesia', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.dana.id/careers'],
+            ['name' => 'PT Visionet Internasional (OVO)', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.ovo.id/career'],
+            ['name' => 'PT Bank Central Asia Tbk', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://karir.bca.co.id'],
+            ['name' => 'PT Indofood CBP Sukses Makmur', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.indofood.com/career'],
+            ['name' => 'PT Unilever Indonesia Tbk', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.unilever.co.id/careers'],
+            ['name' => 'PT Ruang Raya Indonesia', 'category' => 'Pendidikan', 'link' => 'https://career.ruangguru.com'],
+            ['name' => 'PT Zenius Education', 'category' => 'Pendidikan', 'link' => 'https://www.zenius.net/career'],
+            ['name' => 'PT Media Dokter Investama', 'category' => 'Kesehatan', 'link' => 'https://www.halodoc.com/career'],
+            ['name' => 'PT Alodokter', 'category' => 'Kesehatan', 'link' => 'https://www.alodokter.com/career'],
+            ['name' => 'PT PLN (Persero)', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://rekrutmen.pln.co.id'],
+            ['name' => 'PT Bukit Asam Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://www.ptba.co.id/sdm/karir'],
+            ['name' => 'PT Adaro Energy Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://adaro.com/pages/read/11/careers'],
+            ['name' => 'PT Kumparan (Media)', 'category' => 'Media & Kreatif', 'link' => 'https://kumparan.com/career'],
+            ['name' => 'PT IDN Media', 'category' => 'Media & Kreatif', 'link' => 'https://www.idntimes.com/career'],
+            ['name' => 'PT Trans Digital Media', 'category' => 'Media & Kreatif', 'link' => 'https://www.detik.com/karir'],
         ];
 
         foreach ($internshipsData as $data) {
             Internship::updateOrCreate(
                 ['name' => $data['name']],
                 [
-                    'city' => $data['city'],
                     'category_id' => $categories[$data['category']],
-                    'description' => 'Dummy description for ' . $data['name']
+                    'website_link' => $data['link']
                 ]
             );
         }
 
-        // 4. Randomized Activity for Dotted Line Charts (5-8 sessions per user)
+        // 4. Randomized Activity ... (unchanged)
         $users = User::where('role', 'user')->get();
         $internships = Internship::all();
         $criterias = Criteria::all();
 
         foreach ($users as $user) {
-            // Set user weights
             foreach ($criterias as $c) {
                 UserCriteriaWeight::updateOrCreate(
                     ['user_id' => $user->id, 'criteria_id' => $c->id],
@@ -119,7 +117,6 @@ class DummyDataSeeder extends Seeder
                 );
             }
 
-            // Perform 5-8 MOORA sessions per user spread across last 30 days
             $sessionCount = rand(5, 8);
             for ($s = 0; $s < $sessionCount; $s++) {
                 $sessionDate = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59));
@@ -133,17 +130,9 @@ class DummyDataSeeder extends Seeder
                     'updated_at' => $sessionDate
                 ]);
 
-                // Evaluations for this session
                 $internshipSample = $internships->random(rand(4, 6));
                 foreach ($internshipSample as $intern) {
                     foreach ($criterias as $crit) {
-                        // Use raw insert to bypass model event or just unique check if needed
-                        // But since session_id is new for every session, it should be fine 
-                        // as long as user-intern-crit is unique per session if that was the constraint.
-                        // Wait, the unique index is eval_user_intern_crit_unique.
-                        // I must DELETE old evaluations for this user-intern-crit combo to simulate the 
-                        // "most recent state" or just avoid the duplicate key error.
-                        
                         DB::table('internship_evaluations')
                             ->where('user_id', $user->id)
                             ->where('internship_id', $intern->id)

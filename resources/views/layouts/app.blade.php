@@ -13,6 +13,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
     </head>
     <body class="font-sans antialiased pb-24 sm:pb-0 overflow-x-hidden">
         <div class="min-h-screen bg-slate-50 relative">
@@ -36,5 +40,6 @@
                 @include('layouts.bottom-nav')
             </div>
         </div>
+        @stack('scripts')
     </body>
 </html>
