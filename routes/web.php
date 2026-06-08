@@ -26,6 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // MOORA Calculation
     Route::get('/moora', [MooraController::class, 'index'])->name('moora.index');
+    Route::get('/moora/history', [MooraController::class, 'history'])->name('moora.history');
+    Route::delete('/moora/history/{session}', [MooraController::class, 'destroySession'])->name('moora.history.destroy');
     Route::post('/moora/calculate', [MooraController::class, 'calculate'])->name('moora.calculate');
 
     // Profile Management

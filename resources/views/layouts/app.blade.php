@@ -8,37 +8,43 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        
+        <!-- Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('styles')
         <style>
             [x-cloak] { display: none !important; }
+            body { font-family: 'Plus Jakarta Sans', sans-serif !important; }
         </style>
     </head>
-    <body class="font-sans antialiased pb-24 sm:pb-0 overflow-x-hidden">
-        <div class="min-h-screen bg-slate-50 relative">
-            <div class="relative z-10">
+    <body class="font-sans antialiased pb-24 sm:pb-0 overflow-x-hidden bg-slate-50">
+        <div class="min-h-screen">
+            <!-- Combined Sticky Top Bar -->
+            <div class="sticky top-0 z-50 bg-white border-b border-slate-200">
                 @include('layouts.navigation')
 
-                <!-- Page Heading -->
+                <!-- Page Heading (Optional) -->
                 @isset($header)
-                    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-slate-200">
-                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 relative">
-                            {{ $header }}
-                        </div>
-                    </header>
+                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
                 @endisset
-
-                <!-- Page Content -->
-                <main>
-                    {{ $slot }}
-                </main>
-
-                @include('layouts.bottom-nav')
             </div>
+
+            <!-- Main Content Area -->
+            <main class="py-10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {{ $slot }}
+                </div>
+            </main>
+
+            @include('layouts.bottom-nav')
         </div>
         @stack('scripts')
     </body>

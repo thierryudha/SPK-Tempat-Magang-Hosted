@@ -1,0 +1,760 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+
+  .page { background: #F8FAFC; min-height: 100vh; padding: 0; }
+
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #E8EFF6;
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 8px; }
+  .topbar-logo { font-size: 18px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; }
+  .topbar-logo span { color: #2563EB; }
+  .topbar-nav { display: flex; align-items: center; gap: 4px; margin-left: 36px; }
+  .nav-item {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    text-decoration: none;
+  }
+  .nav-item.active {
+    background: #EFF6FF;
+    color: #2563EB;
+  }
+  .nav-item:hover:not(.active) { background: #F1F5F9; color: #334155; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+
+  .main { padding: 32px 32px; max-width: 1200px; margin: 0 auto; }
+
+  .page-header { margin-bottom: 28px; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .breadcrumb-item { font-size: 12px; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .breadcrumb-sep { font-size: 12px; color: #CBD5E1; }
+  .breadcrumb-item.current { color: #64748B; }
+  .page-title { font-size: 26px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .page-subtitle { font-size: 14px; color: #64748B; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  .stat-card {
+    background: #fff;
+    border: 0.5px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .stat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .stat-icon.blue { background: #EFF6FF; color: #2563EB; }
+  .stat-icon.green { background: #F0FDF4; color: #16A34A; }
+  .stat-icon.amber { background: #FFFBEB; color: #D97706; }
+  .stat-icon.purple { background: #F5F3FF; color: #7C3AED; }
+  .stat-label { font-size: 11px; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; }
+
+  .content-area { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+
+  .panel {
+    background: #fff;
+    border: 0.5px solid #E2E8F0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 0.5px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title { font-size: 15px; font-weight: 700; color: #0F172A; }
+  .panel-subtitle { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+  .filter-bar {
+    padding: 14px 24px;
+    border-bottom: 0.5px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    height: 36px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 0 12px 0 34px;
+    font-size: 13px;
+    color: #334155;
+    background: #F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2394A3B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+    outline: none;
+  }
+  .search-box:focus { border-color: #2563EB; background-color: #fff; }
+
+  .filter-chip {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    color: #64748B;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-chip.active { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
+  .filter-chip:hover:not(.active) { background: #F8FAFC; }
+
+  .sort-select {
+    height: 32px;
+    padding: 0 30px 0 10px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #64748B;
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2394A3B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+
+  .history-list { padding: 8px 0; }
+
+  .history-item {
+    padding: 18px 24px;
+    border-bottom: 0.5px solid #F8FAFC;
+    cursor: pointer;
+    transition: background 0.12s;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .history-item:hover { background: #FAFBFC; }
+  .history-item.selected { background: #EFF6FF; border-left: 3px solid #2563EB; padding-left: 21px; }
+  .history-item:last-child { border-bottom: none; }
+
+  .item-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #EFF6FF;
+    display: flex; align-items: center; justify-content: center;
+    color: #2563EB; font-size: 18px;
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  .item-body { flex: 1; min-width: 0; }
+  .item-title { font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-meta { font-size: 12px; color: #94A3B8; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: #CBD5E1; }
+
+  .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .score-badge {
+    font-size: 13px; font-weight: 800; color: #1D4ED8;
+    background: #DBEAFE; border-radius: 8px;
+    padding: 3px 10px; letter-spacing: -0.3px;
+  }
+  .rank-pill {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 6px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .rank-1 { background: #FEF9C3; color: #A16207; }
+  .rank-2 { background: #F1F5F9; color: #475569; }
+  .rank-3 { background: #FEF3C7; color: #92400E; }
+
+  .criteria-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .criteria-tag {
+    font-size: 10px; font-weight: 600;
+    background: #F1F5F9; color: #64748B;
+    padding: 2px 8px; border-radius: 5px;
+  }
+
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+    color: #94A3B8;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-text { font-size: 14px; font-weight: 600; color: #CBD5E1; }
+
+  .pagination {
+    padding: 14px 24px;
+    border-top: 0.5px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-info { font-size: 12px; color: #94A3B8; font-weight: 600; }
+  .page-btns { display: flex; gap: 4px; }
+  .page-btn {
+    width: 30px; height: 30px; border-radius: 7px;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    font-size: 12px; font-weight: 700;
+    color: #64748B; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .page-btn.active { background: #2563EB; color: #fff; border-color: #2563EB; }
+  .page-btn:hover:not(.active) { background: #F8FAFC; }
+
+  .detail-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .detail-card {
+    background: #fff;
+    border: 0.5px solid #E2E8F0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .detail-header {
+    padding: 20px 20px 14px;
+    border-bottom: 0.5px solid #F1F5F9;
+  }
+  .detail-label { font-size: 10px; font-weight: 700; color: #2563EB; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .detail-company { font-size: 17px; font-weight: 800; color: #0F172A; letter-spacing: -0.3px; margin-bottom: 2px; }
+  .detail-category { font-size: 12px; color: #94A3B8; font-weight: 600; }
+
+  .winner-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FFFBEB; border: 1px solid #FEF3C7;
+    border-radius: 8px; padding: 4px 10px;
+    font-size: 12px; font-weight: 700; color: #A16207;
+    margin-top: 10px;
+  }
+
+  .yi-score {
+    padding: 16px 20px;
+    background: #EFF6FF;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 0.5px solid #DBEAFE;
+  }
+  .yi-label { font-size: 11px; font-weight: 700; color: #2563EB; text-transform: uppercase; letter-spacing: 0.05em; }
+  .yi-value { font-size: 24px; font-weight: 800; color: #1D4ED8; letter-spacing: -1px; }
+
+  .ranking-list { padding: 12px 20px 16px; }
+  .ranking-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 0.5px solid #F8FAFC;
+  }
+  .ranking-row:last-child { border-bottom: none; }
+  .rank-num {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+  }
+  .rank-num.r1 { background: #FEF9C3; color: #A16207; }
+  .rank-num.r2 { background: #F1F5F9; color: #475569; }
+  .rank-num.r3 { background: #FEF3C7; color: #B45309; }
+  .rank-num.rn { background: #F8FAFC; color: #94A3B8; }
+  .rank-name { flex: 1; font-size: 13px; font-weight: 600; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rank-yi { font-size: 12px; font-weight: 700; color: #2563EB; font-variant-numeric: tabular-nums; }
+
+  .bar-track { height: 4px; background: #F1F5F9; border-radius: 2px; margin-top: 3px; }
+  .bar-fill { height: 4px; background: #2563EB; border-radius: 2px; }
+
+  .criteria-section { padding: 0 20px 16px; }
+  .criteria-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 0.5px solid #F8FAFC;
+  }
+  .criteria-row:last-child { border-bottom: none; }
+  .criteria-name { font-size: 12px; color: #64748B; font-weight: 600; }
+  .criteria-weight { font-size: 12px; font-weight: 700; color: #334155; }
+  .criteria-type-b { font-size: 10px; font-weight: 700; color: #16A34A; background: #F0FDF4; padding: 1px 6px; border-radius: 4px; }
+  .criteria-type-c { font-size: 10px; font-weight: 700; color: #DC2626; background: #FEF2F2; padding: 1px 6px; border-radius: 4px; }
+
+  .action-btn {
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.12s;
+  }
+  .btn-primary { background: #2563EB; color: #fff; }
+  .btn-primary:hover { background: #1D4ED8; }
+  .btn-secondary { background: #F1F5F9; color: #334155; border: 1px solid #E2E8F0; }
+  .btn-secondary:hover { background: #E2E8F0; }
+  .btn-danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+  .btn-danger:hover { background: #FEE2E2; }
+
+  .action-btns { padding: 16px 20px; border-top: 0.5px solid #F1F5F9; display: flex; flex-direction: column; gap: 8px; }
+
+  @media (max-width: 900px) {
+    .content-area { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .detail-panel { display: none; }
+  }
+</style>
+
+<div class="page">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">Moora<span>Project</span></div>
+      <nav class="topbar-nav">
+        <a class="nav-item" href="#">Dashboard</a>
+        <a class="nav-item" href="#">Magang</a>
+        <a class="nav-item" href="#">Program MOORA</a>
+        <a class="nav-item active" href="#">Riwayat</a>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <div class="avatar">RZ</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <span class="breadcrumb-item">Dashboard</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-item current">Riwayat Perhitungan</span>
+      </div>
+      <div class="page-title">Riwayat Perhitungan MOORA</div>
+      <div class="page-subtitle">Rekap seluruh sesi analisis tempat magang yang pernah kamu jalankan</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+        <div>
+          <div class="stat-label">Total Sesi</div>
+          <div class="stat-value">24</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+        <div>
+          <div class="stat-label">Perusahaan Pemenang</div>
+          <div class="stat-value">Tokopedia</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber"><i class="ti ti-building" aria-hidden="true"></i></div>
+        <div>
+          <div class="stat-label">Rata-rata Alternatif</div>
+          <div class="stat-value">4.2 PT</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+        <div>
+          <div class="stat-label">Sesi Terakhir</div>
+          <div class="stat-value">2 hari lalu</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Daftar Sesi</div>
+            <div class="panel-subtitle">Klik sesi untuk melihat detail perhitungan</div>
+          </div>
+          <button class="action-btn btn-primary" style="width:auto; padding:0 16px; height:34px; font-size:12px;">
+            <i class="ti ti-plus" aria-hidden="true"></i> Sesi Baru
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <input class="search-box" type="text" placeholder="Cari berdasarkan pemenang atau perusahaan...">
+          <button class="filter-chip active"><i class="ti ti-list" style="font-size:13px" aria-hidden="true"></i> Semua</button>
+          <button class="filter-chip"><i class="ti ti-clock" style="font-size:13px" aria-hidden="true"></i> Bulan ini</button>
+          <select class="sort-select">
+            <option>Terbaru</option>
+            <option>Tertua</option>
+            <option>Skor tertinggi</option>
+          </select>
+        </div>
+
+        <div class="history-list" id="historyList">
+        </div>
+
+        <div class="pagination">
+          <div class="page-info">Menampilkan 1–8 dari 24 sesi</div>
+          <div class="page-btns">
+            <button class="page-btn"><i class="ti ti-chevron-left" style="font-size:13px"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn"><i class="ti ti-chevron-right" style="font-size:13px"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-panel" id="detailPanel">
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+const sessions = [
+  {
+    id: 1,
+    winner: 'PT Tokopedia',
+    category: 'E-Commerce',
+    score: 0.3847,
+    date: '6 Jun 2026',
+    time: '14:32',
+    criteriaCount: 6,
+    altCount: 4,
+    companies: [
+      { name: 'PT Tokopedia', yi: 0.3847, bars: 100 },
+      { name: 'PT Shopee Indonesia', yi: 0.2913, bars: 76 },
+      { name: 'PT Bukalapak.com', yi: 0.1745, bars: 45 },
+      { name: 'PT Blibli.com', yi: 0.0892, bars: 23 },
+    ],
+    criteria: [
+      { name: 'Uang Saku', weight: 30, type: 'benefit' },
+      { name: 'Jam Kerja', weight: 15, type: 'cost' },
+      { name: 'Relevansi Techstack', weight: 25, type: 'benefit' },
+      { name: 'Fasilitas Kantor', weight: 15, type: 'benefit' },
+      { name: 'Budaya Perusahaan', weight: 10, type: 'benefit' },
+      { name: 'Beban Tugas', weight: 5, type: 'cost' },
+    ]
+  },
+  {
+    id: 2,
+    winner: 'PT Gojek Indonesia',
+    category: 'Teknologi Informasi',
+    score: 0.4201,
+    date: '4 Jun 2026',
+    time: '10:15',
+    criteriaCount: 5,
+    altCount: 3,
+    companies: [
+      { name: 'PT Gojek Indonesia', yi: 0.4201, bars: 100 },
+      { name: 'PT Grab Teknologi', yi: 0.3155, bars: 75 },
+      { name: 'PT Traveloka', yi: 0.1874, bars: 45 },
+    ],
+    criteria: [
+      { name: 'Uang Saku', weight: 35, type: 'benefit' },
+      { name: 'Relevansi Techstack', weight: 30, type: 'benefit' },
+      { name: 'Reputasi Perusahaan', weight: 20, type: 'benefit' },
+      { name: 'Jam Kerja', weight: 10, type: 'cost' },
+      { name: 'Beban Tugas', weight: 5, type: 'cost' },
+    ]
+  },
+  {
+    id: 3,
+    winner: 'PT Bank Mandiri',
+    category: 'Layanan Keuangan',
+    score: 0.2934,
+    date: '1 Jun 2026',
+    time: '09:48',
+    criteriaCount: 8,
+    altCount: 5,
+    companies: [
+      { name: 'PT Bank Mandiri', yi: 0.2934, bars: 100 },
+      { name: 'PT Bank BCA', yi: 0.2711, bars: 92 },
+      { name: 'PT DANA Indonesia', yi: 0.1892, bars: 65 },
+      { name: 'PT OVO (Visionet)', yi: 0.1234, bars: 42 },
+      { name: 'PT Bank BRI', yi: 0.0987, bars: 34 },
+    ],
+    criteria: [
+      { name: 'Uang Saku', weight: 25, type: 'benefit' },
+      { name: 'Keamanan Lingkungan', weight: 20, type: 'benefit' },
+      { name: 'Reputasi Perusahaan', weight: 20, type: 'benefit' },
+      { name: 'Jam Kerja', weight: 15, type: 'cost' },
+      { name: 'Fasilitas Kantor', weight: 10, type: 'benefit' },
+      { name: 'Jarak dari Kampus', weight: 5, type: 'cost' },
+      { name: 'Budaya Perusahaan', weight: 3, type: 'benefit' },
+      { name: 'Beban Tugas', weight: 2, type: 'cost' },
+    ]
+  },
+  {
+    id: 4,
+    winner: 'PT Ruangguru',
+    category: 'Pendidikan',
+    score: 0.3102,
+    date: '28 Mei 2026',
+    time: '16:22',
+    criteriaCount: 4,
+    altCount: 3,
+    companies: [
+      { name: 'PT Ruangguru', yi: 0.3102, bars: 100 },
+      { name: 'PT Zenius Education', yi: 0.2341, bars: 75 },
+      { name: 'PT Quipper', yi: 0.1504, bars: 49 },
+    ],
+    criteria: [
+      { name: 'Relevansi Techstack', weight: 40, type: 'benefit' },
+      { name: 'Uang Saku', weight: 30, type: 'benefit' },
+      { name: 'Budaya Perusahaan', weight: 20, type: 'benefit' },
+      { name: 'Beban Tugas', weight: 10, type: 'cost' },
+    ]
+  },
+  {
+    id: 5,
+    winner: 'PT Pertamina',
+    category: 'Energi & SDA',
+    score: 0.3567,
+    date: '24 Mei 2026',
+    time: '11:05',
+    criteriaCount: 7,
+    altCount: 4,
+    companies: [
+      { name: 'PT Pertamina', yi: 0.3567, bars: 100 },
+      { name: 'PT PLN (Persero)', yi: 0.3012, bars: 84 },
+      { name: 'PT Bukit Asam', yi: 0.1879, bars: 53 },
+      { name: 'PT Adaro Energy', yi: 0.1234, bars: 35 },
+    ],
+    criteria: [
+      { name: 'Uang Saku', weight: 30, type: 'benefit' },
+      { name: 'Reputasi Perusahaan', weight: 25, type: 'benefit' },
+      { name: 'Fasilitas Kantor', weight: 20, type: 'benefit' },
+      { name: 'Keamanan Lingkungan', weight: 10, type: 'benefit' },
+      { name: 'Jam Kerja', weight: 8, type: 'cost' },
+      { name: 'Jarak dari Kampus', weight: 5, type: 'cost' },
+      { name: 'Beban Tugas', weight: 2, type: 'cost' },
+    ]
+  },
+  {
+    id: 6,
+    winner: 'PT Halodoc',
+    category: 'Kesehatan',
+    score: 0.2789,
+    date: '19 Mei 2026',
+    time: '13:47',
+    criteriaCount: 5,
+    altCount: 3,
+    companies: [
+      { name: 'PT Halodoc', yi: 0.2789, bars: 100 },
+      { name: 'PT Alodokter', yi: 0.2134, bars: 77 },
+      { name: 'PT KlikDokter', yi: 0.1456, bars: 52 },
+    ],
+    criteria: [
+      { name: 'Relevansi Techstack', weight: 35, type: 'benefit' },
+      { name: 'Uang Saku', weight: 25, type: 'benefit' },
+      { name: 'Reputasi Perusahaan', weight: 20, type: 'benefit' },
+      { name: 'Budaya Perusahaan', weight: 15, type: 'benefit' },
+      { name: 'Beban Tugas', weight: 5, type: 'cost' },
+    ]
+  },
+  {
+    id: 7,
+    winner: 'PT Telkom Indonesia',
+    category: 'Telekomunikasi',
+    score: 0.3344,
+    date: '14 Mei 2026',
+    time: '08:30',
+    criteriaCount: 6,
+    altCount: 3,
+    companies: [
+      { name: 'PT Telkom Indonesia', yi: 0.3344, bars: 100 },
+      { name: 'PT XL Axiata', yi: 0.2156, bars: 65 },
+      { name: 'PT Indosat Ooredoo', yi: 0.1789, bars: 54 },
+    ],
+    criteria: [
+      { name: 'Uang Saku', weight: 30, type: 'benefit' },
+      { name: 'Reputasi Perusahaan', weight: 25, type: 'benefit' },
+      { name: 'Fasilitas Kantor', weight: 20, type: 'benefit' },
+      { name: 'Relevansi Techstack', weight: 15, type: 'benefit' },
+      { name: 'Jam Kerja', weight: 7, type: 'cost' },
+      { name: 'Beban Tugas', weight: 3, type: 'cost' },
+    ]
+  },
+  {
+    id: 8,
+    winner: 'PT Astra International',
+    category: 'Logistik & Transportasi',
+    score: 0.3012,
+    date: '10 Mei 2026',
+    time: '15:20',
+    criteriaCount: 7,
+    altCount: 4,
+    companies: [
+      { name: 'PT Astra International', yi: 0.3012, bars: 100 },
+      { name: 'PT JNE Express', yi: 0.2341, bars: 78 },
+      { name: 'PT SiCepat', yi: 0.1789, bars: 59 },
+      { name: 'PT Anteraja', yi: 0.1023, bars: 34 },
+    ],
+    criteria: [
+      { name: 'Reputasi Perusahaan', weight: 30, type: 'benefit' },
+      { name: 'Uang Saku', weight: 25, type: 'benefit' },
+      { name: 'Keamanan Lingkungan', weight: 15, type: 'benefit' },
+      { name: 'Fasilitas Kantor', weight: 15, type: 'benefit' },
+      { name: 'Jarak dari Kampus', weight: 8, type: 'cost' },
+      { name: 'Jam Kerja', weight: 5, type: 'cost' },
+      { name: 'Beban Tugas', weight: 2, type: 'cost' },
+    ]
+  }
+];
+
+let selectedId = 1;
+
+function getRankClass(i) {
+  if (i === 0) return 'r1';
+  if (i === 1) return 'r2';
+  if (i === 2) return 'r3';
+  return 'rn';
+}
+
+function getRankLabel(i) {
+  return ['🥇','🥈','🥉'][i] || '#' + (i + 1);
+}
+
+function renderList() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = sessions.map(s => {
+    const sel = s.id === selectedId;
+    return `
+      <div class="history-item ${sel ? 'selected' : ''}" onclick="selectSession(${s.id})">
+        <div class="item-icon"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+        <div class="item-body">
+          <div class="item-title">${s.winner}</div>
+          <div class="item-meta">
+            <span><i class="ti ti-calendar" style="font-size:11px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${s.date}</span>
+            <span class="meta-dot"></span>
+            <span>${s.time}</span>
+            <span class="meta-dot"></span>
+            <span>${s.altCount} perusahaan</span>
+            <span class="meta-dot"></span>
+            <span>${s.criteriaCount} kriteria</span>
+          </div>
+          <div class="criteria-tags">
+            <span class="criteria-tag">${s.category}</span>
+            <span class="criteria-tag">Yi: ${s.score.toFixed(4)}</span>
+          </div>
+        </div>
+        <div class="item-right">
+          <div class="score-badge">${s.score.toFixed(4)}</div>
+          <div class="rank-pill rank-1">🥇 Winner</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderDetail(session) {
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-label">Sesi ${session.date}, ${session.time}</div>
+        <div class="detail-company">${session.winner}</div>
+        <div class="detail-category">${session.category}</div>
+        <div class="winner-badge">
+          <i class="ti ti-trophy" style="font-size:13px" aria-hidden="true"></i>
+          Pemenang Sesi
+        </div>
+      </div>
+
+      <div class="yi-score">
+        <div>
+          <div class="yi-label">Nilai Optimasi (Yi)</div>
+          <div style="font-size:11px;color:#60A5FA;margin-top:2px;font-weight:600;">Skor terbaik dari ${session.altCount} alternatif</div>
+        </div>
+        <div class="yi-value">${session.score.toFixed(4)}</div>
+      </div>
+
+      <div class="ranking-list">
+        <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">
+          Peringkat Lengkap
+        </div>
+        ${session.companies.map((c, i) => `
+          <div class="ranking-row">
+            <div class="rank-num ${getRankClass(i)}">${i + 1}</div>
+            <div>
+              <div class="rank-name">${c.name}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${c.bars}%"></div></div>
+            </div>
+            <div class="rank-yi">${c.yi.toFixed(4)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="panel-header" style="padding:16px 20px;">
+        <div>
+          <div class="panel-title" style="font-size:13px;">Kriteria Digunakan</div>
+          <div class="panel-subtitle">${session.criteria.length} kriteria, total bobot 100%</div>
+        </div>
+      </div>
+      <div class="criteria-section">
+        ${session.criteria.map(c => `
+          <div class="criteria-row">
+            <div>
+              <div class="criteria-name">${c.name}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="${c.type === 'benefit' ? 'criteria-type-b' : 'criteria-type-c'}">${c.type}</span>
+              <span class="criteria-weight">${c.weight}%</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="action-btns">
+        <button class="action-btn btn-primary">
+          <i class="ti ti-file-description" style="font-size:15px" aria-hidden="true"></i>
+          Lihat Detail Lengkap
+        </button>
+        <button class="action-btn btn-secondary">
+          <i class="ti ti-refresh" style="font-size:15px" aria-hidden="true"></i>
+          Ulangi dengan Pengaturan Ini
+        </button>
+        <button class="action-btn btn-danger">
+          <i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i>
+          Hapus Sesi Ini
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function selectSession(id) {
+  selectedId = id;
+  renderList();
+  const session = sessions.find(s => s.id === id);
+  renderDetail(session);
+}
+
+renderList();
+renderDetail(sessions[0]);
+</script>

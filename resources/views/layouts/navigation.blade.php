@@ -25,8 +25,11 @@
                     <x-nav-link :href="route('internships.index')" :active="request()->routeIs('internships.*')">
                         {{ __('Tempat Magang') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('moora.index')" :active="request()->routeIs('moora.*')">
+                    <x-nav-link :href="route('moora.index')" :active="request()->routeIs('moora.index')">
                         {{ __('Program MOORA') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('moora.history')" :active="request()->routeIs('moora.history')">
+                        {{ __('Riwayat') }}
                     </x-nav-link>
                 </div>
             </div>

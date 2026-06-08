@@ -1,212 +1,299 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Hasil Perhitungan MOORA') }}
-        </h2>
-    </x-slot>
+    <style>
+        /* Typography & Header */
+        .page-title { font-size: 26px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: #64748B; font-weight: 500; }
 
-    <div class="py-6 md:py-12 px-4 sm:px-0">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <x-breadcrumbs :links="[
-                ['label' => 'Program MOORA', 'url' => route('moora.index')],
-                ['label' => 'Hasil Perhitungan']
-            ]" />
-            
-            <!-- Ranking Cards (Top 3) -->
-            <div class="bg-white overflow-hidden shadow-xl rounded-[2.5rem] border border-slate-100 mb-8 p-6 md:p-12">
-                <h3 class="text-xl md:text-2xl font-black mb-10 flex items-center gap-3 text-slate-900 justify-center md:justify-start">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shadow-sm border border-amber-100">
-                        <svg class="w-6 h-6 md:w-7 md:h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        /* Stepper Style */
+        .wizard-stepper { display: flex; justify-content: space-between; items: center; max-width: 700px; margin: 0 auto 48px; position: relative; }
+        .wizard-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; width: 120px; }
+        .wizard-circle { 
+            width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 2px solid #E2E8F0;
+            display: flex; align-items: center; justify-content: center; font-weight: 800; color: #94A3B8;
+            transition: all 0.5s;
+        }
+        .wizard-step.active .wizard-circle, .wizard-step.completed .wizard-circle { background: #2563EB; border-color: #2563EB; color: #fff; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
+        .wizard-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #94A3B8; margin-top: 12px; text-align: center; }
+        .wizard-step.active .wizard-label, .wizard-step.completed .wizard-label { color: #2563EB; }
+        
+        .wizard-line { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 75%; height: 2px; background: #E2E8F0; z-index: 0; }
+        .wizard-line-progress { height: 100%; background: #2563EB; width: 100%; }
+
+        /* Results Panel Style */
+        .results-panel { background: #fff; border: 0.5px solid #E2E8F0; border-radius: 20px; overflow: hidden; margin-bottom: 24px; padding: 32px; }
+        .winner-card { background: linear-gradient(135deg, #1E40AF 0%, #2563EB 100%); border-radius: 20px; padding: 32px; color: #fff; margin-bottom: 32px; position: relative; overflow: hidden; }
+        .winner-card::after { content: ''; position: absolute; right: -20px; bottom: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        
+        .winner-label { display: inline-flex; padding: 4px 12px; border-radius: 8px; background: rgba(255,255,255,0.2); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+        .winner-name { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+        .winner-score { font-size: 14px; font-weight: 600; opacity: 0.8; }
+
+        /* Step Panels (Collapsible) */
+        .details-trigger { color: #2563EB; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none; margin: 24px 0; }
+        .details-trigger:hover { text-decoration: underline; }
+        .step-panel { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid #F1F5F9; }
+        .step-title { font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .step-num { width: 24px; height: 24px; background: #0F172A; color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+        .step-desc { font-size: 12.5px; color: #64748B; margin-bottom: 20px; line-height: 1.6; }
+        .formula-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 16px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #0F172A; margin-bottom: 16px; }
+
+        /* Calculation Tables */
+        .calc-table-container { overflow-x: auto; border: 1px solid #F1F5F9; border-radius: 12px; }
+        .calc-table { width: 100%; border-collapse: collapse; background: #fff; }
+        .calc-table th { padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid #F1F5F9; font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; text-align: left; }
+        .calc-table td { padding: 14px 16px; border-bottom: 1px solid #F8FAFC; font-size: 12.5px; font-weight: 600; color: #334155; }
+        .calc-table tr:last-child td { border-bottom: none; }
+        .calc-table .val { font-variant-numeric: tabular-nums; }
+        .calc-table .alt-name { font-weight: 800; color: #0F172A; }
+
+        /* Ranking Table */
+        .ranking-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .ranking-table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #F1F5F9; }
+        .ranking-table td { padding: 20px 16px; font-size: 14px; color: #334155; border-bottom: 1px solid #F8FAFC; }
+        .rank-badge { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+        .rank-1 { background: #FEF9C3; color: #A16207; }
+        .rank-2 { background: #F1F5F9; color: #475569; }
+        .rank-3 { background: #FEF3C7; color: #B45309; }
+        .rank-other { background: #F8FAFC; color: #94A3B8; }
+        .score-pill { font-size: 13px; font-weight: 800; color: #2563EB; background: #EFF6FF; padding: 4px 12px; border-radius: 8px; }
+
+        /* Unified Visualization Area */
+        .viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+        .viz-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 20px; padding: 24px; }
+        
+        /* Analysis Section Detailed */
+        .analysis-container { background: #F8FAFC; padding: 24px; border-radius: 16px; border-left: 4px solid #2563EB; }
+        .analysis-section { margin-bottom: 20px; }
+        .analysis-section:last-child { margin-bottom: 0; }
+        .analysis-title { font-size: 13px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .analysis-text { font-size: 13.5px; color: #475569; line-height: 1.6; }
+        .analysis-text strong { color: #0F172A; }
+        .badge-alt { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 5px; background: #E2E8F0; color: #475569; margin-left: 4px; }
+
+        /* Action Footer */
+        .btn-row { display: flex; gap: 12px; margin-top: 32px; border-top: 1px solid #F1F5F9; padding-top: 32px; }
+        .btn-action { height: 48px; border-radius: 12px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; border: none; padding: 0 24px; text-decoration: none; }
+        .btn-primary { background: #2563EB; color: #fff; }
+        .btn-secondary { background: #F1F5F9; color: #475569; }
+        .btn-outline { background: #fff; border: 2px solid #F1F5F9; color: #64748B; }
+
+        @media (max-width: 900px) { .viz-grid { grid-template-columns: 1fr; } }
+    </style>
+
+    <div x-data="{ showDetails: false }">
+        <x-breadcrumbs :links="[
+            ['label' => 'Program MOORA', 'url' => route('moora.index')],
+            ['label' => 'Hasil Perhitungan']
+        ]" />
+
+        <div class="text-center mt-6 mb-8">
+            <h1 class="page-title">Hasil Analisis MOORA</h1>
+            <p class="page-subtitle">Pusat Rekomendasi Karir & Magang Berdasarkan Kriteria Profesional</p>
+        </div>
+
+        <!-- Stepper UI -->
+        <div class="wizard-stepper">
+            <div class="wizard-line"><div class="wizard-line-progress"></div></div>
+            <div class="wizard-step completed">
+                <div class="wizard-circle"><i class="ti ti-check"></i></div>
+                <span class="wizard-label">Pilih & Prioritas</span>
+            </div>
+            <div class="wizard-step completed">
+                <div class="wizard-circle"><i class="ti ti-check"></i></div>
+                <span class="wizard-label">Penilaian</span>
+            </div>
+            <div class="wizard-step active">
+                <div class="wizard-circle">3</div>
+                <span class="wizard-label">Hasil</span>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <!-- Winner Highlight -->
+            <div class="winner-card">
+                <div class="winner-label">Rekomendasi Utama</div>
+                <h2 class="winner-name">{{ $results[0]['name'] }}</h2>
+                <p class="winner-score">Indeks Performa Tertinggi (Yi): {{ number_format($results[0]['optimization_value'], 4) }}</p>
+            </div>
+
+            <!-- VIZ & ANALYSIS -->
+            <div class="viz-grid">
+                <!-- Comparative Radar Chart (Top 3) -->
+                <div class="viz-card">
+                    <h4 class="text-sm font-extrabold text-slate-900 mb-6 uppercase tracking-wider">Visualisasi Perbandingan Profil Top 3</h4>
+                    <div style="height: 340px">
+                        <canvas id="top3RadarChart"></canvas>
                     </div>
-                    Rekomendasi Terbaik
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
-                    @foreach(collect($results)->take(3) as $index => $res)
-                    <div class="relative p-6 md:p-8 border-2 {{ $index == 0 ? 'border-amber-400 bg-amber-50/20 ring-4 ring-amber-50/50' : 'border-slate-100 bg-white' }} rounded-[2rem] md:rounded-[2.5rem] shadow-sm transition-all duration-300 hover:shadow-xl group">
-                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white px-6 py-1 border border-slate-100 shadow-sm rounded-full font-black text-[9px] uppercase tracking-widest text-slate-500">
-                            Rank #{{ $res['rank'] }}
+                    <p class="text-[10px] text-slate-400 mt-4 leading-relaxed font-bold text-center italic">
+                        *Grafik ini memetakan keseimbangan kriteria. Semakin luas area yang tertutup, semakin unggul profil perusahaan tersebut.
+                    </p>
+                </div>
+                <!-- Text Analysis Detailed -->
+                <div class="viz-card">
+                    <h4 class="text-sm font-extrabold text-slate-900 mb-6 uppercase tracking-wider">Laporan Analisis Strategis</h4>
+                    <div class="analysis-container">
+                        <!-- Alasan Menang -->
+                        <div class="analysis-section">
+                            <div class="analysis-title"><i class="ti ti-trophy text-blue-600"></i> Ringkasan Kemenangan</div>
+                            <div class="analysis-text">
+                                <strong>{{ $results[0]['name'] }}</strong> unggul dengan skor optimasi <strong>{{ number_format($results[0]['optimization_value'], 4) }}</strong>. 
+                                Kemenangan ini didorong oleh efisiensi tinggi pada kriteria yang Anda prioritaskan.
+                            </div>
                         </div>
-                        <div class="text-4xl md:text-5xl mb-4 md:mb-6 text-center transform group-hover:scale-110 transition-transform">{{ $index == 0 ? '🥇' : ($index == 1 ? '🥈' : '🥉') }}</div>
-                        <div class="text-lg md:text-xl font-black text-slate-900 text-center mb-3 truncate capitalize">{{ $res['name'] }}</div>
-                        <div class="text-[9px] font-black text-blue-600 text-center uppercase tracking-[0.2em] bg-blue-50 py-2 rounded-xl border border-blue-100/50">Yi: {{ number_format($res['optimization_value'], 4) }}</div>
+
+                        <!-- Keunggulan Per Kriteria -->
+                        <div class="analysis-section">
+                            <div class="analysis-title"><i class="ti ti-chart-dots text-blue-600"></i> Pemimpin Kriteria</div>
+                            <div class="analysis-text space-y-2">
+                                @foreach($criterias as $c)
+                                    @php
+                                        $type = strtolower($c->type);
+                                        $sorted = collect($results)->sortBy(function($r) use ($c, $type) {
+                                            return $type === 'cost' ? $r['scores'][$c->id] : -$r['scores'][$c->id];
+                                        })->first();
+                                    @endphp
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="text-slate-500">{{ $c->name }}</span>
+                                        <span class="font-bold text-slate-800">{{ $sorted['name'] }} <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400">{{ $sorted['scores'][$c->id] }}</span></span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Komparasi -->
+                        <div class="analysis-section">
+                            <div class="analysis-title"><i class="ti ti-arrows-left-right text-blue-600"></i> Margin Persaingan</div>
+                            <div class="analysis-text">
+                                @if(count($results) > 1)
+                                    Selisih skor dengan kompetitor terdekat (<strong>{{ $results[1]['name'] }}</strong>) adalah <strong>{{ number_format($results[0]['optimization_value'] - $results[1]['optimization_value'], 4) }}</strong>.
+                                @else
+                                    Perusahaan ini merupakan satu-satunya alternatif yang dianalisis dalam sesi ini.
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                    @endforeach
+                </div>
+            </div>
+
+            <!-- TABLE RANKING -->
+            <h3 class="text-lg font-extrabold text-slate-900 mb-6">Tabel Peringkat & Performa Relatif</h3>
+            <div class="overflow-x-auto mb-10">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px">Rank</th>
+                            <th>Nama Perusahaan</th>
+                            <th style="width: 200px">Indeks Performa (Relatif)</th>
+                            <th style="text-align: right">Skor Yi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $maxYi = $results[0]['optimization_value'] > 0 ? $results[0]['optimization_value'] : 1; @endphp
+                        @foreach($results as $index => $res)
+                            <tr>
+                                <td><div class="rank-badge {{ $index < 3 ? 'rank-'.($index+1) : 'rank-other' }}">{{ $index + 1 }}</div></td>
+                                <td class="font-extrabold text-slate-900">{{ $res['name'] }}</td>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <!-- Unified Visualization Logic: Performance Index compared to Winner -->
+                                        <div style="height: 8px; background: #F1F5F9; border-radius: 4px; width: 140px; overflow: hidden;" title="Persentase performa dibandingkan peringkat 1">
+                                            <div style="height: 100%; background: #2563EB; border-radius: 4px; width: {{ max(0, ($res['optimization_value'] / $maxYi) * 100) }}%"></div>
+                                        </div>
+                                        <span class="text-[10px] font-black text-blue-600 w-8">{{ round(max(0, ($res['optimization_value'] / $maxYi) * 100)) }}%</span>
+                                    </div>
+                                </td>
+                                <td style="text-align: right"><span class="score-pill">{{ number_format($res['optimization_value'], 4) }}</span></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <p class="text-[10px] text-slate-400 font-bold mt-4 italic">
+                    *Garis visual menunjukkan <strong>Relative Performance Index</strong>. Peringkat 1 dijadikan standar 100%, dan baris di bawahnya menunjukkan seberapa jauh tertinggal dibandingkan pemenang.
+                </p>
+            </div>
+
+            <!-- COLLAPSIBLE DETAILS -->
+            <div class="details-trigger" @click="showDetails = !showDetails">
+                <i class="ti" :class="showDetails ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+                <span x-text="showDetails ? 'Sembunyikan Detail Perhitungan' : 'Lihat Detail Perhitungan (Langkah-langkah & Rumus)'"></span>
+            </div>
+
+            <div x-show="showDetails" x-transition.opacity>
+                <div class="step-panel">
+                    <div class="step-title"><div class="step-num">1</div> Matriks Keputusan (X)</div>
+                    <p class="step-desc">Tabel data awal berdasarkan penilaian Anda.</p>
+                    <div class="calc-table-container">
+                        <table class="calc-table">
+                            <thead><tr><th>Alternatif</th>@foreach($criterias as $c)<th>{{ $c->name }}</th>@endforeach</tr></thead>
+                            <tbody>
+                                @foreach($results as $res)
+                                    <tr><td class="alt-name">{{ $res['name'] }}</td>@foreach($criterias as $c)<td class="val">{{ $res['scores'][$c->id] }}</td>@endforeach</tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- Main Results -->
-                <div class="bg-white overflow-hidden border border-slate-100 rounded-[2rem] shadow-sm">
-                    <div class="hidden md:block overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-100 text-center">
-                            <thead class="bg-slate-900">
-                                <tr>
-                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rank</th>
-                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Nama Tempat Magang</th>
-                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Nilai Akhir (Yi)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
+                <div class="step-panel">
+                    <div class="step-title"><div class="step-num">2</div> Normalisasi Matriks (R)</div>
+                    <p class="step-desc">Normalisasi rumus MOORA: Xij / sqrt[ Σ(Xij)² ]</p>
+                    <div class="formula-box">Rumus: Rij = Xij / sqrt[ Σ(Xij)² ]</div>
+                    <div class="calc-table-container">
+                        <table class="calc-table">
+                            <thead><tr><th>Alternatif</th>@foreach($criterias as $c)<th>{{ $c->name }}</th>@endforeach</tr></thead>
+                            <tbody>
                                 @foreach($results as $res)
-                                    <tr class="{{ $res['rank'] == 1 ? 'bg-yellow-50/30' : '' }} hover:bg-slate-50 transition group">
-                                        <td class="px-8 py-5 font-black text-slate-400">#{{ $res['rank'] }}</td>
-                                        <td class="px-8 py-5 font-bold text-slate-700 capitalize text-sm text-left">{{ $res['name'] }}</td>
-                                        <td class="px-8 py-5 text-right font-black text-blue-600 font-mono italic">{{ number_format($res['optimization_value'], 4) }}</td>
+                                    <tr><td class="alt-name">{{ $res['name'] }}</td>@foreach($criterias as $c)<td class="val">{{ number_format($res['normalized_scores'][$c->id]['normalized'], 4) }}</td>@endforeach</tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="step-panel">
+                    <div class="step-title"><div class="step-num">3</div> Normalisasi Terbobot (Y)</div>
+                    <p class="step-desc">Mengalikan nilai normalisasi dengan bobot kepentingan (W).</p>
+                    <div class="formula-box">Rumus: Yij = Rij * Wj</div>
+                    <div class="calc-table-container">
+                        <table class="calc-table">
+                            <thead><tr><th>Alternatif</th>@foreach($criterias as $c)<th>{{ $c->name }} ({{ $c->weight }}%)</th>@endforeach</tr></thead>
+                            <tbody>
+                                @foreach($results as $res)
+                                    <tr><td class="alt-name">{{ $res['name'] }}</td>@foreach($criterias as $c)<td class="val">{{ number_format($res['normalized_scores'][$c->id]['weighted'], 4) }}</td>@endforeach</tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="step-panel">
+                    <div class="step-title"><div class="step-num">4</div> Penentuan Nilai Optimasi (Yi)</div>
+                    <p class="step-desc">Finalisasi ranking berdasarkan selisih kriteria Benefit dan Cost.</p>
+                    <div class="formula-box">Rumus: Yi = Σ(Max Benefit) - Σ(Min Cost)</div>
+                    <div class="calc-table-container">
+                        <table class="calc-table">
+                            <thead><tr><th>Rank</th><th>Alternatif</th><th>Σ Benefit</th><th>Σ Cost</th><th style="text-align: right">Yi (Optimasi)</th></tr></thead>
+                            <tbody>
+                                @foreach($results as $index => $res)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td class="alt-name">{{ $res['name'] }}</td>
+                                        <td class="val text-emerald-600">+ {{ number_format($res['sum_benefit'], 4) }}</td>
+                                        <td class="val text-rose-500">- {{ number_format($res['sum_cost'], 4) }}</td>
+                                        <td style="text-align: right" class="font-extrabold text-blue-600">{{ number_format($res['optimization_value'], 4) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                    <div class="md:hidden divide-y divide-slate-100">
-                        @foreach($results as $res)
-                        <div class="p-5 flex items-center justify-between {{ $res['rank'] == 1 ? 'bg-yellow-50/30' : '' }}">
-                            <div class="flex items-center gap-4">
-                                <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs">#{{ $res['rank'] }}</span>
-                                <span class="font-bold text-slate-700 text-sm capitalize">{{ $res['name'] }}</span>
-                            </div>
-                            <span class="font-black text-blue-600 font-mono text-xs">{{ number_format($res['optimization_value'], 4) }}</span>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Visual Comparison Section -->
-                <div class="mt-12 md:mt-16 bg-slate-50/50 rounded-[2.5rem] md:rounded-[3.5rem] p-6 md:p-10 border border-slate-100">
-                    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
-                        <!-- Left: Radar Chart -->
-                        <div class="w-full lg:w-7/12 bg-white rounded-[2rem] p-4 md:p-6 border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center">
-                            <div class="relative h-[300px] sm:h-[400px] md:h-[450px] w-full">
-                                <canvas id="comparisonRadar"></canvas>
-                            </div>
-                        </div>
-                        
-                        <!-- Right: Analysis -->
-                        <div class="w-full lg:w-5/12 flex flex-col justify-between py-2">
-                            <div>
-                                <h4 class="text-xl font-black text-slate-900 flex items-center gap-3">
-                                    <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
-                                    Analisis Performa
-                                </h4>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2 italic">Perbandingan 3 Kandidat Teratas</p>
-                                
-                                <div class="space-y-3 mt-8">
-                                    @foreach(collect($results)->take(3) as $index => $res)
-                                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition group">
-                                        <div class="flex items-center gap-3 mb-2">
-                                            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ ['#3b82f6', '#10b981', '#f59e0b'][$index] }}"></span>
-                                            <span class="text-[11px] font-black text-slate-800 uppercase truncate group-hover:text-blue-600 transition-colors">{{ $res['name'] }}</span>
-                                            <span class="ml-auto text-[8px] font-black text-slate-300 uppercase italic">Rank #{{ $res['rank'] }}</span>
-                                        </div>
-                                        <p class="text-[10px] text-slate-500 leading-relaxed font-medium">
-                                            Memiliki keunggulan pada: <span class="text-blue-600 font-bold italic">
-                                            @php
-                                                $scores = collect($res['original_scores']);
-                                                $maxScore = $scores->max();
-                                                $strongest = [];
-                                                foreach($criterias as $c) {
-                                                    if($res['original_scores'][$c->id] == $maxScore) $strongest[] = $c->name;
-                                                }
-                                                echo implode(' & ', array_slice($strongest, 0, 2));
-                                            @endphp
-                                            </span>.
-                                        </p>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 lg:mt-0 p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
-                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest leading-loose">
-                                    * Klik pada titik grafik untuk detail kriteria. @if(count($results) > 0) Peringkat tertinggi diraih oleh <span class="text-indigo-600 font-black">{{ $results[0]['name'] }}</span>. @endif
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Detail Perhitungan MOORA (Dropdown Link Style) -->
-            <div x-data="{ open: false }" class="mt-8 px-4 md:px-0">
-                <button @click="open = !open" 
-                        class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-all font-black text-xs uppercase tracking-widest group bg-transparent p-0 mb-8 outline-none">
-                    <svg class="w-4 h-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                        <path d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                    <span class="border-b-2 border-transparent group-hover:border-blue-800 pb-0.5">Detail Perhitungan MOORA</span>
-                </button>
-
-                <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="space-y-12">
-                    <!-- Step 1: Decision Matrix -->
-                    <div class="bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-12 shadow-sm">
-                        <div class="mb-10">
-                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-lg italic">Langkah 1</span>
-                            <h4 class="text-xl font-black text-slate-900 mt-4">Matriks Keputusan (X)</h4>
-                            <p class="text-xs text-slate-500 mt-3 leading-relaxed max-w-2xl">Membentuk matriks keputusan berdasarkan skor penilaian (1-5) yang Anda berikan untuk setiap alternatif pada setiap kriteria.</p>
-                        </div>
-                        @include('moora.partials.step-content', ['key' => 'original_scores', 'results' => $results, 'criterias' => $criterias])
-                    </div>
-
-                    <!-- Step 2: Normalization -->
-                    <div class="bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-12 shadow-sm">
-                        <div class="mb-10">
-                            <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest rounded-lg italic">Langkah 2</span>
-                            <h4 class="text-xl font-black text-slate-900 mt-4">Normalisasi Matriks (r<sub>ij</sub>)</h4>
-                            <div class="bg-slate-900 text-white p-6 rounded-2xl my-6 font-mono text-xs md:text-sm shadow-xl shadow-slate-200">
-                                <span class="text-slate-400">// Rumus Normalisasi</span><br>
-                                <span class="text-emerald-400">r<sub>ij</sub></span> = x<sub>ij</sub> / <span class="text-blue-400">√[Σ x<sub>ij</sub>²]</span>
-                            </div>
-                            <p class="text-xs text-slate-500 leading-relaxed max-w-2xl">Normalisasi dilakukan untuk menyamakan skala berbagai kriteria yang berbeda agar nilainya dapat dibandingkan secara adil.</p>
-                        </div>
-                        @include('moora.partials.step-content', ['key' => 'normalized_scores', 'results' => $results, 'criterias' => $criterias, 'type' => 'normalized'])
-                    </div>
-
-                    <!-- Step 3: Weighted Normalization -->
-                    <div class="bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-12 shadow-sm">
-                        <div class="mb-10">
-                            <span class="px-3 py-1 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-widest rounded-lg italic">Langkah 3</span>
-                            <h4 class="text-xl font-black text-slate-900 mt-4">Matriks Terbobot (y<sub>ij</sub>)</h4>
-                            <div class="bg-slate-900 text-white p-6 rounded-2xl my-6 font-mono text-xs md:text-sm shadow-xl shadow-slate-200">
-                                <span class="text-slate-400">// Rumus Pembobotan</span><br>
-                                <span class="text-amber-400">y<sub>ij</sub></span> = r<sub>ij</sub> * <span class="text-emerald-400">w<sub>j</sub></span>
-                            </div>
-                            <p class="text-xs text-slate-500 leading-relaxed max-w-2xl">Nilai normalisasi dikalikan dengan bobot kepentingan (W) yang telah Anda atur. Semakin tinggi bobot, semakin besar pengaruh kriteria tersebut terhadap hasil akhir.</p>
-                        </div>
-                        @include('moora.partials.step-content', ['key' => 'normalized_scores', 'results' => $results, 'criterias' => $criterias, 'type' => 'weighted'])
-                    </div>
-
-                    <!-- Step 4: Yi Calculation -->
-                    <div class="bg-white rounded-[2.5rem] border border-slate-100 p-6 md:p-12 shadow-sm">
-                        <div class="mb-10">
-                            <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-lg italic">Langkah 4</span>
-                            <h4 class="text-xl font-black text-slate-900 mt-4">Nilai Optimasi Akhir (Yi)</h4>
-                            <div class="bg-slate-900 text-white p-6 rounded-2xl my-6 font-mono text-xs md:text-sm shadow-xl shadow-slate-200 text-center">
-                                <span class="text-blue-400">Yi</span> = <span class="text-emerald-400">ΣBenefit</span> - <span class="text-rose-400">ΣCost</span>
-                            </div>
-                            <p class="text-xs text-slate-500 leading-relaxed max-w-2xl">Langkah terakhir adalah menjumlahkan seluruh nilai kriteria 'Benefit' dan menguranginya dengan kriteria 'Cost'. Alternatif dengan nilai Yi tertinggi adalah pilihan terbaik.</p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach($results as $res)
-                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-300 hover:bg-white transition group">
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="font-black text-xs text-slate-800 capitalize">{{ $res['name'] }}</span>
-                                    <span class="text-[9px] font-black text-slate-400 group-hover:text-blue-600 transition">#{{ $res['rank'] }}</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="text-[8px] font-black text-slate-400 uppercase leading-relaxed italic">
-                                        <span class="text-emerald-500">ΣBenefit: {{ number_format($res['sum_benefit'], 4) }}</span><br>
-                                        <span class="text-rose-500">ΣCost: {{ number_format($res['sum_cost'], 4) }}</span>
-                                    </div>
-                                    <span class="text-xl font-black text-blue-600 font-mono tracking-tighter">{{ number_format($res['optimization_value'], 4) }}</span>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-16 flex flex-col sm:flex-row justify-start gap-4 pb-12">
-                <a href="{{ route('moora.index') }}" class="px-8 py-4 text-slate-400 font-black hover:text-slate-600 transition text-xs uppercase tracking-widest text-center">Ulangi Perhitungan</a>
-                <a href="{{ route('dashboard') }}" class="px-10 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-black transition transform active:scale-95 shadow-xl shadow-slate-900/20 text-xs uppercase tracking-widest text-center">Kembali ke Dashboard</a>
+            <!-- ACTIONS -->
+            <div class="btn-row">
+                <a href="{{ route('moora.index') }}" class="btn-action btn-outline"><i class="ti ti-refresh"></i> Ulangi Analisis</a>
+                <a href="{{ route('moora.history') }}" class="btn-action btn-secondary"><i class="ti ti-history"></i> Lihat Riwayat</a>
+                <a href="{{ route('dashboard') }}" class="btn-action btn-primary ml-auto">Selesai & Ke Dashboard <i class="ti ti-arrow-right"></i></a>
             </div>
         </div>
     </div>
@@ -214,68 +301,47 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('comparisonRadar').getContext('2d');
-            const topResults = {!! json_encode(collect($results)->take(3)) !!};
-            const criteriaNames = {!! json_encode($criterias->pluck('name')) !!};
-            const criteriaIds = {!! json_encode($criterias->pluck('id')) !!};
-            const isDesktop = window.innerWidth >= 1024;
+            const ctx = document.getElementById('top3RadarChart').getContext('2d');
+            const results = {!! json_encode(array_slice($results, 0, 3)) !!};
+            const criterias = {!! json_encode($criterias) !!};
 
             const colors = [
-                { border: '#3b82f6', background: 'rgba(59, 130, 246, 0.15)' },
-                { border: '#10b981', background: 'rgba(16, 185, 129, 0.15)' },
-                { border: '#f59e0b', background: 'rgba(245, 158, 11, 0.15)' }
+                { border: '#2563EB', bg: 'rgba(37, 99, 235, 0.1)' },
+                { border: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
+                { border: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' }
             ];
 
             new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: criteriaNames,
-                    datasets: topResults.map((res, index) => ({
-                        label: res.name.toUpperCase(),
-                        data: criteriaIds.map(id => res.original_scores[id]),
+                    labels: criterias.map(c => c.name),
+                    datasets: results.map((res, index) => ({
+                        label: res.name,
+                        data: criterias.map(c => {
+                            const score = res.scores[c.id] || 0;
+                            return c.type.toLowerCase() === 'cost' ? (6 - score) : score;
+                        }),
+                        backgroundColor: colors[index].bg,
                         borderColor: colors[index].border,
-                        backgroundColor: colors[index].background,
-                        borderWidth: 3.5,
-                        pointRadius: 4,
-                        tension: 0.1
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#fff',
+                        fill: true
                     }))
                 },
                 options: {
-                    maintainAspectRatio: false,
                     responsive: true,
-                    layout: {
-                        padding: isDesktop ? 20 : 10
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: true, position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 10, weight: 'bold' }, padding: 15, usePointStyle: true } }
                     },
                     scales: {
                         r: {
-                            beginAtZero: true, min: 0, max: 5,
-                            ticks: { 
-                                stepSize: 1, 
-                                display: false,
-                            },
-                            grid: { color: '#e2e8f0', lineWidth: 1 },
-                            angleLines: { color: '#e2e8f0' },
-                            pointLabels: {
-                                display: isDesktop,
-                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 10, weight: '900' },
-                                color: '#475569',
-                                padding: 15
-                            }
-                        }
-                    },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            enabled: true,
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleFont: { size: 11, weight: 'black' },
-                            bodyFont: { size: 10, weight: 'bold' },
-                            padding: 10,
-                            cornerRadius: 10,
-                            callbacks: {
-                                title: (tooltipItems) => criteriaNames[tooltipItems[0].dataIndex],
-                                label: (context) => ` ${context.dataset.label}: ${context.parsed.r} Skor`
-                            }
+                            min: 0, max: 5,
+                            ticks: { display: false, stepSize: 1 },
+                            grid: { color: '#F1F5F9' },
+                            angleLines: { color: '#F1F5F9' },
+                            pointLabels: { font: { family: 'Plus Jakarta Sans', size: 10, weight: 'bold' }, color: '#64748B' }
                         }
                     }
                 }

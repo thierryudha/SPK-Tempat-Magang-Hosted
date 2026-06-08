@@ -6,6 +6,8 @@ use App\Models\Internship;
 use App\Models\User;
 use App\Models\Criteria;
 use App\Models\InternshipEvaluation;
+use App\Models\MooraSession;
+use App\Models\ActivityLog;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -134,70 +136,41 @@ class DashboardController extends Controller
         // 3. Global Stats
         $totalUsers = User::count();
         $totalInternships = Internship::count();
+        $totalSessions = MooraSession::where('user_id', $user->id)->count();
         
-        // 4. Treemap Data
-        $treemapData = Internship::with('category')
-            ->select('category_id', DB::raw('count(*) as value'))
-            ->groupBy('category_id')
-            ->get()
-            ->map(function($item) {
-                return (object) [
-                    'category' => $item->category->name ?? 'Unknown',
-                    'value' => $item->value
-                ];
-            });
-
-        // 5. Growth Trend Data ... (unchanged) ...
-
-        // 6. Benchmark Data
-        $top5Categories = Internship::select('category_id', DB::raw('count(*) as total'))
-            ->groupBy('category_id')
-            ->orderBy('total', 'desc')
+        // 4. Latest Sessions
+        $latestSessions = MooraSession::where('user_id', $user->id)
+            ->with(['evaluations.internship.category'])
+            ->latest()
             ->limit(5)
             ->get();
 
-        $criterias = Criteria::all();
-        $criteriaIds = $criterias->pluck('id');
-
-        $criteriaComparison = [];
-        foreach ($top5Categories as $catItem) {
-            $catScores = [];
-            $categoryName = $catItem->category->name ?? 'Unknown';
-            
-            $catData = DB::table('internship_evaluations')
-                ->join('internships', 'internship_evaluations.internship_id', '=', 'internships.id')
-                ->where('internships.category_id', $catItem->category_id)
-                ->whereIn('internship_evaluations.criteria_id', $criteriaIds)
-                ->select('internship_evaluations.criteria_id', DB::raw('AVG(score) as avg_score'))
-                ->groupBy('internship_evaluations.criteria_id')
-                ->get()
-                ->keyBy('criteria_id');
-
-            foreach ($criterias as $crit) {
-                $score = $catData->get($crit->id);
-                $catScores[] = $score ? round($score->avg_score, 2) : null;
+        // 5. Popular Criteria
+        $allSessions = MooraSession::where('user_id', $user->id)->get();
+        $criteriaCounts = [];
+        foreach ($allSessions as $s) {
+            foreach ($s->criteria_used as $cId) {
+                $criteriaCounts[$cId] = ($criteriaCounts[$cId] ?? 0) + 1;
             }
-            $criteriaComparison[] = [
-                'label' => $categoryName,
-                'data' => $catScores
-            ];
         }
+        arsort($criteriaCounts);
+        $topCriteriaIds = array_slice(array_keys($criteriaCounts), 0, 6, true);
+        $popularCriteria = Criteria::whereIn('id', $topCriteriaIds)->get()->map(function($c) use ($criteriaCounts, $totalSessions) {
+            $count = $criteriaCounts[$c->id] ?? 0;
+            return (object) [
+                'name' => $c->name,
+                'count' => $count,
+                'percentage' => $totalSessions > 0 ? round(($count / $totalSessions) * 100) : 0
+            ];
+        })->sortByDesc('count');
 
-        // 7. Global Top Ranking
-        $globalTopInternships = Internship::with('category')
-            ->join('internship_evaluations', 'internships.id', '=', 'internship_evaluations.internship_id')
-            ->select('internships.id', 'internships.name', 'internships.category_id', DB::raw('AVG(internship_evaluations.score) as avg_score'))
-            ->groupBy('internships.id', 'internships.name', 'internships.category_id')
-            ->orderBy('avg_score', 'desc')
-            ->limit(5)
-            ->get()
-            ->map(function($item) {
-                return (object) [
-                    'name' => $item->name,
-                    'avg_score' => $item->avg_score,
-                    'category' => $item->category->name ?? 'Unknown'
-                ];
-            });
+        // 6. Recent Activities
+        $recentActivities = ActivityLog::where('user_id', $user->id)
+            ->latest()
+            ->limit(4)
+            ->get();
+
+        $criterias = Criteria::all();
 
         return view('dashboard', compact(
             'evaluationsCount', 
@@ -205,8 +178,10 @@ class DashboardController extends Controller
             'personalChartData',
             'totalUsers', 
             'totalInternships',
-            'criterias',
-            'globalTopInternships'
+            'totalSessions',
+            'latestSessions',
+            'popularCriteria',
+            'criterias'
         ));
     }
 }

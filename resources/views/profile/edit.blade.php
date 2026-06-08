@@ -7,7 +7,9 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+            <x-breadcrumbs :links="[['label' => 'Profil Saya']]" />
+            
+            <div class="p-4 sm:p-8 bg-white shadow-sm sm:rounded-2xl border border-slate-100">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-photo-form')
                 </div>
