@@ -1,6 +1,6 @@
 # MooraProject - SPK Penentuan Tempat Magang
 
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-12.6-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
 
 **MooraProject** adalah aplikasi Sistem Pendukung Keputusan (SPK) berbasis web yang dirancang untuk membantu mahasiswa menentukan tempat magang terbaik secara objektif menggunakan metode **MOORA (Multi-Objective Optimization on the basis of Ratio Analysis)**.
