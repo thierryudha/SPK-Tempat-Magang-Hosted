@@ -224,7 +224,7 @@
         .rank-name { flex: 1; font-size: 13px; font-weight: 600; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .rank-yi { font-size: 12px; font-weight: 700; color: #2563EB; font-variant-numeric: tabular-nums; }
 
-        .bar-track { height: 4px; background: #F1F5F9; border-radius: 2px; margin-top: 3px; }
+        .bar-track { height: 4px; background: #F1F5F9; border-radius: 2px; margin-top: 3px; overflow: hidden; }
         .bar-fill { height: 4px; background: #2563EB; border-radius: 2px; }
 
         /* Criteria Section */
@@ -280,6 +280,38 @@
     <div class="mt-6 mb-10">
         <h1 class="page-title">Riwayat Perhitungan MOORA</h1>
         <p class="page-subtitle">Rekap seluruh sesi analisis tempat magang yang pernah kamu jalankan</p>
+    </div>
+
+    <!-- Stats Row Restored -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="ti ti-history"></i></div>
+            <div>
+                <div class="stat-label">Total Sesi</div>
+                <div class="stat-value">{{ $totalSessionsCount }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="ti ti-trophy"></i></div>
+            <div>
+                <div class="stat-label">Terakhir Menang</div>
+                <div class="stat-value" style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:160px;">{{ $latestSession->winner_name ?? '-' }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="ti ti-users"></i></div>
+            <div>
+                <div class="stat-label">Rata-rata Alternatif</div>
+                <div class="stat-value">{{ round($avgAlternatifs, 1) }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="ti ti-calendar-event"></i></div>
+            <div>
+                <div class="stat-label">Bulan Ini</div>
+                <div class="stat-value">{{ \App\Models\MooraSession::where('user_id', Auth::id())->whereMonth('created_at', now()->month)->count() }}</div>
+            </div>
+        </div>
     </div>
 
     <div class="content-area">
@@ -338,7 +370,7 @@
 
                         </div>
                         <div class="item-right">
-                            <div class="score-badge">{{ number_format($session['score'], 4) }}</div>
+                            <div class="score-badge">{{ number_format($session['score'], 2) }}</div>
                             <div class="rank-pill rank-1">🥇 Winner</div>
                         </div>
                     </div>
@@ -423,7 +455,7 @@
                             <div class="yi-label">Nilai Optimasi (Yi)</div>
                             <div style="font-size:11px;color:#60A5FA;margin-top:2px;font-weight:600;">Skor tertinggi dari ${session.altCount} alternatif</div>
                         </div>
-                        <div class="yi-value">${session.score.toFixed(4)}</div>
+                        <div class="yi-value">${session.score.toFixed(2)}</div>
                     </div>
 
                     <div class="ranking-list">
@@ -437,7 +469,7 @@
                                     <div class="rank-name">${c.name}</div>
                                     <div class="bar-track"><div class="bar-fill" style="width:${c.bars}%"></div></div>
                                 </div>
-                                <div class="rank-yi">${c.yi.toFixed(4)}</div>
+                                <div class="rank-yi">${c.yi.toFixed(2)}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -465,7 +497,7 @@
 
                 <div class="detail-card">
                     <div class="action-btns">
-                        <a href="{{ route('moora.index') }}" class="action-btn btn-primary">
+                        <a href="/moora/history/${session.id}" class="action-btn btn-primary">
                             <i class="ti ti-file-description" style="font-size:15px"></i>
                             Lihat Detail Lengkap
                         </a>
@@ -475,7 +507,7 @@
                         </a>
                         <form action="/moora/history/${session.id}" method="POST" onsubmit="return confirm('Hapus sesi ini secara permanen?')">
                             @csrf
-                            @method('DELETE')
+                            <input type="hidden" name="_method" value="DELETE">
                             <button type="submit" class="action-btn btn-danger">
                                 <i class="ti ti-trash" style="font-size:15px"></i>
                                 Hapus Sesi Ini

@@ -113,7 +113,7 @@
             <div class="winner-card">
                 <div class="winner-label">Rekomendasi Utama</div>
                 <h2 class="winner-name">{{ $results[0]['name'] }}</h2>
-                <p class="winner-score">Indeks Performa Tertinggi (Yi): {{ number_format($results[0]['optimization_value'], 4) }}</p>
+                <p class="winner-score">Indeks Performa Tertinggi (Yi): {{ number_format($results[0]['optimization_value'], 2) }}</p>
             </div>
 
             <!-- VIZ & ANALYSIS -->
@@ -136,7 +136,7 @@
                         <div class="analysis-section">
                             <div class="analysis-title"><i class="ti ti-trophy text-blue-600"></i> Ringkasan Kemenangan</div>
                             <div class="analysis-text">
-                                <strong>{{ $results[0]['name'] }}</strong> unggul dengan skor optimasi <strong>{{ number_format($results[0]['optimization_value'], 4) }}</strong>. 
+                                <strong>{{ $results[0]['name'] }}</strong> unggul dengan skor optimasi <strong>{{ number_format($results[0]['optimization_value'], 2) }}</strong>. 
                                 Kemenangan ini didorong oleh efisiensi tinggi pada kriteria yang Anda prioritaskan.
                             </div>
                         </div>
@@ -147,14 +147,21 @@
                             <div class="analysis-text space-y-2">
                                 @foreach($criterias as $c)
                                     @php
-                                        $type = strtolower($c->type);
-                                        $sorted = collect($results)->sortBy(function($r) use ($c, $type) {
-                                            return $type === 'cost' ? $r['scores'][$c->id] : -$r['scores'][$c->id];
-                                        })->first();
+                                        $maxScore = collect($results)->max(fn($r) => $r['original_scores'][$c->id]);
+                                        $leaders = collect($results)->filter(fn($r) => $r['original_scores'][$c->id] == $maxScore);
                                     @endphp
-                                    <div class="flex justify-between items-center text-xs">
-                                        <span class="text-slate-500">{{ $c->name }}</span>
-                                        <span class="font-bold text-slate-800">{{ $sorted['name'] }} <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400">{{ $sorted['scores'][$c->id] }}</span></span>
+                                    <div class="flex justify-between items-start text-xs">
+                                        <span class="text-slate-500 shrink-0">{{ $c->name }}</span>
+                                        <div class="text-right">
+                                            @foreach($leaders as $leader)
+                                                <div class="font-bold text-slate-800">
+                                                    {{ $leader['name'] }} 
+                                                    @if($loop->last)
+                                                        <span class="text-[9px] bg-blue-50 px-1.5 py-0.5 rounded text-blue-600 ml-1">Skor {{ $maxScore }}</span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -165,7 +172,7 @@
                             <div class="analysis-title"><i class="ti ti-arrows-left-right text-blue-600"></i> Margin Persaingan</div>
                             <div class="analysis-text">
                                 @if(count($results) > 1)
-                                    Selisih skor dengan kompetitor terdekat (<strong>{{ $results[1]['name'] }}</strong>) adalah <strong>{{ number_format($results[0]['optimization_value'] - $results[1]['optimization_value'], 4) }}</strong>.
+                                    Selisih skor dengan kompetitor terdekat (<strong>{{ $results[1]['name'] }}</strong>) adalah <strong>{{ number_format($results[0]['optimization_value'] - $results[1]['optimization_value'], 2) }}</strong>.
                                 @else
                                     Perusahaan ini merupakan satu-satunya alternatif yang dianalisis dalam sesi ini.
                                 @endif
@@ -188,21 +195,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $maxYi = $results[0]['optimization_value'] > 0 ? $results[0]['optimization_value'] : 1; @endphp
+                        @php 
+                            $minYi = collect($results)->min('optimization_value');
+                            $maxYi = collect($results)->max('optimization_value');
+                            $range = $maxYi - $minYi;
+                        @endphp
                         @foreach($results as $index => $res)
                             <tr>
                                 <td><div class="rank-badge {{ $index < 3 ? 'rank-'.($index+1) : 'rank-other' }}">{{ $index + 1 }}</div></td>
                                 <td class="font-extrabold text-slate-900">{{ $res['name'] }}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <!-- Unified Visualization Logic: Performance Index compared to Winner -->
-                                        <div style="height: 8px; background: #F1F5F9; border-radius: 4px; width: 140px; overflow: hidden;" title="Persentase performa dibandingkan peringkat 1">
-                                            <div style="height: 100%; background: #2563EB; border-radius: 4px; width: {{ max(0, ($res['optimization_value'] / $maxYi) * 100) }}%"></div>
+                                        <!-- Unified Visualization Logic: Min-Max Scaling Performance Index -->
+                                        @php 
+                                            $percentage = $range > 0 ? (($res['optimization_value'] - $minYi) / $range) * 100 : 100;
+                                        @endphp
+                                        <div style="height: 8px; background: #F1F5F9; border-radius: 4px; width: 140px; overflow: hidden;" title="Indeks performa relatif">
+                                            <div style="height: 100%; background: #2563EB; border-radius: 4px; width: {{ $percentage }}%"></div>
                                         </div>
-                                        <span class="text-[10px] font-black text-blue-600 w-8">{{ round(max(0, ($res['optimization_value'] / $maxYi) * 100)) }}%</span>
+                                        <span class="text-[10px] font-black text-blue-600 w-8">{{ round($percentage) }}%</span>
                                     </div>
                                 </td>
-                                <td style="text-align: right"><span class="score-pill">{{ number_format($res['optimization_value'], 4) }}</span></td>
+                                <td style="text-align: right"><span class="score-pill">{{ number_format($res['optimization_value'], 2) }}</span></td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -302,46 +316,70 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('top3RadarChart').getContext('2d');
-            const results = {!! json_encode(array_slice($results, 0, 3)) !!};
-            const criterias = {!! json_encode($criterias) !!};
+            const results = {!! json_encode($results) !!};
+            const topResults = results.slice(0, 3);
+            const criterias = {!! json_encode($criterias->values()) !!};
+            const criteriaNames = criterias.map(c => c.name);
+            const criteriaIds = criterias.map(c => c.id);
 
             const colors = [
-                { border: '#2563EB', bg: 'rgba(37, 99, 235, 0.1)' },
-                { border: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
-                { border: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' }
+                { border: '#3b82f6', background: 'rgba(59, 130, 246, 0.15)' },
+                { border: '#10b981', background: 'rgba(16, 185, 129, 0.15)' },
+                { border: '#f59e0b', background: 'rgba(245, 158, 11, 0.15)' }
             ];
+
+            const isDesktop = window.innerWidth >= 1024;
 
             new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: criterias.map(c => c.name),
-                    datasets: results.map((res, index) => ({
-                        label: res.name,
-                        data: criterias.map(c => {
-                            const score = res.scores[c.id] || 0;
-                            return c.type.toLowerCase() === 'cost' ? (6 - score) : score;
-                        }),
-                        backgroundColor: colors[index].bg,
+                    labels: criteriaNames,
+                    datasets: topResults.map((res, index) => ({
+                        label: res.name.toUpperCase(),
+                        data: criteriaIds.map(id => res.original_scores[id]),
                         borderColor: colors[index].border,
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#fff',
-                        fill: true
+                        backgroundColor: colors[index].background,
+                        borderWidth: 3.5,
+                        pointRadius: 4,
+                        tension: 0.1
                     }))
                 },
                 options: {
-                    responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: true, position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 10, weight: 'bold' }, padding: 15, usePointStyle: true } }
+                    responsive: true,
+                    layout: {
+                        padding: isDesktop ? 20 : 10
                     },
                     scales: {
                         r: {
-                            min: 0, max: 5,
-                            ticks: { display: false, stepSize: 1 },
-                            grid: { color: '#F1F5F9' },
-                            angleLines: { color: '#F1F5F9' },
-                            pointLabels: { font: { family: 'Plus Jakarta Sans', size: 10, weight: 'bold' }, color: '#64748B' }
+                            beginAtZero: true, min: 0, max: 5,
+                            ticks: { 
+                                stepSize: 1, 
+                                display: false,
+                            },
+                            grid: { color: '#e2e8f0', lineWidth: 1 },
+                            angleLines: { color: '#e2e8f0' },
+                            pointLabels: {
+                                display: isDesktop,
+                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 10, weight: '900' },
+                                color: '#475569',
+                                padding: 15
+                            }
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { size: 11, weight: 'black' },
+                            bodyFont: { size: 10, weight: 'bold' },
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                title: (tooltipItems) => criteriaNames[tooltipItems[0].dataIndex],
+                                label: (context) => ` ${context.dataset.label}: ${context.parsed.r} Skor`
+                            }
                         }
                     }
                 }

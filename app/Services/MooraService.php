@@ -17,10 +17,10 @@ class MooraService
             return [];
         }
 
-        // 1. Prepare Decision Matrix (Using original scores)
-        $processedAlternatives = [];
+        // 1. Prepare Decision Matrix
+        $matrix = [];
         foreach ($alternatives as $alt) {
-            $processedAlternatives[] = [
+            $matrix[] = [
                 'id' => $alt['id'],
                 'name' => $alt['name'],
                 'scores' => $alt['scores']
@@ -31,7 +31,7 @@ class MooraService
         $squareSums = [];
         foreach ($criteria as $c) {
             $sum = 0;
-            foreach ($processedAlternatives as $alt) {
+            foreach ($matrix as $alt) {
                 $score = $alt['scores'][$c['id']] ?? 0;
                 $sum += pow($score, 2);
             }
@@ -40,7 +40,7 @@ class MooraService
 
         // 3. Normalization, Weighting, and Yi Calculation
         $results = [];
-        foreach ($processedAlternatives as $alt) {
+        foreach ($matrix as $alt) {
             $sumBenefit = 0;
             $sumCost = 0;
             $normalizedScores = [];
@@ -48,23 +48,17 @@ class MooraService
             foreach ($criteria as $c) {
                 $score = $alt['scores'][$c['id']] ?? 0;
                 
-                // Use original scores as requested in standard MOORA
-                $calculationScore = $score;
-
                 // Normalization: x / sqrt(sum(x^2))
-                $normalized = ($squareSums[$c['id']] != 0) ? ($calculationScore / $squareSums[$c['id']]) : 0;
+                $normalized = ($squareSums[$c['id']] != 0) ? ($score / $squareSums[$c['id']]) : 0;
                 
-                // Weighting: normalized * weight
-                // In your example: $normal * $bobot
-                $weighted = $normalized * ($c['weight']);
+                // Weighting: normalized * weight (weight is percentage, e.g., 40)
+                $weighted = $normalized * ($c['weight'] / 100);
                 
                 $normalizedScores[$c['id']] = [
                     'normalized' => $normalized,
                     'weighted' => $weighted
                 ];
 
-                // Standard MOORA Optimization: 
-                // Sum Benefit and Sum Cost separately
                 if (strtolower($c['type']) === 'cost') {
                     $sumCost += $weighted;
                 } else {
@@ -73,7 +67,6 @@ class MooraService
             }
 
             // Optimization Value (Yi) = SUM(Benefit) - SUM(Cost)
-            // As per your example step 9: optimasi += normal * (type == 'benefit' ? 1 : -1) * bobot
             $optimizationValue = $sumBenefit - $sumCost;
 
             $results[] = [
@@ -87,7 +80,7 @@ class MooraService
             ];
         }
 
-        // 4. Ranking based on Optimization Value (Yi)
+        // 4. Ranking
         usort($results, function ($a, $b) {
             return $b['optimization_value'] <=> $a['optimization_value'];
         });

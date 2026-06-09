@@ -293,7 +293,7 @@
                             <div class="px-5 py-3 bg-blue-50 rounded-xl border border-blue-100">
                                 <p class="text-[8px] text-blue-600 font-bold uppercase tracking-widest mb-1">Yi Skor</p>
                                 <div class="flex items-end gap-1.5">
-                                    <span class="text-lg font-bold text-blue-600">{{ $bestInternshipData ? number_format($bestInternshipData->optimization_value, 4) : '0.0000' }}</span>
+                                    <span class="text-lg font-bold text-blue-600">{{ $bestInternshipData ? number_format($bestInternshipData->optimization_value, 2) : '0.00' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -323,15 +323,7 @@
 
                 <div class="history-list">
                     @forelse($latestSessions as $session)
-                        @php
-                            $evals = $session->evaluations;
-                            $firstEval = $evals->first();
-                            $altCount = $evals->isNotEmpty() ? $evals->groupBy('internship_id')->count() : 0;
-                            $category = ($firstEval && $firstEval->internship && $firstEval->internship->category) 
-                                ? $firstEval->internship->category->name 
-                                : 'Umum';
-                        @endphp
-                        <a href="{{ route('moora.history') }}" class="history-item">
+                        <a href="{{ route('moora.history.show', $session->id) }}" class="history-item">
                             <div class="item-icon"><i class="ti ti-chart-bar"></i></div>
                             <div class="item-body">
                                 <div class="item-title">{{ $session->winner_name }}</div>
@@ -340,16 +332,16 @@
                                     <span class="meta-dot"></span>
                                     <span>{{ $session->created_at->format('H:i') }}</span>
                                     <span class="meta-dot"></span>
-                                    <span>{{ $altCount }} perusahaan</span>
+                                    <span>{{ $session->alt_count }} perusahaan</span>
                                     <span class="meta-dot"></span>
-                                    <span>{{ count($session->criteria_used) }} kriteria</span>
+                                    <span>{{ $session->criteria_count }} kriteria</span>
                                 </div>
                                 <div class="criteria-tags">
-                                    <span class="criteria-tag">{{ $category }}</span>
+                                    <span class="criteria-tag">{{ $session->category }}</span>
                                 </div>
                             </div>
                             <div class="item-right">
-                                <div class="score-badge">{{ number_format($session->max_optimization_value, 4) }}</div>
+                                <div class="score-badge">{{ number_format($session->max_optimization_value, 2) }}</div>
                                 <div class="rank-pill">🥇 Winner</div>
                             </div>
                         </a>

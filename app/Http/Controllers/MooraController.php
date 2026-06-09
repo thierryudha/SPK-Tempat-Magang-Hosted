@@ -10,7 +10,6 @@ use App\Models\MooraSession;
 use App\Services\MooraService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class MooraController extends Controller
 {
@@ -25,7 +24,9 @@ class MooraController extends Controller
     {
         $criterias = Criteria::with('scales')->get();
         // Show ONLY user's own internships for calculation
-        $internships = Internship::where('user_id', Auth::id())->get();
+        $internships = Internship::where('user_id', Auth::id())
+                                 ->with('category')
+                                 ->get();
         $userWeights = Auth::user()->weights->pluck('weight', 'criteria_id');
 
         return view('moora.index', compact('criterias', 'internships', 'userWeights'));
@@ -45,13 +46,12 @@ class MooraController extends Controller
         $selectedInternshipIds = $request->internships;
         $scores = $request->scores;
 
-        // Verify total weight is 100%
         $totalWeight = array_sum(array_intersect_key($weights, array_flip($selectedCriteriaIds)));
         if (abs($totalWeight - 100) > 0.01) {
             return back()->withErrors(['weights' => 'Total bobot harus tepat 100%. Sekarang: ' . $totalWeight . '%'])->withInput();
         }
 
-        // Save weights to DB
+        // Tetap simpan sebagai preferensi terakhir di form (opsional, untuk kenyamanan user)
         foreach ($selectedCriteriaIds as $cId) {
             UserCriteriaWeight::updateOrCreate(
                 ['user_id' => Auth::id(), 'criteria_id' => $cId],
@@ -59,40 +59,27 @@ class MooraController extends Controller
             );
         }
 
-        // Save scores and prepare data for MOORA
-        $mooraAlternatives = [];
         $mooraCriteria = [];
-
+        $sessionWeightsData = []; // Array untuk menyimpan ID Kriteria sekaligus Bobotnya di Sesi ini
+        
         $criterias = Criteria::whereIn('id', $selectedCriteriaIds)->get();
         foreach ($criterias as $c) {
+            $sessionWeightsData[$c->id] = (float) $weights[$c->id]; // Simpan bobot
             $mooraCriteria[] = [
                 'id' => $c->id,
                 'name' => $c->name,
-                'type' => $c->type,
-                'weight' => $weights[$c->id]
+                'type' => strtolower($c->type), // Ambil type dari database (Benefit/Cost)
+                'weight' => (float) $weights[$c->id]
             ];
         }
 
+        $mooraAlternatives = [];
         foreach ($selectedInternshipIds as $iId) {
             $internship = Internship::find($iId);
             $altScores = [];
-            
-            // Delete old evaluations for this user and this internship
-            InternshipEvaluation::where('user_id', Auth::id())
-                ->where('internship_id', $iId)
-                ->delete();
-
             foreach ($selectedCriteriaIds as $cId) {
-                $scoreValue = $scores[$iId][$cId];
-                InternshipEvaluation::create([
-                    'user_id' => Auth::id(), 
-                    'internship_id' => $iId, 
-                    'criteria_id' => $cId,
-                    'score' => $scoreValue
-                ]);
-                $altScores[$cId] = $scoreValue;
+                $altScores[$cId] = (float) $scores[$iId][$cId];
             }
-
             $mooraAlternatives[] = [
                 'id' => $internship->id,
                 'name' => $internship->name,
@@ -102,27 +89,34 @@ class MooraController extends Controller
 
         $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
 
-        // Create a new MOORA Session
+        // Simpan Data Bobot Per Sesi ke dalam JSON `criteria_used`
         $session = MooraSession::create([
             'user_id' => Auth::id(),
             'winner_name' => !empty($results) ? $results[0]['name'] : null,
             'max_optimization_value' => !empty($results) ? $results[0]['optimization_value'] : null,
-            'criteria_used' => $selectedCriteriaIds,
+            'criteria_used' => $sessionWeightsData, 
         ]);
 
-        // Map original scores back into results and save evaluations with session_id
         foreach ($results as &$res) {
             $res['original_scores'] = [];
             foreach ($selectedCriteriaIds as $cId) {
                 $scoreValue = $scores[$res['id']][$cId];
                 $res['original_scores'][$cId] = $scoreValue;
 
-                // Update evaluations to link with the new session
-                InternshipEvaluation::where('user_id', Auth::id())
-                    ->where('internship_id', $res['id'])
-                    ->where('criteria_id', $cId)
-                    ->update(['moora_session_id' => $session->id]);
+                InternshipEvaluation::create([
+                    'user_id' => Auth::id(), 
+                    'internship_id' => $res['id'], 
+                    'criteria_id' => $cId,
+                    'score' => $scoreValue,
+                    'moora_session_id' => $session->id 
+                ]);
             }
+        }
+
+        // Ambil ulang kriteria agar bersih (hanya yang terpilih)
+        $criterias = Criteria::whereIn('id', $selectedCriteriaIds)->get();
+        foreach ($criterias as $c) {
+            $c->weight = $weights[$c->id];
         }
 
         return view('moora.results', compact('results', 'criterias'));
@@ -143,9 +137,12 @@ class MooraController extends Controller
             $query->where('winner_name', 'like', '%' . $request->search . '%');
         }
 
+        if ($request->sort === 'oldest') {
+            $query->reorder('created_at', 'asc');
+        }
+
         $sessions = $query->paginate(8)->withQueryString();
 
-        // Calculate stats for the header
         $totalSessionsCount = MooraSession::where('user_id', Auth::id())->count();
         $latestSession = MooraSession::where('user_id', Auth::id())->latest()->first();
         $avgAlternatifs = MooraSession::where('user_id', Auth::id())->with('evaluations')->get()->map(function($s) {
@@ -156,22 +153,23 @@ class MooraController extends Controller
             $evaluations = $session->evaluations;
             $grouped = $evaluations->groupBy('internship_id');
             
-            $criteriaIds = $session->criteria_used;
-            $criteriaModels = $evaluations->pluck('criteria')->unique('id');
+            $sessionWeights = $session->criteria_used; 
+            $isAssociative = array_keys($sessionWeights) !== range(0, count($sessionWeights) - 1);
+            $criteriaIds = $isAssociative ? array_keys($sessionWeights) : $sessionWeights;
             
-            $weights = UserCriteriaWeight::where('user_id', Auth::id())
-                ->whereIn('criteria_id', $criteriaIds)
-                ->get()
-                ->keyBy('criteria_id');
-
+            // Re-fetch criteria to get correct types from DB (seeder standard)
+            $criteriaModels = Criteria::whereIn('id', $criteriaIds)->get()->keyBy('id');
+            
             $mooraCriteria = [];
-            foreach ($criteriaModels as $c) {
-                if (!in_array($c->id, $criteriaIds)) continue;
+            foreach ($criteriaIds as $cId) {
+                $c = $criteriaModels[$cId] ?? null;
+                if (!$c) continue;
+                $weight = $isAssociative ? ($sessionWeights[$cId] ?? 0) : (100 / count($criteriaIds));
                 $mooraCriteria[] = [
                     'id' => $c->id,
                     'name' => $c->name,
-                    'type' => $c->type,
-                    'weight' => $weights[$c->id]->weight ?? 0
+                    'type' => strtolower($c->type),
+                    'weight' => (float) $weight
                 ];
             }
 
@@ -180,7 +178,9 @@ class MooraController extends Controller
                 $internship = $evals->first()->internship;
                 $altScores = [];
                 foreach ($evals as $e) {
-                    $altScores[$e->criteria_id] = $e->score;
+                    if (in_array($e->criteria_id, $criteriaIds)) {
+                        $altScores[$e->criteria_id] = (float) $e->score;
+                    }
                 }
                 $mooraAlternatives[] = [
                     'id' => $iId,
@@ -193,6 +193,11 @@ class MooraController extends Controller
                 ? $this->mooraService->calculate($mooraAlternatives, $mooraCriteria)
                 : [];
             
+            // Min-Max Scaling for Bars
+            $minYi = !empty($results) ? collect($results)->min('optimization_value') : 0;
+            $maxYi = !empty($results) ? collect($results)->max('optimization_value') : 0;
+            $range = $maxYi - $minYi;
+
             $firstEval = $evaluations->first();
             
             return [
@@ -206,13 +211,12 @@ class MooraController extends Controller
                 'time' => $session->created_at->format('H:i'),
                 'criteriaCount' => count($criteriaIds),
                 'altCount' => count($grouped),
-                'companies' => collect($results)->map(function($res) use ($results) {
-                    $maxYi = !empty($results) ? $results[0]['optimization_value'] : 1;
-                    if ($maxYi == 0) $maxYi = 1;
+                'companies' => collect($results)->map(function($res) use ($maxYi, $minYi, $range) {
+                    $percentage = ($range > 0) ? (($res['optimization_value'] - $minYi) / $range) * 100 : 100;
                     return [
                         'name' => $res['name'],
                         'yi' => (float) $res['optimization_value'],
-                        'bars' => ($res['optimization_value'] / $maxYi) * 100
+                        'bars' => $percentage
                     ];
                 })->toArray(),
                 'criteria' => collect($mooraCriteria)->map(function($c) {
@@ -228,14 +232,71 @@ class MooraController extends Controller
         return view('moora.history', compact('sessions', 'formattedSessions', 'totalSessionsCount', 'latestSession', 'avgAlternatifs'));
     }
 
-    public function destroySession(MooraSession $session)
+    public function showHistory(MooraSession $session)
     {
         if ($session->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $session->delete();
+        $session->load(['evaluations.internship.category', 'evaluations.criteria']);
+        $evaluations = $session->evaluations;
+        $grouped = $evaluations->groupBy('internship_id');
+        
+        $sessionWeights = $session->criteria_used; 
+        $isAssociative = array_keys($sessionWeights) !== range(0, count($sessionWeights) - 1);
+        $criteriaIds = $isAssociative ? array_keys($sessionWeights) : $sessionWeights;
+        
+        $criteriaModels = Criteria::whereIn('id', $criteriaIds)->get()->keyBy('id');
+        
+        $mooraCriteria = [];
+        $displayCriteria = [];
+        foreach ($criteriaIds as $cId) {
+            $c = $criteriaModels[$cId] ?? null;
+            if (!$c) continue;
+            $weight = $isAssociative ? ($sessionWeights[$cId] ?? 0) : (100 / count($criteriaIds));
+            
+            $mooraCriteria[] = [
+                'id' => $c->id,
+                'name' => $c->name,
+                'type' => strtolower($c->type),
+                'weight' => (float) $weight
+            ];
 
+            $c->weight = $weight;
+            $displayCriteria[] = $c;
+        }
+
+        $mooraAlternatives = [];
+        foreach ($grouped as $iId => $evals) {
+            $internship = $evals->first()->internship;
+            $altScores = [];
+            foreach ($evals as $e) {
+                if (in_array($e->criteria_id, $criteriaIds)) {
+                    $altScores[$e->criteria_id] = (float) $e->score;
+                }
+            }
+            $mooraAlternatives[] = [
+                'id' => $iId,
+                'name' => $internship->name ?? 'Unknown',
+                'scores' => $altScores
+            ];
+        }
+
+        $results = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
+        foreach ($results as &$res) {
+            $res['original_scores'] = $res['scores'];
+        }
+        $criterias = collect($displayCriteria);
+
+        return view('moora.results', compact('results', 'criterias'));
+    }
+
+    public function destroySession(MooraSession $session)
+    {
+        if ($session->user_id !== Auth::id()) {
+            abort(403);
+        }
+        $session->delete();
         return back()->with('success', 'Sesi berhasil dihapus.');
     }
 }

@@ -32,91 +32,61 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        // 1. Get the latest evaluations session (most recent timestamp)
-        $latestEval = DB::table('internship_evaluations')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
+        // 1. Get the latest MOORA session
+        $latestSession = MooraSession::where('user_id', $user->id)
+            ->with(['evaluations.internship.category', 'evaluations.criteria'])
+            ->latest()
             ->first();
 
         $bestInternshipData = null;
         $evaluationsCount = 0;
         $personalChartData = [];
 
-        if ($latestEval) {
-            // Find all internships evaluated in the same "session" (within 2 seconds of the latest evaluation)
-            $sessionTime = Carbon::parse($latestEval->created_at);
-            $allEvaluations = DB::table('internship_evaluations')
-                ->where('user_id', $user->id)
-                ->whereBetween('created_at', [
-                    $sessionTime->copy()->subSeconds(2), 
-                    $sessionTime->copy()->addSeconds(2)
-                ])
-                ->get();
-            
-            $groupedByInternship = $allEvaluations->groupBy('internship_id');
-            $evaluationsCount = $groupedByInternship->count();
-            
-            $criteriaIds = $allEvaluations->pluck('criteria_id')->unique();
-            $weights = DB::table('user_criteria_weights')
-                ->where('user_id', $user->id)
-                ->whereIn('criteria_id', $criteriaIds)
-                ->get()
-                ->keyBy('criteria_id');
-            
-            $criteriaModels = Criteria::whereIn('id', $criteriaIds)->get();
+        if ($latestSession) {
+            $evaluations = $latestSession->evaluations;
+            $grouped = $evaluations->groupBy('internship_id');
+            $evaluationsCount = $grouped->count();
 
-            // Prepare data for MOORA
-            $mooraAlternatives = [];
-            foreach ($groupedByInternship as $iId => $evals) {
-                $internship = Internship::find($iId);
-                if (!$internship) continue;
-                
-                $altScores = [];
-                foreach ($evals as $e) {
-                    $altScores[$e->criteria_id] = $e->score;
+            // Find the winner from evaluations
+            $winnerInternship = null;
+            $winnerEvaluations = collect();
+
+            foreach ($grouped as $internshipId => $evs) {
+                $internship = $evs->first()->internship;
+                // Since winner_name is stored in session, we match by name
+                if ($internship && $internship->name === $latestSession->winner_name) {
+                    $winnerInternship = $internship;
+                    $winnerEvaluations = $evs;
+                    break;
                 }
-                $mooraAlternatives[] = [
-                    'id' => $iId,
-                    'name' => $internship->name,
-                    'scores' => $altScores
-                ];
             }
 
-            $mooraCriteria = [];
-            foreach ($criteriaModels as $c) {
-                $mooraCriteria[] = [
-                    'id' => $c->id,
-                    'name' => $c->name,
-                    'type' => $c->type,
-                    'weight' => $weights[$c->id]->weight ?? 0
-                ];
+            // Fallback if name matching fails (rare)
+            if (!$winnerInternship && $grouped->isNotEmpty()) {
+                $winnerEvaluations = $grouped->first();
+                $winnerInternship = $winnerEvaluations->first()->internship;
             }
 
-            // Run MOORA ranking
-            $mooraResults = $this->mooraService->calculate($mooraAlternatives, $mooraCriteria);
-
-            if (!empty($mooraResults)) {
-                $winner = $mooraResults[0];
-                $winnerInternship = Internship::with('category')->find($winner['id']);
-                
-                // Mock the internship data for the view
+            if ($winnerInternship) {
                 $bestInternshipData = (object) [
-                    'id' => $winner['id'],
-                    'name' => $winner['name'],
+                    'id' => $winnerInternship->id,
+                    'name' => $winnerInternship->name,
                     'category' => $winnerInternship->category->name ?? 'Umum',
-                    'avg_score' => collect($winner['scores'])->avg(),
-                    'optimization_value' => $winner['optimization_value']
+                    'optimization_value' => $latestSession->max_optimization_value
                 ];
 
-                // 2. Personal Evaluation Profile (Radar)
+                // Radar Chart Data
                 $labels = [];
                 $values = [];
-                foreach ($criteriaModels as $c) {
-                    $score = $winner['scores'][$c->id] ?? 0;
-                    $labels[] = $c->name;
+                foreach ($winnerEvaluations as $ev) {
+                    $labels[] = $ev->criteria->name;
+                    $score = $ev->score;
                     
-                    // Logic: If Benefit, score 5 = 5. If Cost, score 1 = 5 (Inverted)
-                    if (strtolower($c->type) === 'cost') {
+                    // Logic from Seeder:
+                    // Benefit: C1, C4, C5, C6, C7, C8, C9
+                    // Cost: C2 (Jam Kerja), C3 (Jarak), C10 (Beban Tugas)
+                    // Visualization logic: Invert Cost so higher point on radar is always "better"
+                    if (strtolower($ev->criteria->type) === 'cost') {
                         $values[] = 6 - $score;
                     } else {
                         $values[] = $score;
@@ -128,33 +98,58 @@ class DashboardController extends Controller
                     'values' => $values,
                 ];
 
-                // Update avg_score to be the average of the radar values (with inverted cost)
-                $bestInternshipData->avg_score = collect($values)->avg();
+                $bestInternshipData->avg_score = !empty($values) ? collect($values)->avg() : 0;
             }
         }
 
-        // 3. Global Stats
+        // 2. Global Stats
         $totalUsers = User::count();
         $totalInternships = Internship::whereNull('user_id')->count();
         $totalSessions = MooraSession::where('user_id', $user->id)->count();
         
-        // 4. Latest Sessions
-        $latestSessions = MooraSession::where('user_id', $user->id)
+        // 3. Latest Sessions (Enhanced for View)
+        $latestSessionsRaw = MooraSession::where('user_id', $user->id)
             ->with(['evaluations.internship.category'])
             ->latest()
             ->limit(5)
             ->get();
 
-        // 5. Popular Criteria
-        $allSessions = MooraSession::where('user_id', $user->id)->get();
+        $latestSessions = $latestSessionsRaw->map(function($session) {
+            $evals = $session->evaluations;
+            $firstEval = $evals->first();
+            $altCount = $evals->isNotEmpty() ? $evals->groupBy('internship_id')->count() : 0;
+            
+            return (object) [
+                'id' => $session->id,
+                'winner_name' => $session->winner_name,
+                'created_at' => $session->created_at,
+                'max_optimization_value' => $session->max_optimization_value,
+                'alt_count' => $altCount,
+                'criteria_count' => count($session->criteria_used ?? []),
+                'category' => ($firstEval && $firstEval->internship && $firstEval->internship->category) 
+                    ? $firstEval->internship->category->name 
+                    : 'Umum'
+            ];
+        });
+
+        // 4. Popular Criteria
         $criteriaCounts = [];
-        foreach ($allSessions as $s) {
-            foreach ($s->criteria_used as $cId) {
-                $criteriaCounts[$cId] = ($criteriaCounts[$cId] ?? 0) + 1;
+        $allSessionsCriteria = MooraSession::where('user_id', $user->id)->get(['criteria_used']);
+        
+        foreach ($allSessionsCriteria as $s) {
+            $used = $s->criteria_used;
+            if (is_array($used)) {
+                // Handle both associative (id => weight) and sequential (id)
+                $isAssociative = array_keys($used) !== range(0, count($used) - 1);
+                $ids = $isAssociative ? array_keys($used) : $used;
+                foreach ($ids as $cId) {
+                    $criteriaCounts[$cId] = ($criteriaCounts[$cId] ?? 0) + 1;
+                }
             }
         }
+        
         arsort($criteriaCounts);
-        $topCriteriaIds = array_slice(array_keys($criteriaCounts), 0, 6, true);
+        $topCriteriaIds = array_slice(array_keys($criteriaCounts), 0, 6);
         $popularCriteria = Criteria::whereIn('id', $topCriteriaIds)->get()->map(function($c) use ($criteriaCounts, $totalSessions) {
             $count = $criteriaCounts[$c->id] ?? 0;
             return (object) [
@@ -164,7 +159,7 @@ class DashboardController extends Controller
             ];
         })->sortByDesc('count');
 
-        // 6. Recent Activities
+        // 5. Recent Activities
         $recentActivities = ActivityLog::where('user_id', $user->id)
             ->latest()
             ->limit(4)
