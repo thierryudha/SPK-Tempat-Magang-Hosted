@@ -9,6 +9,7 @@ use App\Models\UserCriteriaWeight;
 use App\Models\Category;
 use App\Models\MooraSession;
 use App\Models\InternshipEvaluation;
+use App\Services\MooraService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -17,6 +18,9 @@ class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
+        $mooraService = new MooraService();
+        $allCriteria = Criteria::all()->keyBy('id');
+
         // 1. Kategori Perusahaan (Manual)
         $categoriesData = [
             'Manufaktur & Elektronik', 'Proptech', 'E-Commerce', 'IT & Networking', 
@@ -60,6 +64,7 @@ class DummyDataSeeder extends Seeder
             [
                 'name' => 'Budi',
                 'email' => 'budi@example.com',
+                'created_at' => '2026-05-01 08:30:00',
                 'personal_internships' => [
                     'PT Excelitas Technologies Batam',
                     'PT Properti Solusi Manajemen (Pinhome)',
@@ -74,25 +79,21 @@ class DummyDataSeeder extends Seeder
                 'active_criteria' => [1 => 40, 5 => 40, 9 => 20], 
                 'sessions' => [
                     [
-                        'winner' => 'PT Excelitas Technologies Batam', 
-                        'max_val' => 0.15, 
-                        'days_ago' => 25, 
+                        'created_at' => '2026-05-15 10:00:00', 
                         'weights' => [1 => 40, 2 => 30, 3 => 30], 
                         'evaluations' => [
-                            ['name' => 'PT Excelitas Technologies Batam', 'scores' => [1 => 5, 2 => 1, 3 => 1]], // Win: Ben high, Cost low
+                            ['name' => 'PT Excelitas Technologies Batam', 'scores' => [1 => 5, 2 => 1, 3 => 1]], 
                             ['name' => 'PT Properti Solusi Manajemen (Pinhome)', 'scores' => [1 => 3, 2 => 3, 3 => 3]], 
                             ['name' => 'PT Maju Terus Budi', 'scores' => [1 => 2, 2 => 5, 3 => 4]]
                         ]
                     ],
                     [
-                        'winner' => 'CV Karya Bersama Budi', 
-                        'max_val' => 0.18, 
-                        'days_ago' => 20, 
+                        'created_at' => '2026-05-20 14:30:00', 
                         'weights' => [2 => 25, 3 => 25, 4 => 25, 5 => 25], 
                         'evaluations' => [
                             ['name' => 'PT. Global Tiket Network (Tiket.com)', 'scores' => [2 => 4, 3 => 4, 4 => 3, 5 => 3]], 
                             ['name' => 'PT. Packet Systems Indonesia', 'scores' => [2 => 3, 3 => 3, 4 => 4, 5 => 4]], 
-                            ['name' => 'CV Karya Bersama Budi', 'scores' => [2 => 1, 3 => 1, 4 => 5, 5 => 5]] // Win: Cost very low, Ben very high
+                            ['name' => 'CV Karya Bersama Budi', 'scores' => [2 => 1, 3 => 1, 4 => 5, 5 => 5]]
                         ]
                     ]
                 ]
@@ -101,6 +102,7 @@ class DummyDataSeeder extends Seeder
             [
                 'name' => 'Siti',
                 'email' => 'siti@example.com',
+                'created_at' => '2026-05-02 09:15:00',
                 'personal_internships' => [
                     'PT Excelitas Technologies Batam',
                     'PT Properti Solusi Manajemen (Pinhome)',
@@ -111,9 +113,7 @@ class DummyDataSeeder extends Seeder
                 'active_criteria' => [2 => 25, 4 => 25, 6 => 30, 8 => 20], 
                 'sessions' => [
                     [
-                        'winner' => 'UD Sejahtera Siti', 
-                        'max_val' => 0.81, 
-                        'days_ago' => 30, 
+                        'created_at' => '2026-05-10 11:45:00', 
                         'weights' => [1 => 30, 3 => 40, 5 => 30], 
                         'evaluations' => [
                             ['name' => 'PT Excelitas Technologies Batam', 'scores' => [1 => 4, 3 => 3, 5 => 5]], 
@@ -126,10 +126,20 @@ class DummyDataSeeder extends Seeder
 
         // 4. Eksekusi Pembuatan Data secara Sekuensial
         foreach ($usersConfig as $config) {
-            $user = User::firstOrCreate(
+            $userTimestamp = Carbon::parse($config['created_at']);
+            $user = User::updateOrCreate(
                 ['email' => $config['email']],
-                ['name' => $config['name'], 'password' => Hash::make('password123'), 'role' => 'user']
+                [
+                    'name' => $config['name'], 
+                    'password' => Hash::make('password123'), 
+                    'role' => 'user',
+                    'created_at' => $userTimestamp,
+                    'updated_at' => $userTimestamp
+                ]
             );
+
+            // Hapus sesi lama agar sinkron dengan seeder
+            MooraSession::where('user_id', $user->id)->delete(); 
 
             // Buat Perusahaan Pribadi (Termasuk salinan dari global)
             foreach ($config['personal_internships'] as $internName) {
@@ -154,13 +164,41 @@ class DummyDataSeeder extends Seeder
 
             // Buat Sesi MOORA
             foreach ($config['sessions'] as $sessionData) {
-                $session = MooraSession::create([
-                    'user_id' => $user->id,
-                    'winner_name' => $sessionData['winner'],
-                    'max_optimization_value' => $sessionData['max_val'],
-                    'criteria_used' => $sessionData['weights'], 
-                    'created_at' => Carbon::now()->subDays($sessionData['days_ago'])
-                ]);
+                // Prepare data for MOORA calculation
+                $alternatives = [];
+                foreach ($sessionData['evaluations'] as $index => $eval) {
+                    $alternatives[] = [
+                        'id' => $index,
+                        'name' => $eval['name'],
+                        'scores' => $eval['scores']
+                    ];
+                }
+
+                $criteriaForMoora = [];
+                foreach ($sessionData['weights'] as $critId => $weight) {
+                    $criteriaForMoora[] = [
+                        'id' => $critId,
+                        'weight' => $weight,
+                        'type' => $allCriteria[$critId]->type
+                    ];
+                }
+
+                $results = $mooraService->calculate($alternatives, $criteriaForMoora);
+                $winner = $results[0];
+
+                $sessionTimestamp = Carbon::parse($sessionData['created_at']);
+                $session = MooraSession::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'created_at' => $sessionTimestamp
+                    ],
+                    [
+                        'winner_name' => $winner['name'],
+                        'max_optimization_value' => round($winner['optimization_value'], 2),
+                        'criteria_used' => $sessionData['weights'],
+                        'updated_at' => $sessionTimestamp
+                    ]
+                );
 
                 foreach ($sessionData['evaluations'] as $evaluation) {
                     $internship = Internship::where('name', $evaluation['name'])
@@ -169,13 +207,17 @@ class DummyDataSeeder extends Seeder
 
                     if ($internship) {
                         foreach ($evaluation['scores'] as $critId => $score) {
-                            InternshipEvaluation::create([
-                                'user_id' => $user->id,
-                                'internship_id' => $internship->id,
-                                'criteria_id' => $critId,
-                                'moora_session_id' => $session->id,
-                                'score' => $score,
-                            ]);
+                            InternshipEvaluation::updateOrCreate(
+                                [
+                                    'user_id' => $user->id,
+                                    'internship_id' => $internship->id,
+                                    'criteria_id' => $critId,
+                                ],
+                                [
+                                    'moora_session_id' => $session->id,
+                                    'score' => $score,
+                                ]
+                            );
                         }
                     }
                 }

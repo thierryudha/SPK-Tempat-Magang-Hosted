@@ -218,12 +218,13 @@
                             <div class="panel-title" style="color:#DC2626;">Zona Berbahaya</div>
                         </div>
                         <div class="danger-zone" style="padding-top:0;">
-                            <div class="danger-item">
-                                <div>
-                                    <div class="danger-info-title">Hapus Akun</div>
-                                </div>
-                                <button type="button" class="danger-btn" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
-                                    Hapus Akun
+                            <div class="mb-2">
+                                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Hapus Akun Permanen</div>
+                                <p class="text-[13px] text-slate-500 font-medium leading-relaxed mb-6">
+                                    Setelah akun Anda dihapus, semua sumber daya dan data yang terkait akan dihapus secara permanen dari sistem kami. Harap pastikan Anda telah mempertimbangkan keputusan ini dengan matang.
+                                </p>
+                                <button type="button" class="w-full h-[38px] bg-red-600 text-white text-[12px] font-bold rounded-xl hover:bg-red-700 transition-all shadow-sm shadow-red-200" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
+                                    <i class="ti ti-trash" style="font-size:14px"></i> Hapus Akun Saya
                                 </button>
                             </div>
                         </div>
@@ -406,10 +407,10 @@
             </div>
 
             <div class="mt-8 flex justify-end gap-3">
-                <button type="button" class="cancel-btn" x-on:click="$dispatch('close')">
+                <button type="button" class="h-10 px-6 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all" x-on:click="$dispatch('close')">
                     {{ __('Batal') }}
                 </button>
-                <button type="submit" class="danger-btn" style="width:auto; padding:0 24px; font-size:13px;">
+                <button type="submit" class="h-10 px-6 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-sm shadow-red-200">
                     {{ __('Hapus Sekarang') }}
                 </button>
             </div>

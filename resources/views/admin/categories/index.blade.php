@@ -31,11 +31,6 @@
                     <button type="submit" class="h-10 px-5 flex items-center justify-center bg-[#2563EB] text-white text-[12px] font-bold rounded-xl hover:bg-[#1D4ED8] transition-all">
                         Cari
                     </button>
-                    @if(request('search'))
-                        <a href="{{ route('admin.categories.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
-                            Reset
-                        </a>
-                    @endif
                 </form>
             </div>
 

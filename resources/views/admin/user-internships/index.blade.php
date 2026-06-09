@@ -48,11 +48,16 @@
                         </div>
                     </div>
 
-                    @if(request('search') || request('category_id'))
-                        <a href="{{ route('admin.user-internships.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
-                            Reset
-                        </a>
-                    @endif
+                    <div class="relative w-full md:w-[180px]">
+                        <select name="status" class="search-box appearance-none" onchange="this.form.submit()">
+                            <option value="">Semua Status</option>
+                            <option value="global" {{ request('status') == 'global' ? 'selected' : '' }}>Sudah Ada Global</option>
+                            <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>Belum Ada</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#94A3B8]">
+                            <i class="ti ti-chevron-down text-sm"></i>
+                        </div>
+                    </div>
                 </form>
             </div>
 

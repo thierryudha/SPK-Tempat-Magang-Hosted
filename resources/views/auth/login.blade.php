@@ -52,8 +52,13 @@
             </div>
 
             <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-slate-100 rounded-xl shadow-sm hover:border-blue-400 hover:bg-blue-50/30 transition-all active:scale-[0.98]">
-                <i class="ti ti-brand-google text-lg"></i>
-                <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">Masuk dengan Google</span>
+                <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M47.04 24.51c0-1.65-.15-3.23-.42-4.75H24v9h12.91c-.56 2.98-2.25 5.51-4.78 7.21v6h7.73c4.52-4.16 7.18-10.29 7.18-17.46z" fill="#4285F4"/>
+                    <path d="M24 48c6.48 0 11.91-2.14 15.86-5.81l-7.73-6c-2.14 1.43-4.88 2.27-8.13 2.27-6.26 0-11.56-4.23-13.46-9.91H2.74v6.23C6.71 42.66 14.81 48 24 48z" fill="#34A853"/>
+                    <path d="M10.54 28.55c-.48-1.43-.75-2.95-.75-4.55s.27-3.12.75-4.55V13.22H2.74C1 16.6 0 20.19 0 24s1 7.4 2.74 10.78l7.8-6.23z" fill="#FBBC05"/>
+                    <path d="M24 9.73c3.52 0 6.69 1.21 9.18 3.59l6.88-6.88C35.9 2.15 30.47 0 24 0 14.81 0 6.71 5.34 2.74 13.22l7.8 6.23C12.44 13.96 17.74 9.73 24 9.73z" fill="#EA4335"/>
+                </svg>
+                <span class="text-[13px] font-extrabold text-slate-700 uppercase tracking-widest">Masuk dengan Google</span>
             </a>
         </div>
     </form>

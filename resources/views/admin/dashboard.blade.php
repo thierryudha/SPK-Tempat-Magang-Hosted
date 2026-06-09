@@ -154,10 +154,10 @@
             <!-- Top Winners -->
             <div class="panel shadow-sm">
                 <div class="panel-header">
-                    <h3 class="panel-title"><i class="ti ti-trophy text-amber-500"></i> Pemenang Top</h3>
+                    <h3 class="panel-title"><i class="ti ti-trophy text-amber-500"></i> Top 5 Perusahaan</h3>
                 </div>
                 <div class="list-stack">
-                    @forelse($topWinners->take(4) as $winner)
+                    @forelse($topWinners->take(5) as $winner)
                         <div class="list-item">
                             <div class="avatar-small bg-amber-50 text-amber-600"><i class="ti ti-award"></i></div>
                             <div class="flex-1">
@@ -169,31 +169,25 @@
                         <div class="p-10 text-center text-[12px] text-slate-400">Belum ada data</div>
                     @endforelse
                 </div>
-                <div class="panel-footer text-center">
-                    <a href="{{ route('admin.logs.index') }}" class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider hover:underline">Lihat Laporan Lengkap</a>
-                </div>
             </div>
 
-            <!-- Top Contributions -->
+            <!-- Recent Activity -->
             <div class="panel shadow-sm">
                 <div class="panel-header">
-                    <h3 class="panel-title"><i class="ti ti-building-community text-emerald-500"></i> Referensi Mahasiswa</h3>
+                    <h3 class="panel-title"><i class="ti ti-history text-emerald-500"></i> Aktivitas Terbaru</h3>
                 </div>
                 <div class="list-stack">
-                    @forelse($topUserContributions->take(4) as $contrib)
+                    @forelse($latest_sessions->take(5) as $session)
                         <div class="list-item">
-                            <div class="avatar-small bg-emerald-50 text-emerald-600"><i class="ti ti-building"></i></div>
+                            <div class="avatar-small bg-emerald-50 text-emerald-600"><i class="ti ti-user"></i></div>
                             <div class="flex-1">
-                                <div class="text-[13px] font-bold text-[#0F172A] truncate w-[140px] capitalize">{{ $contrib->name }}</div>
-                                <div class="text-[11px] text-[#94A3B8] font-bold">Diinput {{ $contrib->count }}x</div>
+                                <div class="text-[13px] font-bold text-[#0F172A] truncate w-[140px] capitalize">{{ $session->user->name }}</div>
+                                <div class="text-[11px] text-[#94A3B8] font-bold">Analisis: {{ $session->winner_name }}</div>
                             </div>
                         </div>
                     @empty
                         <div class="p-10 text-center text-[12px] text-slate-400">Belum ada data</div>
                     @endforelse
-                </div>
-                <div class="panel-footer text-center">
-                    <a href="{{ route('admin.user-internships.index') }}" class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider hover:underline">Lihat Semua Data</a>
                 </div>
             </div>
 
@@ -276,7 +270,20 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: { 
-                    y: { beginAtZero: true, border: { display: false } },
+                    y: { 
+                        beginAtZero: true, 
+                        border: { display: false },
+                        min: 0,
+                        suggestedMax: 5,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (Math.floor(value) === value) {
+                                    return value;
+                                }
+                            }
+                        }
+                    },
                     x: { border: { display: false } }
                 }
             }

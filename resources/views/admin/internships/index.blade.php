@@ -46,12 +46,6 @@
                             <i class="ti ti-chevron-down text-sm"></i>
                         </div>
                     </div>
-
-                    @if(request('search') || request('category_id'))
-                        <a href="{{ route('admin.internships.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
-                            Reset
-                        </a>
-                    @endif
                 </form>
             </div>
 

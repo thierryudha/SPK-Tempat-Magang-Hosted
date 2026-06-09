@@ -19,26 +19,6 @@
                     <button type="submit" class="h-10 px-5 flex items-center justify-center bg-[#2563EB] text-white text-[12px] font-bold rounded-xl hover:bg-[#1D4ED8] transition-all">
                         Cari
                     </button>
-                    
-                    <div class="relative w-full md:w-[150px]">
-                        <select name="action" class="search-box appearance-none" onchange="this.form.submit()">
-                            <option value="">Semua Tindakan</option>
-                            @foreach($actions as $act)
-                                <option value="{{ $act }}" {{ request('action') == $act ? 'selected' : '' }}>
-                                    {{ $act }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#64748B]">
-                            <i class="ti ti-chevron-down text-sm"></i>
-                        </div>
-                    </div>
-
-                    @if(request('search') || request('action'))
-                        <a href="{{ route('admin.logs.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
-                            Reset
-                        </a>
-                    @endif
                 </form>
             </div>
 

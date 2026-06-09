@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Internship;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserInternshipController extends Controller
 {
@@ -13,6 +14,9 @@ class UserInternshipController extends Controller
     {
         $search = $request->input('search');
         $categoryId = $request->input('category_id');
+        $status = $request->input('status');
+
+        $globalNames = Internship::whereNull('user_id')->pluck('name')->map(fn($n) => strtolower($n))->toArray();
 
         $internships = Internship::with(['user', 'category'])
             ->whereNotNull('user_id')
@@ -22,12 +26,18 @@ class UserInternshipController extends Controller
             ->when($categoryId, function ($query, $categoryId) {
                 return $query->where('category_id', $categoryId);
             })
+            ->when($status, function ($query, $status) use ($globalNames) {
+                if ($status === 'global') {
+                    return $query->whereIn(DB::raw('LOWER(name)'), $globalNames);
+                } elseif ($status === 'new') {
+                    return $query->whereNotIn(DB::raw('LOWER(name)'), $globalNames);
+                }
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
         $categories = Category::all();
-        $globalNames = Internship::whereNull('user_id')->pluck('name')->map(fn($n) => strtolower($n))->toArray();
 
         return view('admin.user-internships.index', compact('internships', 'categories', 'globalNames'));
     }

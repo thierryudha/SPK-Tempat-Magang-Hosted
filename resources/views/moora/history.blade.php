@@ -501,18 +501,6 @@
                             <i class="ti ti-file-description" style="font-size:15px"></i>
                             Lihat Detail Lengkap
                         </a>
-                        <a href="{{ route('moora.index') }}" class="action-btn btn-secondary">
-                            <i class="ti ti-refresh" style="font-size:15px"></i>
-                            Ulangi dengan Pengaturan Ini
-                        </a>
-                        <form action="/moora/history/${session.id}" method="POST" onsubmit="return confirm('Hapus sesi ini secara permanen?')">
-                            @csrf
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="action-btn btn-danger">
-                                <i class="ti ti-trash" style="font-size:15px"></i>
-                                Hapus Sesi Ini
-                            </button>
-                        </form>
                     </div>
                 </div>
             `;

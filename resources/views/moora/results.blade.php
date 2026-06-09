@@ -147,18 +147,19 @@
                             <div class="analysis-text space-y-2">
                                 @foreach($criterias as $c)
                                     @php
-                                        $maxScore = collect($results)->max(fn($r) => $r['original_scores'][$c->id]);
-                                        $leaders = collect($results)->filter(fn($r) => $r['original_scores'][$c->id] == $maxScore);
+                                        $isCost = strtolower($c->type) === 'cost';
+                                        $bestScore = $isCost 
+                                            ? collect($results)->min(fn($r) => $r['original_scores'][$c->id])
+                                            : collect($results)->max(fn($r) => $r['original_scores'][$c->id]);
+                                        
+                                        $leaders = collect($results)->filter(fn($r) => $r['original_scores'][$c->id] == $bestScore);
                                     @endphp
                                     <div class="flex justify-between items-start text-xs">
                                         <span class="text-slate-500 shrink-0">{{ $c->name }}</span>
                                         <div class="text-right">
                                             @foreach($leaders as $leader)
                                                 <div class="font-bold text-slate-800">
-                                                    {{ $leader['name'] }} 
-                                                    @if($loop->last)
-                                                        <span class="text-[9px] bg-blue-50 px-1.5 py-0.5 rounded text-blue-600 ml-1">Skor {{ $maxScore }}</span>
-                                                    @endif
+                                                    {{ $leader['name'] }}
                                                 </div>
                                             @endforeach
                                         </div>
@@ -336,7 +337,11 @@
                     labels: criteriaNames,
                     datasets: topResults.map((res, index) => ({
                         label: res.name.toUpperCase(),
-                        data: criteriaIds.map(id => res.original_scores[id]),
+                        data: criterias.map(c => {
+                            const score = res.original_scores[c.id];
+                            // Logic: If cost, invert (1 becomes 5, 5 becomes 1) for visualization
+                            return c.type.toLowerCase() === 'cost' ? (6 - score) : score;
+                        }),
                         borderColor: colors[index].border,
                         backgroundColor: colors[index].background,
                         borderWidth: 3.5,
