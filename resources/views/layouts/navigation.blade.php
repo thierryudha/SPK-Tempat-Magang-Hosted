@@ -60,10 +60,15 @@
 
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                                this.closest('form').submit();"
+                                    class="text-red-600 hover:text-red-700 hover:bg-red-50 font-bold transition-all">
+                                <div class="flex items-center gap-2">
+                                    <i class="ti ti-logout"></i>
+                                    {{ __('Log Out') }}
+                                </div>
                             </x-dropdown-link>
                         </form>
+
                     </x-slot>
                 </x-dropdown>
             </div>

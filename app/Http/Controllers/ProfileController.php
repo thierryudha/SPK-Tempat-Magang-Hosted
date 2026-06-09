@@ -63,7 +63,22 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('status', 'profile-updated')->with('tab', 'pribadi');
+    }
+
+    /**
+     * Delete the user's profile photo.
+     */
+    public function destroyPhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        if ($user->photo) {
+            Storage::disk('public')->delete($user->photo);
+            $user->photo = null;
+            $user->save();
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated')->with('tab', 'pribadi');
     }
 
     /**

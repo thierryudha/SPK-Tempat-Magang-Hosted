@@ -16,7 +16,8 @@ class AdminDashboardController extends Controller
     {
         $stats = [
             'total_users' => User::where('role', 'user')->count(),
-            'total_internships' => Internship::count(),
+            'total_internships' => Internship::whereNull('user_id')->count(),
+            'total_user_internships' => Internship::whereNotNull('user_id')->count(),
             'total_sessions' => MooraSession::count(),
             'avg_alternatives' => round(DB::table('internship_evaluations')
                 ->select('moora_session_id', DB::raw('count(distinct internship_id) as count'))
@@ -49,7 +50,14 @@ class AdminDashboardController extends Controller
             ->groupBy('internships.id', 'internships.name')
             ->orderBy('total', 'desc')->limit(5)->get();
 
-        // Chart 4: Criteria Importance (Avg Weights across all users)
+        // Chart 4: Top User Contributed Companies
+        $topUserContributions = Internship::whereNotNull('user_id')
+            ->select(DB::raw('LOWER(name) as lower_name'), DB::raw('MAX(name) as name'), DB::raw('count(*) as count'))
+            ->groupBy('lower_name')
+            ->orderBy('count', 'desc')
+            ->limit(5)->get();
+
+        // Chart 5: Criteria Importance (Avg Weights across all users)
         $criteriaWeights = DB::table('user_criteria_weights')
             ->join('criterias', 'user_criteria_weights.criteria_id', '=', 'criterias.id')
             ->select('criterias.name', DB::raw('AVG(weight) as avg_weight'))
@@ -82,7 +90,7 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard', compact(
             'stats', 'latest_users', 'latest_sessions', 'categoryDist', 
             'sessionTrend', 'registrationTrends', 'topCompared', 
-            'criteriaWeights', 'topWinners', 'potentialWinners'
+            'criteriaWeights', 'topWinners', 'potentialWinners', 'topUserContributions'
         ));
     }
 }

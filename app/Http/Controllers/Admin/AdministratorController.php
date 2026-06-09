@@ -9,9 +9,20 @@ use Illuminate\Support\Facades\Hash;
 
 class AdministratorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $admins = User::where('role', 'admin')->get();
+        $search = $request->input('search');
+
+        $admins = User::where('role', 'admin')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
+
         return view('admin.administrators.index', compact('admins'));
     }
 

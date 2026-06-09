@@ -9,15 +9,17 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('styles')
     
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
         }
         
         [x-cloak] { display: none !important; }
@@ -28,13 +30,12 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background-color: #f8fafc;
         }
 
         .admin-sidebar {
             width: 280px;
             background-color: #ffffff;
-            border-right: 1px solid #f1f5f9;
+            border-right: 0.5px solid #E2E8F0;
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -53,49 +54,123 @@
         }
 
         .admin-header {
-            height: 80px;
+            height: 64px;
             background-color: #ffffff;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #E8EFF6;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 40px;
+            padding: 0 32px;
             flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 40;
         }
 
         .admin-content {
             flex: 1;
             overflow-y: auto;
-            padding: 40px;
-            background-color: #f8fafc;
+            padding: 32px;
         }
 
-        /* Center all table content */
-        table th, table td {
-            text-align: center !important;
-            vertical-align: middle !important;
-        }
-
-        /* Keep action columns or specific columns if needed, but user requested all */
-        .text-right { text-align: right !important; }
-        .text-left { text-align: left !important; }
-
-        /* Standardized Action Icons */
-        .action-btn {
-            width: 38px;
-            height: 38px;
+        /* Sidebar Nav */
+        .nav-link {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 12px;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
             transition: all 0.2s;
+            color: #64748B;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            background-color: #F1F5F9;
+            color: #0F172A;
+        }
+        .nav-link.active {
+            background-color: #EFF6FF;
+            color: #2563EB;
+        }
+        .nav-link i {
+            font-size: 18px;
         }
 
+        .section-label {
+            padding: 24px 16px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Custom scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
 
-        /* Responsive Fixes */
+        /* Pagination & Search Styles */
+        .pagination-container {
+            padding: 14px 24px;
+            border-top: 0.5px solid #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .page-info { font-size: 12px; color: #94A3B8; font-weight: 600; }
+        .page-btns { display: flex; gap: 4px; }
+        .page-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            background: #fff;
+            font-size: 12px; font-weight: 700;
+            color: #64748B; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .page-btn.active { background: #2563EB; color: #fff; border-color: #2563EB; }
+        .page-btn:hover:not(.active) { background: #F8FAFC; border-color: #CBD5E1; color: #0F172A; }
+        .page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .search-box {
+            height: 40px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 0 12px 0 40px;
+            font-size: 13px;
+            color: #334155;
+            background: #F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2394A3B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 14px center;
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .search-box:focus { border-color: #2563EB; background-color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+
+        .filter-select {
+            height: 40px;
+            padding: 0 34px 0 14px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #334155;
+            background: #F8FAFC;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2394A3B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            transition: all 0.2s;
+        }
+        .filter-select:focus { border-color: #2563EB; background-color: #fff; }
+
         @media (max-width: 1024px) {
             .admin-sidebar {
                 position: fixed;
@@ -107,7 +182,7 @@
                 transform: translateX(0);
             }
             .admin-header {
-                padding: 0 24px;
+                padding: 0 20px;
             }
             .admin-content {
                 padding: 24px;
@@ -115,71 +190,69 @@
         }
     </style>
 </head>
-<body class="h-full antialiased text-slate-900 overflow-hidden" x-data="{ sidebarOpen: false }">
+<body class="h-full antialiased" x-data="{ sidebarOpen: false }">
     
     <div class="admin-layout">
         
         <!-- SIDEBAR -->
         <aside :class="sidebarOpen ? 'open' : ''" class="admin-sidebar">
-            <div class="h-20 flex items-center justify-between px-8 border-b border-slate-50 flex-shrink-0">
-                <span class="text-lg font-black tracking-tighter italic text-slate-900">Moora<span class="text-blue-600">Project</span></span>
+            <div class="h-[64px] flex items-center justify-between px-8 border-b border-[#E8EFF6] flex-shrink-0">
+                <span class="text-xl font-extrabold tracking-tight text-[#0F172A]">Moora<span class="text-[#2563EB]">Project</span></span>
                 <!-- Close Button (Mobile Only) -->
                 <button @click="sidebarOpen = false" class="lg:hidden text-slate-500 p-2 hover:bg-slate-50 rounded-xl transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <i class="ti ti-x"></i>
                 </button>
             </div>
             
-            <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto custom-scrollbar">
-                <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Main Menu</p>
-                
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <nav class="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="ti ti-layout-dashboard"></i>
                     Dashboard
                 </a>
 
-                <div class="pt-6 pb-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-4">Master Data</div>
+                <div class="section-label">Master Data</div>
                 
-                <a href="{{ route('admin.criterias.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.criterias.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                <a href="{{ route('admin.criterias.index') }}" class="nav-link {{ request()->routeIs('admin.criterias.*') ? 'active' : '' }}">
+                    <i class="ti ti-list-details"></i>
                     Kriteria
                 </a>
 
-                <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.categories.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    <i class="ti ti-category"></i>
                     Bidang
                 </a>
 
-                <a href="{{ route('admin.internships.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.internships.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <a href="{{ route('admin.internships.index') }}" class="nav-link {{ request()->routeIs('admin.internships.*') ? 'active' : '' }}">
+                    <i class="ti ti-building"></i>
                     Perusahaan Global
                 </a>
 
-                <a href="{{ route('admin.user-internships.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.user-internships.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <a href="{{ route('admin.user-internships.index') }}" class="nav-link {{ request()->routeIs('admin.user-internships.*') ? 'active' : '' }}">
+                    <i class="ti ti-users-group"></i>
                     Kontribusi Mahasiswa
                 </a>
 
-                <div class="pt-6 pb-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-4">User Management</div>
+                <div class="section-label">User Management</div>
 
-                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l-9-5 9-5 9 5-9 5zm0 0v6"></path></svg>
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="ti ti-users"></i>
                     Data Mahasiswa
                 </a>
 
-                <a href="{{ route('admin.administrators.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.administrators.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/30' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <a href="{{ route('admin.administrators.index') }}" class="nav-link {{ request()->routeIs('admin.administrators.*') ? 'active' : '' }}">
+                    <i class="ti ti-shield-check"></i>
                     Tim Administrator
                 </a>
 
-                <a href="{{ route('admin.logs.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all {{ request()->routeIs('admin.logs.*') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/30' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-12 0 9 9 0 0112 0z"></path></svg>
+                <a href="{{ route('admin.logs.index') }}" class="nav-link {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
+                    <i class="ti ti-history"></i>
                     Log Aktivitas
                 </a>
             </nav>
 
-            <div class="p-6 border-t border-slate-50 bg-slate-50/30">
+            <div class="p-6 border-t border-[#E8EFF6] bg-white">
                 <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 mb-6 group">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-blue-500/20 border-2 border-white transform rotate-3 group-hover:rotate-0 transition-transform">
+                    <div class="w-10 h-10 rounded-xl bg-[#2563EB] flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-blue-500/10 border-2 border-white transform transition-transform group-hover:scale-105">
                         @if(Auth::user()->photo)
                             <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="w-full h-full object-cover rounded-xl">
                         @else
@@ -187,14 +260,14 @@
                         @endif
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-[11px] font-black text-slate-900 truncate uppercase tracking-tight">{{ Auth::user()->name }}</p>
-                        <p class="text-[9px] font-bold text-blue-600/60 uppercase tracking-widest">My Profile</p>
+                        <p class="text-[13px] font-bold text-[#0F172A] truncate tracking-tight">{{ Auth::user()->name }}</p>
+                        <p class="text-[11px] font-medium text-[#64748B] uppercase tracking-wider">Administrator</p>
                     </div>
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-white bg-red-500 rounded-xl hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95">
-                        Logout
+                    <button type="submit" class="w-full py-2.5 text-[12px] font-bold text-white bg-[#DC2626] rounded-[10px] hover:bg-[#B91C1C] transition-all active:scale-[0.98] shadow-sm shadow-red-500/20">
+                        Keluar
                     </button>
                 </form>
             </div>
@@ -205,22 +278,18 @@
             <header class="admin-header">
                 <div class="flex items-center gap-4">
                     <!-- Hamburger Mobile -->
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button type="button" @click.stop="sidebarOpen = true" class="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-all">
+                        <i class="ti ti-menu-2"></i>
                     </button>
                     <div>
-                        <h2 class="hidden md:block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1 italic">Moora System</h2>
-                        <p class="text-[10px] md:text-xs font-black text-slate-900 uppercase tracking-widest">Admin Control Panel</p>
+                        <h2 class="hidden md:block text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest mb-0.5">Sistem Moora</h2>
+                        <p class="text-[14px] font-extrabold text-[#0F172A] tracking-tight">Admin Control Panel</p>
                     </div>
-                </div>
-                
-                <div class="flex items-center gap-4 lg:gap-6">
-                    <span class="hidden md:inline text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ now()->format('d M Y') }}</span>
                 </div>
             </header>
 
             <!-- Overlay Mobile -->
-            <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="lg:hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity"></div>
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="lg:hidden fixed inset-0 bg-[#0F172A]/40 backdrop-blur-sm z-40 transition-opacity"></div>
 
             <main class="admin-content custom-scrollbar">
                 <div class="max-w-[1400px] mx-auto">

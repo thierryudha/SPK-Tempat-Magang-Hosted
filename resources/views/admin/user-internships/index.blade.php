@@ -1,131 +1,213 @@
 <x-admin-layout>
-    <div class="max-w-7xl mx-auto">
-        <div class="mb-10">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Kontribusi Mahasiswa</h1>
-            <p class="text-slate-500 text-sm mt-1 font-bold uppercase tracking-widest text-[10px]">Daftar perusahaan yang ditambahkan secara pribadi oleh mahasiswa.</p>
+    <div class="mt-4">
+        <x-breadcrumbs :links="[['label' => 'Kontribusi Mahasiswa']]" />
+        
+        <div class="mb-8">
+            <h1 class="text-[26px] font-[800] text-[#0F172A] tracking-tight leading-none mb-2">Kontribusi Mahasiswa</h1>
+            <p class="text-[14px] text-[#64748B] font-medium">Daftar perusahaan yang ditambahkan secara pribadi oleh mahasiswa.</p>
         </div>
 
         @if(session('success'))
-            <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3 animate-fade-in">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                <span class="text-xs font-bold uppercase tracking-widest">{{ session('success') }}</span>
+            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold rounded-xl flex items-center gap-3 shadow-sm shadow-emerald-500/5">
+                <i class="ti ti-circle-check text-lg"></i>
+                {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="mb-8 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center gap-3 animate-fade-in">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                <span class="text-xs font-bold uppercase tracking-widest">{{ session('error') }}</span>
+            <div class="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-700 text-sm font-bold rounded-xl flex items-center gap-3 shadow-sm shadow-rose-500/5">
+                <i class="ti ti-alert-circle text-lg"></i>
+                {{ session('error') }}
             </div>
         @endif
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <!-- Desktop Table View -->
+        <div class="bg-white border-[0.5px] border-[#E2E8F0] rounded-[16px] overflow-hidden shadow-sm shadow-slate-200/50">
+            <div class="px-6 py-5 border-b border-[#F1F5F9] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h3 class="text-[15px] font-bold text-[#0F172A]">Daftar Perusahaan Mahasiswa</h3>
+                
+                <form action="{{ route('admin.user-internships.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
+                    <div class="relative w-full md:w-[250px]">
+                        <input type="text" name="search" value="{{ request('search') }}" class="search-box" placeholder="Cari nama perusahaan...">
+                    </div>
+                    
+                    <button type="submit" class="h-10 px-5 flex items-center justify-center bg-[#2563EB] text-white text-[12px] font-bold rounded-xl hover:bg-[#1D4ED8] transition-all">
+                        Cari
+                    </button>
+
+                    <div class="relative w-full md:w-[180px]">
+                        <select name="category_id" class="search-box appearance-none" onchange="this.form.submit()">
+                            <option value="">Semua Bidang</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                    {{ $cat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#94A3B8]">
+                            <i class="ti ti-chevron-down text-sm"></i>
+                        </div>
+                    </div>
+
+                    @if(request('search') || request('category_id'))
+                        <a href="{{ route('admin.user-internships.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+            </div>
+
+            <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm text-left">
+                <table class="w-full border-collapse text-left">
                     <thead>
-                        <tr class="bg-slate-900 border-b border-slate-800">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Penginput</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Nama Perusahaan</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Bidang</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Aksi</th>
+                        <tr class="bg-[#F8FAFC]">
+                            <th class="px-6 py-4 text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9] w-[80px]">No</th>
+                            <th class="px-6 py-4 text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Penginput</th>
+                            <th class="px-6 py-4 text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Perusahaan</th>
+                            <th class="px-6 py-4 text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Bidang</th>
+                            <th class="px-6 py-4 text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Status</th>
+                            <th class="px-6 py-4 text-right text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9] w-[300px]">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50">
+                    <tbody class="divide-y divide-[#F1F5F9]">
                         @forelse($internships as $i)
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center justify-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400 border border-slate-200">
-                                        {{ substr($i->user->name, 0, 1) }}
+                            <tr class="hover:bg-[#F8FAFC]/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <span class="text-[14px] font-bold text-[#64748B]">{{ ($internships->currentPage() - 1) * $internships->perPage() + $loop->iteration }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] text-[13px] font-bold overflow-hidden flex-shrink-0">
+                                            {{ substr($i->user->name, 0, 1) }}
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-[14px] font-bold text-[#0F172A]">{{ $i->user->name }}</span>
+                                            <span class="text-[11px] text-[#94A3B8] font-bold uppercase tracking-tight">Mahasiswa</span>
+                                        </div>
                                     </div>
-                                    <p class="text-xs font-bold text-slate-600 truncate max-w-[120px]">{{ $i->user->name }}</p>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5 text-center">
-                                <p class="text-sm font-bold text-slate-700 capitalize tracking-tight">{{ $i->name }}</p>
-                                @if($i->website_link)
-                                    <a href="{{ $i->website_link }}" target="_blank" class="text-[9px] text-blue-600 font-black uppercase hover:underline mt-1 inline-block">Visit Website</a>
-                                @else
-                                    <span class="text-[9px] text-slate-300 font-bold uppercase mt-1 inline-block italic">No Link Provided</span>
-                                @endif
-                            </td>
-                            <td class="px-8 py-5 text-center">
-                                <span class="px-3 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-lg border border-slate-100 italic capitalize">
-                                    {{ $i->category->name ?? 'Umum' }}
-                                </span>
-                            </td>
-                            <td class="px-8 py-5">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="{{ route('admin.internships.edit', $i) }}" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition">
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('admin.user-internships.promote', $i) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition active:scale-95">
-                                            Promote to Global
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[14px] font-bold text-[#0F172A] capitalize">{{ $i->name }}</span>
+                                        @if($i->website_link)
+                                            <a href="{{ $i->website_link }}" target="_blank" class="text-[11px] text-[#2563EB] font-bold hover:underline inline-flex items-center gap-1 mt-0.5">
+                                                <i class="ti ti-world text-[13px]"></i>
+                                                Kunjungi Website
+                                            </a>
+                                        @else
+                                            <span class="text-[11px] text-[#94A3B8] font-medium italic mt-0.5">Tidak ada link website</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-100">
+                                        {{ $i->category->name ?? 'Umum' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if(in_array(strtolower($i->name), $globalNames))
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-extrabold uppercase border border-emerald-100">
+                                            <i class="ti ti-check mr-1"></i> Sudah Ada Global
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-extrabold uppercase border border-slate-200">
+                                            Belum Ada
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <a href="{{ route('admin.internships.edit', $i) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F1F5F9] text-[#475569] text-[12px] font-bold rounded-[8px] hover:bg-[#E2E8F0] transition-all">
+                                            <i class="ti ti-edit text-sm"></i>
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.user-internships.promote', $i) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB] text-white text-[12px] font-bold rounded-[8px] hover:bg-[#1D4ED8] transition-all shadow-sm shadow-blue-500/10">
+                                                <i class="ti ti-arrow-up-circle text-sm"></i>
+                                                Promote to Global
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="4" class="py-20 text-center">
-                                <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Belum ada kontribusi data dari mahasiswa.</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="4" class="py-20 text-center">
+                                    <div class="w-16 h-16 bg-[#F8FAFC] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <i class="ti ti-building-community text-3xl text-[#94A3B8]"></i>
+                                    </div>
+                                    <p class="text-[#64748B] font-bold">Belum ada kontribusi data dari mahasiswa.</p>
+                                    <p class="text-[12px] text-[#94A3B8] mt-1">Data perusahaan yang diinput mahasiswa akan muncul di sini.</p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <!-- Mobile Card View -->
-            <div class="md:hidden divide-y divide-slate-50">
+            <!-- Mobile Cards -->
+            <div class="md:hidden grid grid-cols-1 gap-4 p-4 bg-[#F8FAFC]">
                 @forelse($internships as $i)
-                <div class="p-6">
-                    <div class="flex items-center gap-3 mb-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[10px] font-black text-slate-400 border border-slate-200 shadow-sm">
-                            {{ substr($i->user->name, 0, 1) }}
+                    <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm shadow-slate-200/50">
+                        <div class="flex items-center gap-3 mb-4 bg-[#F8FAFC] -mx-5 -mt-5 p-4 border-b border-[#F1F5F9] rounded-t-xl">
+                            <div class="w-10 h-10 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] text-[14px] font-bold overflow-hidden flex-shrink-0 shadow-sm">
+                                {{ substr($i->user->name, 0, 1) }}
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-[13px] font-bold text-[#0F172A] leading-tight">{{ $i->user->name }}</p>
+                                <p class="text-[11px] text-[#94A3B8] font-bold uppercase mt-0.5">Mahasiswa</p>
+                            </div>
+                            <div>
+                                @if(in_array(strtolower($i->name), $globalNames))
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase border border-emerald-100">
+                                        <i class="ti ti-check mr-1"></i> Global
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 text-[9px] font-extrabold uppercase border border-slate-200">
+                                        Belum
+                                    </span>
+                                @endif
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Diinput Oleh:</p>
-                            <p class="text-[10px] font-bold text-slate-600 uppercase">{{ $i->user->name }}</p>
-                        </div>
-                    </div>
 
-                    <div class="mb-6">
-                        <h4 class="font-black text-slate-900 text-base leading-tight capitalize">{{ $i->name }}</h4>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="px-3 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-lg border border-slate-100 italic capitalize">
-                                {{ $i->category->name ?? 'Umum' }}
-                            </span>
-                            @if($i->website_link)
-                                <a href="{{ $i->website_link }}" target="_blank" class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-md active:scale-95 transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-[16px] font-extrabold text-[#0F172A] leading-tight capitalize">{{ $i->name }}</h4>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold border border-blue-100">
+                                        {{ $i->category->name ?? 'Umum' }}
+                                    </span>
+                                    @if($i->website_link)
+                                        <a href="{{ $i->website_link }}" target="_blank" class="w-8 h-8 rounded-lg bg-[#F1F5F9] text-[#475569] flex items-center justify-center hover:bg-[#E2E8F0] transition-all">
+                                            <i class="ti ti-world"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-4 border-t border-[#F1F5F9]">
+                                <a href="{{ route('admin.internships.edit', $i) }}" class="flex justify-center items-center gap-1.5 py-2.5 bg-[#F1F5F9] text-[#475569] text-[12px] font-bold rounded-lg hover:bg-[#E2E8F0]">
+                                    <i class="ti ti-edit text-base"></i> Edit
                                 </a>
-                            @endif
+                                <form action="{{ route('admin.user-internships.promote', $i) }}" method="POST" class="w-full">
+                                    @csrf
+                                    <button type="submit" class="w-full flex justify-center items-center gap-1.5 py-2.5 bg-[#2563EB] text-white text-[12px] font-bold rounded-lg hover:bg-[#1D4ED8] shadow-sm shadow-blue-500/10">
+                                        <i class="ti ti-arrow-up-circle text-base"></i> Promote
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="flex gap-3">
-                        <a href="{{ route('admin.internships.edit', $i) }}" class="flex-1 flex items-center justify-center py-3 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-sm active:scale-95 transition">
-                            Edit
-                        </a>
-                        <form action="{{ route('admin.user-internships.promote', $i) }}" method="POST" class="flex-[1.5]">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center justify-center py-3 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition">
-                                Promote to Global
-                            </button>
-                        </form>
-                    </div>
-                </div>
                 @empty
-                <div class="py-20 text-center">
-                    <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Belum ada kontribusi mahasiswa.</p>
-                </div>
+                    <div class="py-12 text-center bg-white border border-[#E2E8F0] rounded-xl p-6">
+                        <i class="ti ti-building-community text-4xl text-[#94A3B8] mb-3 block"></i>
+                        <p class="text-[#64748B] font-bold text-sm">Belum ada kontribusi mahasiswa.</p>
+                    </div>
                 @endforelse
             </div>
+
+            {{ $internships->appends(request()->query())->links('vendor.pagination.admin') }}
         </div>
     </div>
 </x-admin-layout>

@@ -135,7 +135,7 @@ class DashboardController extends Controller
 
         // 3. Global Stats
         $totalUsers = User::count();
-        $totalInternships = Internship::count();
+        $totalInternships = Internship::whereNull('user_id')->count();
         $totalSessions = MooraSession::where('user_id', $user->id)->count();
         
         // 4. Latest Sessions

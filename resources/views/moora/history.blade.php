@@ -282,38 +282,6 @@
         <p class="page-subtitle">Rekap seluruh sesi analisis tempat magang yang pernah kamu jalankan</p>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-icon blue"><i class="ti ti-chart-bar"></i></div>
-            <div>
-                <div class="stat-label">Total Sesi</div>
-                <div class="stat-value">{{ $totalSessionsCount }}</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon green"><i class="ti ti-trophy"></i></div>
-            <div>
-                <div class="stat-label">Pemenang Terakhir</div>
-                <div class="stat-value" style="font-size:16px;">{{ $latestSession->winner_name ?? '-' }}</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon amber"><i class="ti ti-building"></i></div>
-            <div>
-                <div class="stat-label">Rata-rata Alternatif</div>
-                <div class="stat-value">{{ number_format($avgAlternatifs, 1) }} PT</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple"><i class="ti ti-calendar"></i></div>
-            <div>
-                <div class="stat-label">Sesi Terakhir</div>
-                <div class="stat-value" style="font-size:16px;">{{ $latestSession ? $latestSession->created_at->diffForHumans() : '-' }}</div>
-            </div>
-        </div>
-    </div>
-
     <div class="content-area">
         <!-- Left Panel: List -->
         <div class="panel">
@@ -328,8 +296,14 @@
             </div>
 
             <form action="{{ route('moora.history') }}" method="GET" class="filter-bar">
-                <input name="search" class="search-box" type="text" placeholder="Cari berdasarkan pemenang..." value="{{ request('search') }}">
+                <div class="relative flex-1">
+                    <input name="search" class="search-box w-full" type="text" placeholder="Cari berdasarkan pemenang..." value="{{ request('search') }}">
+                </div>
                 
+                <button type="submit" class="h-[36px] px-5 flex items-center justify-center bg-[#2563EB] text-white text-[12px] font-bold rounded-lg hover:bg-[#1D4ED8] transition-all">
+                    Cari
+                </button>
+
                 <a href="{{ route('moora.history') }}" class="filter-chip {{ !request('filter') ? 'active' : '' }}">
                     <i class="ti ti-list" style="font-size:13px"></i> Semua
                 </a>

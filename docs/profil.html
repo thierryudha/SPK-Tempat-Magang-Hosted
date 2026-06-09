@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — MooraProject</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #F8FAFC; color: #0F172A; }
+
+/* ── Topbar ─────────────────────────────── */
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #E8EFF6;
+  padding: 0 32px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-logo { font-size: 18px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; }
+.topbar-logo span { color: #2563EB; }
+.topbar-nav { display: flex; align-items: center; gap: 4px; margin-left: 36px; }
+.nav-item {
+  padding: 6px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; color: #64748B;
+  cursor: pointer; border: none; background: transparent; text-decoration: none;
+  transition: all 0.12s;
+}
+.nav-item.active { background: #EFF6FF; color: #2563EB; }
+.nav-item:hover:not(.active) { background: #F1F5F9; color: #334155; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.notif-btn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid #E2E8F0;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  color: #64748B; cursor: pointer; font-size: 18px; position: relative;
+}
+.notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #2563EB; border: 1.5px solid #fff;
+}
+.avatar-topbar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
+/* ── Layout ──────────────────────────────── */
+.main { padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+.page-header { margin-bottom: 28px; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+.breadcrumb-item { font-size: 12px; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.breadcrumb-sep { font-size: 12px; color: #CBD5E1; }
+.breadcrumb-item.current { color: #64748B; }
+.page-title { font-size: 26px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 4px; }
+.page-subtitle { font-size: 14px; color: #64748B; font-weight: 500; }
+
+/* ── Main grid ───────────────────────────── */
+.profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+
+/* ── Panel ───────────────────────────────── */
+.panel {
+  background: #fff; border: 0.5px solid #E2E8F0;
+  border-radius: 16px; overflow: hidden;
+}
+.panel-header {
+  padding: 20px 24px; border-bottom: 0.5px solid #F1F5F9;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title { font-size: 15px; font-weight: 700; color: #0F172A; }
+.panel-subtitle { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+/* ── Profile card (left) ─────────────────── */
+.profile-card-body { padding: 28px 24px; text-align: center; }
+
+.avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+.avatar-large {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 28px; font-weight: 800;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px #DBEAFE;
+}
+.avatar-edit-btn {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #2563EB; color: #fff; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px;
+  transition: background 0.12s;
+}
+.avatar-edit-btn:hover { background: #1D4ED8; }
+
+.profile-name { font-size: 18px; font-weight: 800; color: #0F172A; letter-spacing: -0.3px; margin-bottom: 4px; }
+.profile-nim { font-size: 12px; color: #94A3B8; font-weight: 600; margin-bottom: 12px; }
+.profile-prodi {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #EFF6FF; color: #2563EB;
+  border-radius: 8px; padding: 5px 12px;
+  font-size: 12px; font-weight: 700; margin-bottom: 20px;
+}
+
+.profile-divider { border: none; border-top: 0.5px solid #F1F5F9; margin: 0 0 20px; }
+
+.profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.pstat {
+  background: #F8FAFC; border-radius: 10px; padding: 12px 10px; text-align: center;
+}
+.pstat-val { font-size: 18px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 2px; }
+.pstat-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.social-links { display: flex; flex-direction: column; gap: 8px; }
+.social-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 9px;
+  border: 1px solid #E2E8F0; background: #fff;
+  font-size: 12px; font-weight: 600; color: #475569;
+  cursor: pointer; text-decoration: none;
+  transition: all 0.12s;
+}
+.social-link:hover { border-color: #93C5FD; background: #F8FBFF; color: #2563EB; }
+.social-link i { font-size: 16px; color: #94A3B8; }
+.social-link:hover i { color: #2563EB; }
+.social-link .link-val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.social-link .link-edit { font-size: 11px; color: #CBD5E1; }
+
+/* ── Right column ────────────────────────── */
+.right-col { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Tab nav ─────────────────────────────── */
+.tab-nav {
+  display: flex; gap: 2px;
+  background: #F1F5F9; border-radius: 10px; padding: 4px;
+  width: fit-content;
+}
+.tab-btn {
+  height: 32px; padding: 0 16px; border-radius: 7px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: none; background: transparent; color: #64748B;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.12s;
+}
+.tab-btn.active { background: #fff; color: #0F172A; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* ── Form sections ───────────────────────── */
+.form-body { padding: 24px; }
+.form-section { margin-bottom: 28px; }
+.form-section:last-child { margin-bottom: 0; }
+.form-section-title {
+  font-size: 11px; font-weight: 700; color: #94A3B8;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.form-section-title::after {
+  content: ''; flex: 1; height: 0.5px; background: #F1F5F9;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-row.single { grid-template-columns: 1fr; }
+.form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 5px; }
+.form-label .required { color: #DC2626; }
+.form-input {
+  height: 38px; border: 1px solid #E2E8F0; border-radius: 9px;
+  padding: 0 12px; font-size: 13px; color: #334155;
+  background: #fff; outline: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  transition: border-color 0.12s;
+}
+.form-input:focus { border-color: #2563EB; }
+.form-input::placeholder { color: #CBD5E1; }
+.form-input:disabled { background: #F8FAFC; color: #94A3B8; cursor: not-allowed; }
+.form-select {
+  height: 38px; border: 1px solid #E2E8F0; border-radius: 9px;
+  padding: 0 32px 0 12px; font-size: 13px; color: #334155;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2394A3B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  outline: none; cursor: pointer; appearance: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  transition: border-color 0.12s;
+}
+.form-select:focus { border-color: #2563EB; }
+.form-textarea {
+  border: 1px solid #E2E8F0; border-radius: 9px;
+  padding: 10px 12px; font-size: 13px; color: #334155;
+  background: #fff; outline: none; resize: vertical; min-height: 88px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  line-height: 1.5; transition: border-color 0.12s;
+}
+.form-textarea:focus { border-color: #2563EB; }
+.form-textarea::placeholder { color: #CBD5E1; }
+.form-hint { font-size: 11px; color: #94A3B8; font-weight: 500; margin-top: 4px; }
+
+/* ── Skill tags ──────────────────────────── */
+.skill-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.skill-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+  border-radius: 8px; padding: 4px 10px;
+  font-size: 12px; font-weight: 700;
+}
+.skill-tag-remove {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #BFDBFE; color: #1D4ED8; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 10px; flex-shrink: 0;
+}
+.skill-tag-remove:hover { background: #93C5FD; }
+.add-skill-wrap { display: flex; gap: 8px; margin-top: 10px; }
+.skill-input {
+  flex: 1; height: 34px; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 0 12px; font-size: 12px; color: #334155;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif; outline: none;
+}
+.skill-input:focus { border-color: #2563EB; }
+.skill-add-btn {
+  height: 34px; padding: 0 14px;
+  background: #2563EB; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background 0.12s;
+}
+.skill-add-btn:hover { background: #1D4ED8; }
+
+/* ── Kriteria preferensi ─────────────────── */
+.pref-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 0.5px solid #F8FAFC;
+}
+.pref-item:last-child { border-bottom: none; }
+.pref-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #EFF6FF; color: #2563EB;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.pref-label { flex: 1; }
+.pref-name { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 2px; }
+.pref-desc { font-size: 11px; color: #94A3B8; font-weight: 500; }
+.pref-weight-wrap { display: flex; align-items: center; gap: 8px; }
+.pref-weight-input {
+  width: 52px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 0 8px; font-size: 12px; color: #334155; text-align: center;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif; outline: none;
+}
+.pref-weight-input:focus { border-color: #2563EB; }
+.pref-type-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px;
+}
+.ptb-benefit { background: #DCFCE7; color: #15803D; }
+.ptb-cost { background: #FEE2E2; color: #B91C1C; }
+
+/* ── Password section ────────────────────── */
+.password-strength { margin-top: 6px; }
+.strength-bar { height: 4px; background: #F1F5F9; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+.strength-text { font-size: 11px; font-weight: 600; }
+
+/* ── Notification toggles ────────────────── */
+.notif-list { padding: 0 24px 20px; }
+.notif-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 0.5px solid #F8FAFC;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-info { flex: 1; }
+.notif-name { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 2px; }
+.notif-desc { font-size: 11px; color: #94A3B8; font-weight: 500; }
+.toggle-wrap { flex-shrink: 0; }
+.toggle {
+  width: 40px; height: 22px; border-radius: 11px;
+  background: #E2E8F0; border: none; cursor: pointer;
+  position: relative; transition: background 0.2s;
+}
+.toggle.on { background: #2563EB; }
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(18px); }
+
+/* ── Danger zone ─────────────────────────── */
+.danger-zone { padding: 20px 24px; }
+.danger-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-radius: 10px;
+  border: 1px solid #FECACA; background: #FEF2F2; margin-bottom: 10px;
+}
+.danger-item:last-child { margin-bottom: 0; }
+.danger-info-title { font-size: 13px; font-weight: 700; color: #B91C1C; margin-bottom: 2px; }
+.danger-info-desc { font-size: 11px; color: #DC2626; font-weight: 500; opacity: 0.8; }
+.danger-btn {
+  height: 32px; padding: 0 14px;
+  background: #FEF2F2; color: #B91C1C;
+  border: 1px solid #FECACA; border-radius: 8px;
+  font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+  transition: all 0.12s;
+}
+.danger-btn:hover { background: #FEE2E2; border-color: #FCA5A5; }
+
+/* ── Form footer ─────────────────────────── */
+.form-footer {
+  padding: 16px 24px; border-top: 0.5px solid #F1F5F9;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.save-btn {
+  height: 38px; padding: 0 22px;
+  background: #2563EB; color: #fff;
+  border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: background 0.12s;
+}
+.save-btn:hover { background: #1D4ED8; }
+.cancel-btn {
+  height: 38px; padding: 0 16px;
+  background: #F1F5F9; color: #334155;
+  border: 1px solid #E2E8F0; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.12s;
+}
+.cancel-btn:hover { background: #E2E8F0; }
+
+.save-hint { font-size: 12px; color: #94A3B8; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+/* ── Tab content visibility ──────────────── */
+.tab-pane { display: none; }
+.tab-pane.active { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Completion badge ────────────────────── */
+.completion-bar-wrap { padding: 16px 24px; border-bottom: 0.5px solid #F1F5F9; }
+.completion-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.completion-text { font-size: 12px; font-weight: 700; color: #334155; }
+.completion-pct { font-size: 12px; font-weight: 800; color: #2563EB; }
+.completion-track { height: 6px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
+.completion-fill { height: 100%; background: #2563EB; border-radius: 3px; transition: width 0.6s; }
+
+@media (max-width: 960px) {
+  .profile-grid { grid-template-columns: 1fr; }
+  .form-row.triple { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Moora<span>Project</span></div>
+    <nav class="topbar-nav">
+      <a class="nav-item" href="#">Dashboard</a>
+      <a class="nav-item" href="#">Magang</a>
+      <a class="nav-item" href="#">Program MOORA</a>
+      <a class="nav-item" href="#">Riwayat</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <div class="notif-btn">
+      <i class="ti ti-bell" aria-hidden="true"></i>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="avatar-topbar">RZ</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <span class="breadcrumb-item">Dashboard</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-item current">Profil</span>
+    </div>
+    <div class="page-title">Profil Saya</div>
+    <div class="page-subtitle">Kelola informasi pribadi, preferensi analisis, dan pengaturan akun</div>
+  </div>
+
+  <div class="profile-grid">
+
+    <!-- ── LEFT: Profile card ───────────────── -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div class="panel">
+        <div class="profile-card-body">
+          <div class="avatar-wrap">
+            <div class="avatar-large">RZ</div>
+            <div class="avatar-edit-btn"><i class="ti ti-camera" aria-hidden="true"></i></div>
+          </div>
+          <div class="profile-name">Muhammad Reza Arifin</div>
+          <div class="profile-nim">NIM: 2241720123</div>
+          <div class="profile-prodi">
+            <i class="ti ti-school" style="font-size:13px" aria-hidden="true"></i>
+            Teknik Informatika
+          </div>
+
+          <hr class="profile-divider">
+
+          <div class="profile-stats">
+            <div class="pstat">
+              <div class="pstat-val">8</div>
+              <div class="pstat-label">Sesi MOORA</div>
+            </div>
+            <div class="pstat">
+              <div class="pstat-val">12</div>
+              <div class="pstat-label">Tempat Magang</div>
+            </div>
+            <div class="pstat">
+              <div class="pstat-val">1</div>
+              <div class="pstat-label">Magang Aktif</div>
+            </div>
+            <div class="pstat">
+              <div class="pstat-val">6</div>
+              <div class="pstat-label">Kriteria</div>
+            </div>
+          </div>
+
+          <hr class="profile-divider">
+
+          <div class="social-links">
+            <a class="social-link" href="#">
+              <i class="ti ti-brand-github" aria-hidden="true"></i>
+              <span class="link-val">github.com/rezaarifin</span>
+              <i class="ti ti-pencil link-edit" aria-hidden="true"></i>
+            </a>
+            <a class="social-link" href="#">
+              <i class="ti ti-brand-linkedin" aria-hidden="true"></i>
+              <span class="link-val">linkedin.com/in/reza</span>
+              <i class="ti ti-pencil link-edit" aria-hidden="true"></i>
+            </a>
+            <a class="social-link" href="#">
+              <i class="ti ti-mail" aria-hidden="true"></i>
+              <span class="link-val">reza@student.pnj.ac.id</span>
+              <i class="ti ti-pencil link-edit" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completion -->
+      <div class="panel">
+        <div class="panel-header" style="border-bottom:none;padding-bottom:12px;">
+          <div>
+            <div class="panel-title">Kelengkapan Profil</div>
+            <div class="panel-subtitle">Lengkapi untuk hasil lebih akurat</div>
+          </div>
+        </div>
+        <div class="completion-bar-wrap">
+          <div class="completion-label">
+            <span class="completion-text">75% profil terisi</span>
+            <span class="completion-pct">75%</span>
+          </div>
+          <div class="completion-track">
+            <div class="completion-fill" style="width:75%"></div>
+          </div>
+        </div>
+        <div style="padding:12px 24px 20px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#94A3B8;font-weight:600;">
+            <i class="ti ti-circle-check" style="font-size:14px;color:#16A34A" aria-hidden="true"></i>
+            Informasi pribadi
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#94A3B8;font-weight:600;">
+            <i class="ti ti-circle-check" style="font-size:14px;color:#16A34A" aria-hidden="true"></i>
+            Data akademik
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#94A3B8;font-weight:600;">
+            <i class="ti ti-circle-check" style="font-size:14px;color:#16A34A" aria-hidden="true"></i>
+            Preferensi analisis
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#D97706;font-weight:600;">
+            <i class="ti ti-circle" style="font-size:14px;color:#D97706" aria-hidden="true"></i>
+            Skills & teknologi — belum diisi
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#D97706;font-weight:600;">
+            <i class="ti ti-circle" style="font-size:14px;color:#D97706" aria-hidden="true"></i>
+            Link sosial media — belum lengkap
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT: Tabs ───────────────────────── -->
+    <div class="right-col">
+
+      <!-- Tab nav -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('personal', this)">
+          <i class="ti ti-user" style="font-size:13px" aria-hidden="true"></i> Pribadi
+        </button>
+        <button class="tab-btn" onclick="switchTab('academic', this)">
+          <i class="ti ti-school" style="font-size:13px" aria-hidden="true"></i> Akademik
+        </button>
+        <button class="tab-btn" onclick="switchTab('preference', this)">
+          <i class="ti ti-adjustments" style="font-size:13px" aria-hidden="true"></i> Preferensi
+        </button>
+        <button class="tab-btn" onclick="switchTab('security', this)">
+          <i class="ti ti-lock" style="font-size:13px" aria-hidden="true"></i> Keamanan
+        </button>
+      </div>
+
+      <!-- ══ TAB: PRIBADI ══════════════════════ -->
+      <div id="tab-personal" class="tab-pane active">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Informasi Pribadi</div>
+              <div class="panel-subtitle">Data dasar akun kamu</div>
+            </div>
+          </div>
+          <div class="form-body">
+            <div class="form-section">
+              <div class="form-section-title">Data Diri</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Nama Depan <span class="required">*</span></label>
+                  <input class="form-input" type="text" value="Muhammad Reza">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nama Belakang</label>
+                  <input class="form-input" type="text" value="Arifin">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email Aktif <span class="required">*</span></label>
+                  <input class="form-input" type="email" value="reza@student.pnj.ac.id">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nomor WhatsApp</label>
+                  <input class="form-input" type="text" placeholder="+62 812 xxxx xxxx">
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label class="form-label">Bio Singkat</label>
+                  <textarea class="form-textarea" placeholder="Ceritakan sedikit tentang dirimu, minat, atau tujuan magang...">Mahasiswa Teknik Informatika semester 7 PNJ, tertarik di bidang backend development dan data engineering.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Skills & Teknologi</div>
+              <div class="skill-tags" id="skillTags">
+                <div class="skill-tag">PHP <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+                <div class="skill-tag">Laravel <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+                <div class="skill-tag">JavaScript <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+                <div class="skill-tag">MySQL <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+                <div class="skill-tag">Git <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+                <div class="skill-tag">Python <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+              </div>
+              <div class="add-skill-wrap">
+                <input class="skill-input" type="text" id="skillInput" placeholder="Tambah skill (contoh: React, Docker...)">
+                <button class="skill-add-btn" onclick="addSkill()">+ Tambah</button>
+              </div>
+            </div>
+
+            <div class="form-section" style="margin-bottom:0;">
+              <div class="form-section-title">Link Profil</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label"><i class="ti ti-brand-github" style="font-size:13px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>GitHub</label>
+                  <input class="form-input" type="text" value="github.com/rezaarifin" placeholder="github.com/username">
+                </div>
+                <div class="form-group">
+                  <label class="form-label"><i class="ti ti-brand-linkedin" style="font-size:13px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>LinkedIn</label>
+                  <input class="form-input" type="text" value="linkedin.com/in/reza" placeholder="linkedin.com/in/username">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <div class="save-hint"><i class="ti ti-info-circle" style="font-size:14px" aria-hidden="true"></i> Perubahan tersimpan otomatis</div>
+            <div style="display:flex;gap:10px;">
+              <button class="cancel-btn">Batal</button>
+              <button class="save-btn"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i> Simpan Perubahan</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: AKADEMIK ═════════════════════ -->
+      <div id="tab-academic" class="tab-pane">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Data Akademik</div>
+              <div class="panel-subtitle">Informasi studi dan kampus</div>
+            </div>
+          </div>
+          <div class="form-body">
+            <div class="form-section">
+              <div class="form-section-title">Identitas Mahasiswa</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">NIM <span class="required">*</span></label>
+                  <input class="form-input" type="text" value="2241720123" disabled>
+                  <span class="form-hint">NIM tidak dapat diubah. Hubungi admin jika ada kesalahan.</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Angkatan</label>
+                  <input class="form-input" type="text" value="2022" disabled>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Program Studi</label>
+                  <select class="form-select">
+                    <option selected>Teknik Informatika</option>
+                    <option>Sistem Informasi</option>
+                    <option>Teknik Komputer</option>
+                    <option>Manajemen Informatika</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Semester Saat Ini</label>
+                  <select class="form-select">
+                    <option>5</option>
+                    <option>6</option>
+                    <option selected>7</option>
+                    <option>8</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Kelas</label>
+                  <select class="form-select">
+                    <option>TI 4A</option>
+                    <option selected>TI 4B</option>
+                    <option>TI 4C</option>
+                    <option>TI 4D</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">IPK Terakhir</label>
+                  <input class="form-input" type="text" value="3.72" placeholder="Contoh: 3.50">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section" style="margin-bottom:0;">
+              <div class="form-section-title">Institusi</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Perguruan Tinggi</label>
+                  <input class="form-input" type="text" value="Politeknik Negeri Jakarta" disabled>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Jurusan / Departemen</label>
+                  <input class="form-input" type="text" value="Teknik Informatika dan Komputer" disabled>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label class="form-label">Dosen Pembimbing Magang</label>
+                  <input class="form-input" type="text" value="Iqbal Maulana, M.Kom." placeholder="Nama dosen pembimbing">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <div class="save-hint"><i class="ti ti-info-circle" style="font-size:14px" aria-hidden="true"></i> Data NIM & institusi dikunci oleh admin</div>
+            <div style="display:flex;gap:10px;">
+              <button class="cancel-btn">Batal</button>
+              <button class="save-btn"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i> Simpan Perubahan</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: PREFERENSI ═══════════════════ -->
+      <div id="tab-preference" class="tab-pane">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Preferensi Analisis MOORA</div>
+              <div class="panel-subtitle">Kriteria default yang otomatis terisi saat memulai analisis baru</div>
+            </div>
+          </div>
+          <div style="padding:8px 24px 4px;">
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:10px 14px;font-size:12px;color:#1D4ED8;font-weight:600;display:flex;align-items:center;gap:8px;">
+              <i class="ti ti-info-circle" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>
+              Pengaturan ini hanya sebagai nilai awal. Kamu tetap bisa mengubahnya saat membuat sesi baru.
+            </div>
+          </div>
+          <div style="padding:16px 24px 8px;">
+            <div class="form-section-title">Bobot Kriteria Default</div>
+            <div style="font-size:12px;color:#94A3B8;font-weight:500;margin-bottom:16px;">Total bobot: <strong style="color:#0F172A;">100%</strong></div>
+          </div>
+          <div style="padding:0 24px;">
+            <div class="pref-item">
+              <div class="pref-icon"><i class="ti ti-cash" aria-hidden="true"></i></div>
+              <div class="pref-label">
+                <div class="pref-name">Uang Saku</div>
+                <div class="pref-desc">Nilai tunjangan bulanan yang ditawarkan</div>
+              </div>
+              <div class="pref-weight-wrap">
+                <span class="pref-type-badge ptb-benefit">Benefit</span>
+                <input class="pref-weight-input" type="number" value="30" min="0" max="100">
+                <span style="font-size:11px;color:#94A3B8;font-weight:600;">%</span>
+              </div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-icon"><i class="ti ti-code" aria-hidden="true"></i></div>
+              <div class="pref-label">
+                <div class="pref-name">Relevansi Techstack</div>
+                <div class="pref-desc">Kesesuaian teknologi dengan skills kamu</div>
+              </div>
+              <div class="pref-weight-wrap">
+                <span class="pref-type-badge ptb-benefit">Benefit</span>
+                <input class="pref-weight-input" type="number" value="25" min="0" max="100">
+                <span style="font-size:11px;color:#94A3B8;font-weight:600;">%</span>
+              </div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-icon"><i class="ti ti-star" aria-hidden="true"></i></div>
+              <div class="pref-label">
+                <div class="pref-name">Reputasi Perusahaan</div>
+                <div class="pref-desc">Brand value dan prestige di industri</div>
+              </div>
+              <div class="pref-weight-wrap">
+                <span class="pref-type-badge ptb-benefit">Benefit</span>
+                <input class="pref-weight-input" type="number" value="20" min="0" max="100">
+                <span style="font-size:11px;color:#94A3B8;font-weight:600;">%</span>
+              </div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-icon"><i class="ti ti-clock" aria-hidden="true"></i></div>
+              <div class="pref-label">
+                <div class="pref-name">Jam Kerja</div>
+                <div class="pref-desc">Beban jam kerja harian/mingguan</div>
+              </div>
+              <div class="pref-weight-wrap">
+                <span class="pref-type-badge ptb-cost">Cost</span>
+                <input class="pref-weight-input" type="number" value="15" min="0" max="100">
+                <span style="font-size:11px;color:#94A3B8;font-weight:600;">%</span>
+              </div>
+            </div>
+            <div class="pref-item">
+              <div class="pref-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+              <div class="pref-label">
+                <div class="pref-name">Jarak dari Kampus</div>
+                <div class="pref-desc">Kemudahan akses dan biaya transportasi</div>
+              </div>
+              <div class="pref-weight-wrap">
+                <span class="pref-type-badge ptb-cost">Cost</span>
+                <input class="pref-weight-input" type="number" value="10" min="0" max="100">
+                <span style="font-size:11px;color:#94A3B8;font-weight:600;">%</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding:16px 24px 20px;border-top:0.5px solid #F1F5F9;margin-top:8px;">
+            <div class="form-section-title">Preferensi Tampilan Hasil</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Jumlah Alternatif Default</label>
+                <select class="form-select">
+                  <option>3 perusahaan</option>
+                  <option selected>4 perusahaan</option>
+                  <option>5 perusahaan</option>
+                  <option>Tidak ada batas</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Urutan Hasil</label>
+                <select class="form-select">
+                  <option selected>Skor tertinggi ke terendah</option>
+                  <option>Skor terendah ke tertinggi</option>
+                  <option>Nama A–Z</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <div class="save-hint"><i class="ti ti-info-circle" style="font-size:14px" aria-hidden="true"></i> Berlaku untuk sesi baru</div>
+            <div style="display:flex;gap:10px;">
+              <button class="cancel-btn">Reset ke Default</button>
+              <button class="save-btn"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i> Simpan Preferensi</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifikasi -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Notifikasi</div>
+              <div class="panel-subtitle">Atur kapan kamu ingin diberitahu</div>
+            </div>
+          </div>
+          <div class="notif-list">
+            <div class="notif-item">
+              <div class="notif-info">
+                <div class="notif-name">Update status magang</div>
+                <div class="notif-desc">Notifikasi saat status pendaftaran magang berubah</div>
+              </div>
+              <div class="toggle-wrap">
+                <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-info">
+                <div class="notif-name">Perusahaan baru ditambahkan</div>
+                <div class="notif-desc">Diberitahu jika ada perusahaan baru yang cocok dengan preferensimu</div>
+              </div>
+              <div class="toggle-wrap">
+                <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-info">
+                <div class="notif-name">Pengingat sesi MOORA</div>
+                <div class="notif-desc">Ingatkan jika sudah lama tidak melakukan analisis baru</div>
+              </div>
+              <div class="toggle-wrap">
+                <button class="toggle" onclick="this.classList.toggle('on')"></button>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-info">
+                <div class="notif-name">Newsletter & tips magang</div>
+                <div class="notif-desc">Info tips melamar dan persiapan magang via email</div>
+              </div>
+              <div class="toggle-wrap">
+                <button class="toggle" onclick="this.classList.toggle('on')"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: KEAMANAN ═════════════════════ -->
+      <div id="tab-security" class="tab-pane">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Ubah Password</div>
+              <div class="panel-subtitle">Gunakan password yang kuat dan unik</div>
+            </div>
+          </div>
+          <div class="form-body">
+            <div class="form-row single">
+              <div class="form-group">
+                <label class="form-label">Password Saat Ini <span class="required">*</span></label>
+                <input class="form-input" type="password" placeholder="Masukkan password lama">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Password Baru <span class="required">*</span></label>
+                <input class="form-input" type="password" id="newPass" placeholder="Min. 8 karakter" oninput="checkStrength(this.value)">
+                <div class="password-strength">
+                  <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%;background:#E2E8F0;"></div></div>
+                  <span class="strength-text" id="strengthText" style="color:#94A3B8;">Belum diisi</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Konfirmasi Password <span class="required">*</span></label>
+                <input class="form-input" type="password" placeholder="Ulangi password baru">
+              </div>
+            </div>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;font-size:12px;color:#64748B;font-weight:500;margin-top:4px;line-height:1.7;">
+              <strong style="color:#334155;">Tips password kuat:</strong> minimal 8 karakter, kombinasi huruf besar &amp; kecil, angka, dan simbol seperti !@#$
+            </div>
+          </div>
+          <div class="form-footer">
+            <div class="save-hint"><i class="ti ti-shield-check" style="font-size:14px" aria-hidden="true"></i> Enkripsi aman</div>
+            <button class="save-btn"><i class="ti ti-lock" style="font-size:14px" aria-hidden="true"></i> Perbarui Password</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Sesi Aktif</div>
+              <div class="panel-subtitle">Perangkat yang sedang login dengan akun ini</div>
+            </div>
+          </div>
+          <div style="padding:16px 24px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;">
+              <i class="ti ti-device-laptop" style="font-size:22px;color:#16A34A;flex-shrink:0" aria-hidden="true"></i>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#0F172A;">Chrome — Windows 11</div>
+                <div style="font-size:11px;color:#16A34A;font-weight:600;margin-top:1px;">Sesi ini (aktif sekarang)</div>
+              </div>
+              <div style="font-size:11px;color:#94A3B8;font-weight:600;">Jakarta, ID</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;">
+              <i class="ti ti-device-mobile" style="font-size:22px;color:#94A3B8;flex-shrink:0" aria-hidden="true"></i>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#0F172A;">Chrome Mobile — Android</div>
+                <div style="font-size:11px;color:#94A3B8;font-weight:600;margin-top:1px;">Terakhir aktif: 2 hari lalu</div>
+              </div>
+              <button style="height:28px;padding:0 12px;background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button>
+            </div>
+          </div>
+          <div style="padding:0 24px 16px;">
+            <button style="width:100%;height:36px;background:#F1F5F9;color:#334155;border:1px solid #E2E8F0;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">
+              <i class="ti ti-logout" style="font-size:13px;vertical-align:-1px;margin-right:6px" aria-hidden="true"></i>
+              Logout Semua Sesi Lain
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" style="color:#DC2626;">Zona Berbahaya</div>
+              <div class="panel-subtitle">Tindakan permanen yang tidak bisa dibatalkan</div>
+            </div>
+          </div>
+          <div class="danger-zone">
+            <div class="danger-item">
+              <div>
+                <div class="danger-info-title">Hapus Semua Riwayat Sesi</div>
+                <div class="danger-info-desc">Seluruh data analisis MOORA akan dihapus secara permanen</div>
+              </div>
+              <button class="danger-btn">Hapus Riwayat</button>
+            </div>
+            <div class="danger-item">
+              <div>
+                <div class="danger-info-title">Hapus Akun</div>
+                <div class="danger-info-desc">Akun dan seluruh datamu akan dihapus permanen tanpa bisa dipulihkan</div>
+              </div>
+              <button class="danger-btn">Hapus Akun</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function addSkill() {
+  const input = document.getElementById('skillInput');
+  const val = input.value.trim();
+  if (!val) return;
+  const tags = document.getElementById('skillTags');
+  const div = document.createElement('div');
+  div.className = 'skill-tag';
+  div.innerHTML = `${val} <button class="skill-tag-remove" onclick="removeTag(this)"><i class="ti ti-x" aria-hidden="true"></i></button>`;
+  tags.appendChild(div);
+  input.value = '';
+  input.focus();
+}
+
+document.getElementById('skillInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
+});
+
+function removeTag(btn) {
+  btn.closest('.skill-tag').remove();
+}
+
+function checkStrength(val) {
+  const fill = document.getElementById('strengthFill');
+  const text = document.getElementById('strengthText');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { pct: '0%', color: '#E2E8F0', label: 'Belum diisi', labelColor: '#94A3B8' },
+    { pct: '25%', color: '#DC2626', label: 'Lemah', labelColor: '#DC2626' },
+    { pct: '50%', color: '#D97706', label: 'Cukup', labelColor: '#D97706' },
+    { pct: '75%', color: '#2563EB', label: 'Kuat', labelColor: '#2563EB' },
+    { pct: '100%', color: '#16A34A', label: 'Sangat Kuat', labelColor: '#16A34A' },
+  ];
+  const l = val.length === 0 ? levels[0] : levels[score] || levels[4];
+  fill.style.width = l.pct;
+  fill.style.background = l.color;
+  text.textContent = l.label;
+  text.style.color = l.labelColor;
+}
+</script>
+
+</body>
+</html>

@@ -1,23 +1,21 @@
 @props(['links' => []])
 
-<nav class="flex px-4 sm:px-0 pt-1 pb-3 mb-2" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+<nav class="flex mb-4" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-2">
         <li class="inline-flex items-center">
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <a href="{{ request()->is('admin*') ? route('admin.dashboard') : route('dashboard') }}" class="inline-flex items-center text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider hover:text-[#2563EB] transition-colors">
+                <i class="ti ti-smart-home mr-1.5 text-[14px]"></i>
                 Dashboard
             </a>
         </li>
         @foreach($links as $link)
-        <li>
-            <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                @if(isset($link['url']))
-                    <a href="{{ $link['url'] }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 transition-colors duration-200">{{ $link['label'] }}</a>
-                @else
-                    <span class="ml-1 text-sm font-bold text-blue-600 md:ml-2">{{ $link['label'] }}</span>
-                @endif
-            </div>
+        <li class="flex items-center">
+            <i class="ti ti-chevron-right text-[#94A3B8] text-[12px] mx-1"></i>
+            @if(isset($link['url']))
+                <a href="{{ $link['url'] }}" class="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider hover:text-[#2563EB] transition-colors">{{ $link['label'] }}</a>
+            @else
+                <span class="text-[12px] font-bold text-[#2563EB] uppercase tracking-wider">{{ $link['label'] }}</span>
+            @endif
         </li>
         @endforeach
     </ol>

@@ -43,6 +43,8 @@ class AdminProfileController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Profil admin berhasil diperbarui.');
+        $tab = $request->filled('password') ? 'keamanan' : 'pribadi';
+
+        return back()->with('success', 'Profil admin berhasil diperbarui.')->with('tab', $tab);
     }
 }

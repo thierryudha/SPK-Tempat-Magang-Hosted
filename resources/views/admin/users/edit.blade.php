@@ -1,50 +1,71 @@
 <x-admin-layout>
-    <div class="max-w-3xl mx-auto">
-        <div class="mb-10">
-            <a href="{{ route('admin.users.index') }}" class="inline-flex items-center text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition mb-4">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Kembali
-            </a>
-            <h1 class="text-3xl font-black text-slate-900">Edit User</h1>
-            <p class="text-slate-500 text-sm mt-2">Perbarui informasi akun untuk <span class="text-blue-600 font-black">{{ $user->name }}</span>.</p>
+    <div class="mt-4">
+        <x-breadcrumbs :links="[
+            ['label' => 'Mahasiswa', 'url' => route('admin.users.index')],
+            ['label' => 'Edit Mahasiswa']
+        ]" />
+        
+        <div class="mb-8">
+            <h1 class="text-[26px] font-[800] text-[#0F172A] tracking-tight leading-none mb-2">Edit Mahasiswa</h1>
+            <p class="text-[14px] text-[#64748B] font-medium">Perbarui informasi akun untuk <span class="text-[#2563EB] font-bold">{{ $user->name }}</span>.</p>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 md:p-12">
-            <form action="{{ route('admin.users.update', $user) }}" method="POST" class="space-y-8">
+        <div class="max-w-2xl">
+            <form action="{{ route('admin.users.update', $user) }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div>
-                    <x-input-label for="name" value="Nama Lengkap" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                    <x-text-input id="name" name="name" type="text" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('name', $user->name)" required />
-                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                </div>
-
-                <div>
-                    <x-input-label for="email" value="Alamat Email" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                    <x-text-input id="email" name="email" type="email" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" :value="old('email', $user->email)" required />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <x-input-label for="role" value="Role Akses" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <select id="role" name="role" class="block w-full bg-slate-50 border-transparent focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition py-3 px-4 text-sm font-bold text-slate-700">
-                            <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>USER (Pengguna Biasa)</option>
-                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>ADMIN (Pengelola Sistem)</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                
+                <div class="bg-white border-[0.5px] border-[#E2E8F0] rounded-[16px] overflow-hidden shadow-sm shadow-slate-200/50 mb-8">
+                    <div class="px-6 py-5 border-b border-[#F1F5F9]">
+                        <h3 class="text-[15px] font-bold text-[#0F172A]">Informasi Akun</h3>
                     </div>
-                    <div>
-                        <x-input-label for="password" value="Password Baru (Kosongkan jika tidak ganti)" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3" />
-                        <x-text-input id="password" name="password" type="password" class="block w-full bg-slate-50 border-transparent focus:bg-white transition" />
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    <div class="p-6 space-y-6">
+                        <div class="space-y-2">
+                            <label for="name" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Nama Lengkap</label>
+                            <input type="text" id="name" name="name" 
+                                class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all" 
+                                required placeholder="Masukkan nama lengkap" value="{{ old('name', $user->name) }}">
+                            @error('name') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="email" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Alamat Email</label>
+                            <input type="email" id="email" name="email" 
+                                class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all" 
+                                required placeholder="email@contoh.com" value="{{ old('email', $user->email) }}">
+                            @error('email') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label for="role" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Role Akses</label>
+                                <select id="role" name="role" 
+                                    class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all appearance-none" 
+                                    required>
+                                    <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>USER (Mahasiswa)</option>
+                                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>ADMIN (Pengelola)</option>
+                                </select>
+                                @error('role') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
+                            </div>
+                            <div class="space-y-2">
+                                <label for="password" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Password (Kosongkan jika tidak ganti)</label>
+                                <input type="password" id="password" name="password" 
+                                    class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all" 
+                                    placeholder="Min. 8 karakter">
+                                @error('password') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="pt-4">
-                    <x-primary-button class="w-full justify-center bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl shadow-xl shadow-blue-500/20 text-xs font-black uppercase tracking-[0.2em]">
+                <div class="flex items-center gap-3">
+                    <button type="submit" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-8 h-[48px] bg-[#2563EB] text-white text-[14px] font-bold rounded-[12px] hover:bg-[#1D4ED8] transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98]">
+                        <i class="ti ti-device-floppy text-lg"></i>
                         Simpan Perubahan
-                    </x-primary-button>
+                    </button>
+                    <a href="{{ route('admin.users.index') }}" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-8 h-[48px] bg-[#F1F5F9] text-[#475569] text-[14px] font-bold rounded-[12px] hover:bg-[#E2E8F0] transition-all active:scale-[0.98]">
+                        Batal
+                    </a>
                 </div>
             </form>
         </div>

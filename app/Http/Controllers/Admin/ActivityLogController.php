@@ -8,9 +8,29 @@ use Illuminate\Http\Request;
 
 class ActivityLogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $logs = ActivityLog::with('user')->latest()->paginate(20);
-        return view('admin.logs.index', compact('logs'));
+        $search = $request->input('search');
+        $action = $request->input('action');
+
+        $logs = ActivityLog::with('user')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('description', 'like', "%{$search}%")
+                      ->orWhereHas('user', function ($uq) use ($search) {
+                          $uq->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
+            ->when($action, function ($query, $action) {
+                return $query->where('action', $action);
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $actions = ActivityLog::distinct()->pluck('action');
+
+        return view('admin.logs.index', compact('logs', 'actions'));
     }
 }

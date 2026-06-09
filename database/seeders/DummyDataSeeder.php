@@ -4,166 +4,106 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Internship;
-use App\Models\InternshipEvaluation;
 use App\Models\Criteria;
 use App\Models\UserCriteriaWeight;
 use App\Models\Category;
 use App\Models\MooraSession;
+use App\Models\InternshipEvaluation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Services\MooraService;
 
 class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
         // 1. Categories
-        $catNames = [
-            'Teknologi Informasi', 'E-Commerce', 'Layanan Keuangan & Perbankan', 
-            'Energi & Sumber Daya Alam', 'Media & Kreatif', 'Kesehatan', 
-            'Pendidikan', 'Telekomunikasi', 'Konsumsi & Ritel', 'Logistik & Transportasi'
-        ];
+        $catNames = ['Teknologi Informasi', 'E-Commerce', 'Layanan Keuangan & Perbankan', 'Energi & Sumber Daya Alam', 'Media & Kreatif', 'Kesehatan', 'Pendidikan', 'Telekomunikasi', 'Konsumsi & Ritel', 'Logistik & Transportasi'];
         $categories = [];
         foreach ($catNames as $name) {
             $categories[$name] = Category::updateOrCreate(['name' => $name])->id;
         }
 
-        // 2. Real Personas
-        $personas = [
-            ['name' => 'Rizky Amalia', 'email' => 'rizky@example.com', 'days' => 170],
-            ['name' => 'Siti Aminah', 'email' => 'siti@example.com', 'days' => 165],
-            ['name' => 'Budi Santoso', 'email' => 'budi@example.com', 'days' => 162],
-            ['name' => 'Dewi Lestari', 'email' => 'dewi@example.com', 'days' => 140],
-            ['name' => 'Eko Prasetyo', 'email' => 'eko@example.com', 'days' => 135],
-            ['name' => 'Fitriani', 'email' => 'fitri@example.com', 'days' => 110],
-            ['name' => 'Guntur Ginting', 'email' => 'guntur@example.com', 'days' => 105],
-            ['name' => 'Hani Handayani', 'email' => 'hani@example.com', 'days' => 90],
-            ['name' => 'Irfan Bachdim', 'email' => 'irfan@example.com', 'days' => 88],
-            ['name' => 'Joko Widodo', 'email' => 'joko@example.com', 'days' => 85],
-            ['name' => 'Kiki Fatmala', 'email' => 'kiki@example.com', 'days' => 70],
-            ['name' => 'Lutfi Agizal', 'email' => 'lutfi@example.com', 'days' => 65],
-            ['name' => 'Mamat Alkatiri', 'email' => 'mamat@example.com', 'days' => 50],
-            ['name' => 'Neni', 'email' => 'neni@example.com', 'days' => 45],
-            ['name' => 'Agus', 'email' => 'agus@example.com', 'days' => 42],
-            ['name' => 'Maya', 'email' => 'maya@example.com', 'days' => 30],
-            ['name' => 'Andi Saputra', 'email' => 'andi.saputra@example.com', 'days' => 25],
-            ['name' => 'Bambang Hermawan', 'email' => 'bams.hermawan@example.com', 'days' => 20],
-            ['name' => 'Citra Lestari', 'email' => 'citra.lestari@example.com', 'days' => 10],
-            ['name' => 'Dedi Kusnadi', 'email' => 'dedi.kusnadi@example.com', 'days' => 5],
+        // 2. Global Internships (20)
+        $globalInternshipsData = [
+            ['name' => 'PT Tokopedia', 'category' => 'E-Commerce'], ['name' => 'PT Gojek Indonesia', 'category' => 'Teknologi Informasi'],
+            ['name' => 'PT Shopee International', 'category' => 'E-Commerce'], ['name' => 'PT Bukalapak.com', 'category' => 'E-Commerce'],
+            ['name' => 'PT Traveloka', 'category' => 'Teknologi Informasi'], ['name' => 'PT Bank Mandiri', 'category' => 'Layanan Keuangan & Perbankan'],
+            ['name' => 'PT Telkom Indonesia', 'category' => 'Telekomunikasi'], ['name' => 'PT Pertamina', 'category' => 'Energi & Sumber Daya Alam'],
+            ['name' => 'PT Astra International', 'category' => 'Logistik & Transportasi'], ['name' => 'PT Grab Indonesia', 'category' => 'Teknologi Informasi'],
+            ['name' => 'PT Dana Indonesia', 'category' => 'Layanan Keuangan & Perbankan'], ['name' => 'PT OVO', 'category' => 'Layanan Keuangan & Perbankan'],
+            ['name' => 'PT BCA', 'category' => 'Layanan Keuangan & Perbankan'], ['name' => 'PT Indofood', 'category' => 'Konsumsi & Ritel'],
+            ['name' => 'PT Unilever', 'category' => 'Konsumsi & Ritel'], ['name' => 'PT Ruangguru', 'category' => 'Pendidikan'],
+            ['name' => 'PT Zenius', 'category' => 'Pendidikan'], ['name' => 'PT Halodoc', 'category' => 'Kesehatan'],
+            ['name' => 'PT Alodokter', 'category' => 'Kesehatan'], ['name' => 'PT PLN', 'category' => 'Energi & Sumber Daya Alam'],
         ];
 
-        foreach ($personas as $p) {
-            User::updateOrCreate(
-                ['email' => $p['email']],
-                [
-                    'name' => $p['name'],
-                    'password' => Hash::make('password123'),
-                    'role' => 'user',
-                    'created_at' => Carbon::now()->subDays($p['days']),
-                    'email_verified_at' => now(),
-                ]
-            );
+        foreach ($globalInternshipsData as $data) {
+            Internship::updateOrCreate(['name' => $data['name']], ['category_id' => $categories[$data['category']], 'user_id' => null]);
         }
 
-        // 3. Internships (Global)
-        $internshipsData = [
-            ['name' => 'PT Tokopedia', 'category' => 'E-Commerce', 'link' => 'https://www.tokopedia.com/careers'],
-            ['name' => 'PT Gojek Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.gojek.io/careers'],
-            ['name' => 'PT Shopee International', 'category' => 'E-Commerce', 'link' => 'https://careers.shopee.co.id'],
-            ['name' => 'PT Bukalapak.com', 'category' => 'E-Commerce', 'link' => 'https://careers.bukalapak.com'],
-            ['name' => 'PT Traveloka Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.traveloka.com/en-id/careers'],
-            ['name' => 'PT Bank Mandiri (Persero) Tbk', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.bankmandiri.co.id/en/karir'],
-            ['name' => 'PT Telkom Indonesia Tbk', 'category' => 'Telekomunikasi', 'link' => 'https://itdr.telkom.co.id/careers'],
-            ['name' => 'PT Pertamina (Persero)', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://recruitment.pertamina.com'],
-            ['name' => 'PT Astra International Tbk', 'category' => 'Logistik & Transportasi', 'link' => 'https://career.astra.co.id'],
-            ['name' => 'PT Grab Teknologi Indonesia', 'category' => 'Teknologi Informasi', 'link' => 'https://www.grab.com/id/careers'],
-            ['name' => 'PT Dana Indonesia', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.dana.id/careers'],
-            ['name' => 'PT Visionet Internasional (OVO)', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://www.ovo.id/career'],
-            ['name' => 'PT Bank Central Asia Tbk (BCA)', 'category' => 'Layanan Keuangan & Perbankan', 'link' => 'https://karir.bca.co.id'],
-            ['name' => 'PT Indofood CBP Sukses Makmur', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.indofood.com/career'],
-            ['name' => 'PT Unilever Indonesia Tbk', 'category' => 'Konsumsi & Ritel', 'link' => 'https://www.unilever.co.id/careers'],
-            ['name' => 'PT Ruang Raya Indonesia (Ruangguru)', 'category' => 'Pendidikan', 'link' => 'https://career.ruangguru.com'],
-            ['name' => 'PT Zenius Education', 'category' => 'Pendidikan', 'link' => 'https://www.zenius.net/career'],
-            ['name' => 'PT Media Dokter Investama (Halodoc)', 'category' => 'Kesehatan', 'link' => 'https://www.halodoc.com/career'],
-            ['name' => 'PT Alodokter', 'category' => 'Kesehatan', 'link' => 'https://www.alodokter.com/career'],
-            ['name' => 'PT PLN (Persero)', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://rekrutmen.pln.co.id'],
-            ['name' => 'PT Bukit Asam Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://www.ptba.co.id/sdm/karir'],
-            ['name' => 'PT Adaro Energy Tbk', 'category' => 'Energi & Sumber Daya Alam', 'link' => 'https://adaro.com/pages/read/11/careers'],
-            ['name' => 'PT Kumparan (Media)', 'category' => 'Media & Kreatif', 'link' => 'https://kumparan.com/career'],
-            ['name' => 'PT IDN Media', 'category' => 'Media & Kreatif', 'link' => 'https://www.idntimes.com/career'],
-            ['name' => 'PT Trans Digital Media (Detikcom)', 'category' => 'Media & Kreatif', 'link' => 'https://www.detik.com/karir'],
-        ];
+        // 3. 20 Users
+        for ($i = 1; $i <= 20; $i++) {
+            $name = "Mahasiswa " . $i;
+            $email = str_replace(' ', '', strtolower($name)) . "@example.com";
+            $user = User::updateOrCreate(['email' => $email], [
+                'name' => $name, 'password' => Hash::make('password123'), 'role' => 'user'
+            ]);
 
-        foreach ($internshipsData as $data) {
-            Internship::updateOrCreate(
-                ['name' => $data['name']],
-                [
-                    'category_id' => $categories[$data['category']],
-                    'website_link' => $data['link'],
-                    'user_id' => null
-                ]
-            );
-        }
-
-        // 4. User Contributions & Activity
-        $users = User::where('role', 'user')->get();
-        $globalInternships = Internship::whereNull('user_id')->get();
-        $criterias = Criteria::all();
-
-        foreach ($users as $user) {
-            // Contributions
-            $contributionCount = rand(1, 2);
-            $userInternships = collect();
-            for ($i = 0; $i < $contributionCount; $i++) {
-                $compName = "PT Private " . fake()->company . " " . rand(1, 9999);
-                $newInt = Internship::create([
-                    'name' => $compName,
+            // Manual Contributions (2-3)
+            $myInternships = [];
+            for ($j = 1; $j <= rand(2, 3); $j++) {
+                $myInternships[] = Internship::create([
+                    'name' => "PT Kontribusi {$name} {$j}",
                     'category_id' => $categories[array_rand($categories)],
-                    'website_link' => rand(0, 1) ? fake()->url : null,
-                    'user_id' => $user->id,
+                    'user_id' => $user->id
                 ]);
-                $userInternships->push($newInt);
+            }
+            $allInternships = Internship::whereNull('user_id')->get()->concat($myInternships);
+            $criterias = Criteria::all();
+
+            // Set Weights (100% total)
+            $weights = [];
+            $totalWeight = 0;
+            foreach ($criterias as $index => $c) {
+                if ($index === count($criterias) - 1) {
+                    $w = 100 - $totalWeight;
+                } else {
+                    $w = rand(5, 15);
+                    $totalWeight += $w;
+                }
+                UserCriteriaWeight::updateOrCreate(['user_id' => $user->id, 'criteria_id' => $c->id], ['weight' => $w]);
+                $weights[$c->id] = $w;
             }
 
-            foreach ($criterias as $c) {
-                UserCriteriaWeight::updateOrCreate(['user_id' => $user->id, 'criteria_id' => $c->id], ['weight' => rand(1, 5)]);
-            }
-
-            $sessionCount = rand(5, 8);
-            for ($s = 0; $s < $sessionCount; $s++) {
-                $sessionDate = Carbon::now()->subDays(rand(0, 30))->subHours(rand(0, 23));
-                $available = $globalInternships->concat($userInternships);
-
+            // 5 MOORA Sessions
+            for ($s = 0; $s < 5; $s++) {
+                $chosenInternships = $allInternships->random(rand(2, 5));
+                $chosenCriterias = $criterias->random(rand(3, count($criterias)));
+                
                 $session = MooraSession::create([
                     'user_id' => $user->id,
-                    'winner_name' => $available->random()->name,
-                    'max_optimization_value' => rand(50, 95) / 100,
-                    'criteria_used' => $criterias->pluck('id')->toArray(),
-                    'created_at' => $sessionDate,
-                    'updated_at' => $sessionDate
+                    'winner_name' => $chosenInternships->first()->name,
+                    'max_optimization_value' => rand(60, 90) / 100,
+                    'criteria_used' => $chosenCriterias->pluck('id')->toArray(),
+                    'created_at' => now()->subDays(rand(1, 30))
                 ]);
 
-                // Ensure unique internship-criteria combo for this USER in this SESSION
-                $internshipSample = $available->shuffle()->take(rand(4, 6));
-                foreach ($internshipSample as $intern) {
-                    foreach ($criterias as $crit) {
-                        // Use raw insert ignore logic by checking if it exists
-                        $exists = DB::table('internship_evaluations')
-                            ->where('user_id', $user->id)
-                            ->where('internship_id', $intern->id)
+                foreach ($chosenInternships as $int) {
+                    foreach ($chosenCriterias as $crit) {
+                        $existing = InternshipEvaluation::where('user_id', $user->id)
+                            ->where('internship_id', $int->id)
                             ->where('criteria_id', $crit->id)
-                            ->exists();
-                        
-                        if (!$exists) {
-                            DB::table('internship_evaluations')->insert([
+                            ->first();
+
+                        if (!$existing) {
+                            InternshipEvaluation::create([
                                 'user_id' => $user->id,
-                                'moora_session_id' => $session->id,
-                                'internship_id' => $intern->id,
+                                'internship_id' => $int->id,
                                 'criteria_id' => $crit->id,
-                                'score' => rand(1, 5),
-                                'created_at' => $sessionDate,
-                                'updated_at' => $sessionDate
+                                'moora_session_id' => $session->id,
+                                'score' => rand(1, 5)
                             ]);
                         }
                     }

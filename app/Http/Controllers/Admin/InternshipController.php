@@ -9,10 +9,24 @@ use Illuminate\Http\Request;
 
 class InternshipController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $internships = Internship::with('category')->get();
-        return view('admin.internships.index', compact('internships'));
+        $search = $request->input('search');
+        $categoryId = $request->input('category_id');
+
+        $internships = Internship::with('category')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+        $categories = Category::all();
+
+        return view('admin.internships.index', compact('internships', 'categories'));
     }
 
     public function create()

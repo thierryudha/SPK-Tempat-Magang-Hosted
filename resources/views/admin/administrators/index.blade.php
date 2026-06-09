@@ -1,118 +1,164 @@
 <x-admin-layout>
-    <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 text-capitalize">
+    <div class="mt-4">
+        <x-breadcrumbs :links="[['label' => 'Administrator']]" />
+        
+        <div class="flex justify-between items-end mb-8">
             <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Tim Administrator</h1>
-                <p class="text-slate-500 text-sm mt-1">Kelola akun tim pengelola sistem MooraProject.</p>
+                <h1 class="text-[26px] font-[800] text-[#0F172A] tracking-tight leading-none mb-2">Tim Administrator</h1>
+                <p class="text-[14px] text-[#64748B] font-medium">Kelola akun tim pengelola sistem MooraProject.</p>
             </div>
-            <a href="{{ route('admin.administrators.create') }}" class="inline-flex items-center px-6 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+            <a href="{{ route('admin.administrators.create') }}" class="inline-flex items-center gap-2 px-5 h-[42px] bg-[#2563EB] text-white text-[13px] font-bold rounded-[10px] hover:bg-[#1D4ED8] transition-all shadow-sm shadow-blue-500/10">
+                <i class="ti ti-plus text-base"></i>
                 Tambah Admin
             </a>
         </div>
 
         @if(session('success'))
-            <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                <span class="text-xs font-bold uppercase tracking-widest text-capitalize">{{ session('success') }}</span>
+            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold rounded-xl flex items-center gap-3">
+                <i class="ti ti-circle-check text-lg"></i>
+                {{ session('success') }}
             </div>
         @endif
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <!-- Desktop Table View -->
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-slate-900 border-b border-slate-800">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Administrator</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Alamat Email</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Status</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        @foreach($admins as $a)
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <td class="px-8 py-5 text-center">
-                                <div class="flex items-center justify-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs overflow-hidden border-2 border-white shadow-md flex-shrink-0" style="aspect-ratio: 1/1;">
-                                        @if($a->photo)
-                                            <img src="{{ asset('storage/'.$a->photo) }}" class="w-full h-full object-cover rounded-full">
-                                        @else
-                                            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-black italic rounded-full">
-                                                {{ substr($a->name, 0, 1) }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <p class="text-sm font-bold text-slate-700 capitalize tracking-tight">{{ $a->name }}</p>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5 text-sm text-slate-500 lowercase tracking-tighter text-center">{{ $a->email }}</td>
-                            <td class="px-8 py-5 text-center">
-                                @if($a->id === auth()->id())
-                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase rounded-lg italic">Anda Saat Ini</span>
-                                @else
-                                    <span class="px-3 py-1 bg-slate-100 text-slate-400 text-[9px] font-black uppercase rounded-lg">Anggota Tim</span>
-                                @endif
-                            </td>
-                            <td class="px-8 py-5 text-center">
-                                <div class="flex justify-center gap-3">
-                                    <a href="{{ route('admin.administrators.edit', $a) }}" class="action-btn bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </a>
-                                    @if($a->id !== auth()->id())
-                                    <form action="{{ route('admin.administrators.destroy', $a) }}" method="POST" onsubmit="return confirm('Hapus admin ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="action-btn bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm transition">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14"></path></svg>
-                                        </button>
-                                    </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-white border-[0.5px] border-[#E2E8F0] rounded-[16px] overflow-hidden shadow-sm shadow-slate-200/50">
+            <div class="px-6 py-5 border-b border-[#F1F5F9] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h3 class="text-[15px] font-bold text-[#0F172A]">Daftar Administrator</h3>
+                
+                <form action="{{ route('admin.administrators.index') }}" method="GET" class="flex items-center gap-2">
+                    <div class="relative w-full md:w-[260px]">
+                        <input type="text" name="search" value="{{ request('search') }}" class="search-box" placeholder="Cari nama atau email...">
+                    </div>
+                    @if(request('search'))
+                        <a href="{{ route('admin.administrators.index') }}" class="h-10 px-4 flex items-center justify-center bg-[#F1F5F9] text-[#64748B] text-[12px] font-bold rounded-xl hover:bg-[#E2E8F0] transition-all">
+                            Reset
+                        </a>
+                    @endif
+                    <button type="submit" class="h-10 px-5 flex items-center justify-center bg-[#2563EB] text-white text-[12px] font-bold rounded-xl hover:bg-[#1D4ED8] transition-all">
+                        Cari
+                    </button>
+                </form>
             </div>
 
-            <!-- Mobile Card View -->
-            <div class="md:hidden divide-y divide-slate-50">
-                @foreach($admins as $a)
-                <div class="p-6">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 rounded-full bg-slate-100 border-2 border-white shadow-md overflow-hidden flex-shrink-0">
-                            @if($a->photo)
-                                <img src="{{ asset('storage/'.$a->photo) }}" class="w-full h-full object-cover rounded-full">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white font-black italic">
-                                    {{ substr($a->name, 0, 1) }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-black text-slate-900 text-base leading-tight capitalize">{{ $a->name }}</h4>
-                            <p class="text-[10px] text-slate-500 font-bold lowercase mt-1">{{ $a->email }}</p>
-                        </div>
+            @if($admins->isEmpty())
+                <div class="py-20 text-center">
+                    <div class="w-16 h-16 bg-[#F8FAFC] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="ti ti-shield text-3xl text-[#94A3B8]"></i>
                     </div>
-                    <div class="flex gap-3 mt-4">
-                        <a href="{{ route('admin.administrators.edit', $a) }}" class="flex-1 flex items-center justify-center py-2.5 bg-white border border-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-widest rounded-xl shadow-sm active:scale-95 transition">
-                            Edit
-                        </a>
-                        @if($a->id !== auth()->id())
-                        <form action="{{ route('admin.administrators.destroy', $a) }}" method="POST" class="flex-1">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full flex items-center justify-center py-2.5 bg-red-50 text-red-600 font-black text-[10px] uppercase tracking-widest rounded-xl active:scale-95 transition" onclick="return confirm('Hapus admin ini?')">
-                                Hapus
-                            </button>
-                        </form>
-                        @endif
-                    </div>
+                    <p class="text-[#64748B] font-bold">Belum ada data admin.</p>
+                    @if(request('search'))
+                        <p class="text-[12px] text-[#94A3B8] mt-1">Tidak ada hasil yang ditemukan untuk kata kunci "{{ request('search') }}".</p>
+                    @endif
                 </div>
-                @endforeach
-            </div>
+            @else
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-[#F8FAFC]">
+                                <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9] w-[80px]">No</th>
+                                <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Administrator</th>
+                                <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Email</th>
+                                <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Status</th>
+                                <th class="px-6 py-4 text-right text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9] w-[200px]">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#F1F5F9]">
+                            @foreach($admins as $a)
+                                <tr class="hover:bg-[#F8FAFC]/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <span class="text-[14px] font-bold text-[#64748B]">{{ ($admins->currentPage() - 1) * $admins->perPage() + $loop->iteration }}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-[13px] font-bold overflow-hidden flex-shrink-0">
+                                                @if($a->photo)
+                                                    <img src="{{ asset('storage/'.$a->photo) }}" class="w-full h-full object-cover">
+                                                @else
+                                                    {{ substr($a->name, 0, 1) }}
+                                                @endif
+                                            </div>
+                                            <span class="text-[14px] font-bold text-[#0F172A]">{{ $a->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-[14px] text-[#64748B] font-medium lowercase">
+                                        {{ $a->email }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @if($a->id === auth()->id())
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                                                ANDA SAAT INI
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-50 text-[#64748B] border border-slate-200">
+                                                ANGGOTA TIM
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ route('admin.administrators.edit', $a) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F1F5F9] text-[#475569] text-[12px] font-bold rounded-[8px] hover:bg-[#E2E8F0] transition-all">
+                                                <i class="ti ti-edit text-sm"></i>
+                                                Edit
+                                            </a>
+                                            @if($a->id !== auth()->id())
+                                                <form action="{{ route('admin.administrators.destroy', $a) }}" method="POST" onsubmit="return confirm('Hapus admin ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FEF2F2] text-[#DC2626] text-[12px] font-bold rounded-[8px] hover:bg-[#FEE2E2] transition-all">
+                                                        <i class="ti ti-trash text-sm"></i>
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden grid grid-cols-1 gap-4 p-4">
+                    @foreach($admins as $a)
+                        <div class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm shadow-slate-100">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-[14px] font-bold overflow-hidden flex-shrink-0">
+                                    @if($a->photo)
+                                        <img src="{{ asset('storage/'.$a->photo) }}" class="w-full h-full object-cover">
+                                    @else
+                                        {{ substr($a->name, 0, 1) }}
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-[14px] font-bold text-[#0F172A] leading-tight">{{ $a->name }}</h4>
+                                    <p class="text-[11px] text-[#64748B] font-medium mt-0.5 lowercase">{{ $a->email }}</p>
+                                </div>
+                                @if($a->id === auth()->id())
+                                    <span class="text-[9px] font-extrabold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">ME</span>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-{{ $a->id !== auth()->id() ? '2' : '1' }} gap-2 pt-3 border-t border-[#F1F5F9]">
+                                <a href="{{ route('admin.administrators.edit', $a) }}" class="flex justify-center items-center gap-1.5 py-2 bg-[#F1F5F9] text-[#475569] text-[11px] font-bold rounded-lg hover:bg-[#E2E8F0]">
+                                    <i class="ti ti-edit"></i> Edit
+                                </a>
+                                @if($a->id !== auth()->id())
+                                    <form action="{{ route('admin.administrators.destroy', $a) }}" method="POST" onsubmit="return confirm('Hapus admin ini?')" class="w-full">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-full flex justify-center items-center gap-1.5 py-2 bg-[#FEF2F2] text-[#DC2626] text-[11px] font-bold rounded-lg hover:bg-[#FEE2E2]">
+                                            <i class="ti ti-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{ $admins->appends(request()->query())->links('vendor.pagination.admin') }}
+            @endif
         </div>
     </div>
 </x-admin-layout>

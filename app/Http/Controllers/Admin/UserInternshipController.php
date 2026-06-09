@@ -4,18 +4,32 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class UserInternshipController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $categoryId = $request->input('category_id');
+
         $internships = Internship::with(['user', 'category'])
             ->whereNotNull('user_id')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.user-internships.index', compact('internships'));
+        $categories = Category::all();
+        $globalNames = Internship::whereNull('user_id')->pluck('name')->map(fn($n) => strtolower($n))->toArray();
+
+        return view('admin.user-internships.index', compact('internships', 'categories', 'globalNames'));
     }
 
     public function promote(Internship $internship)

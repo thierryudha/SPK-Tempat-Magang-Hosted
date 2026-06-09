@@ -252,7 +252,7 @@
             <div class="stat-icon purple"><i class="ti ti-clock"></i></div>
             <div>
                 <div class="stat-label">Sesi Terakhir</div>
-                <div class="stat-value" style="font-size:14px;">{{ $latestSessions->first() ? $latestSessions->first()->created_at->diffForHumans() : '-' }}</div>
+                <div class="stat-value" style="font-size:14px;">{{ $latestSessions->first() ? $latestSessions->first()->created_at->format('d M Y') : '-' }}</div>
             </div>
         </div>
     </div>
