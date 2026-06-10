@@ -296,7 +296,11 @@ class MooraController extends Controller
         if ($session->user_id !== Auth::id()) {
             abort(403);
         }
+        $name = $session->winner_name;
         $session->delete();
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'MOORA', "Menghapus riwayat analisis: {$name}.");
+
         return back()->with('success', 'Sesi berhasil dihapus.');
     }
 }

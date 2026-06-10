@@ -176,7 +176,8 @@ class DashboardController extends Controller
             'totalSessions',
             'latestSessions',
             'popularCriteria',
-            'criterias'
+            'criterias',
+            'recentActivities'
         ));
     }
 }

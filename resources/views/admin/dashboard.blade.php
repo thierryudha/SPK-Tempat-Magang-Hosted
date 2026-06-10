@@ -177,16 +177,25 @@
                     <h3 class="panel-title"><i class="ti ti-history text-emerald-500"></i> Aktivitas Terbaru</h3>
                 </div>
                 <div class="list-stack">
-                    @forelse($latest_sessions->take(5) as $session)
+                    @forelse($latest_logs as $log)
                         <div class="list-item">
-                            <div class="avatar-small bg-emerald-50 text-emerald-600"><i class="ti ti-user"></i></div>
-                            <div class="flex-1">
-                                <div class="text-[13px] font-bold text-[#0F172A] truncate w-[140px] capitalize">{{ $session->user->name }}</div>
-                                <div class="text-[11px] text-[#94A3B8] font-bold">Analisis: {{ $session->winner_name }}</div>
+                            <div class="avatar-small bg-emerald-50 text-emerald-600">
+                                @if($log->action == 'Created') <i class="ti ti-plus"></i>
+                                @elseif($log->action == 'Updated') <i class="ti ti-edit"></i>
+                                @elseif($log->action == 'Deleted') <i class="ti ti-trash"></i>
+                                @else <i class="ti ti-history"></i>
+                                @endif
+                            </div>
+                            <div class="flex-1 overflow-hidden">
+                                <div class="text-[13px] font-bold text-[#0F172A] flex justify-between">
+                                    <span class="truncate">{{ $log->user->name }}</span>
+                                    <span class="text-[10px] text-[#94A3B8] font-medium">{{ $log->created_at->diffForHumans() }}</span>
+                                </div>
+                                <div class="text-[11px] text-[#64748B] font-medium truncate">{{ $log->description }}</div>
                             </div>
                         </div>
                     @empty
-                        <div class="p-10 text-center text-[12px] text-slate-400">Belum ada data</div>
+                        <div class="p-10 text-center text-[12px] text-slate-400">Belum ada rekaman aktivitas</div>
                     @endforelse
                 </div>
             </div>

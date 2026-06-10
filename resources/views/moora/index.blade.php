@@ -59,15 +59,15 @@
             <div class="wizard-line"><div class="wizard-line-progress" :style="'width: ' + ((step-1)/2)*100 + '%'"></div></div>
             <div class="wizard-step" :class="step >= 1 ? 'active' : ''">
                 <div class="wizard-circle">1</div>
-                <span class="wizard-label">Pilih & Prioritas</span>
+                <span class="wizard-label">Pilih Tempat Magang & Kriteria</span>
             </div>
             <div class="wizard-step" :class="step >= 2 ? 'active' : ''">
                 <div class="wizard-circle">2</div>
-                <span class="wizard-label">Penilaian</span>
+                <span class="wizard-label">Penilaian Kriteria</span>
             </div>
             <div class="wizard-step" :class="step >= 3 ? 'active' : ''">
                 <div class="wizard-circle">3</div>
-                <span class="wizard-label">Hasil</span>
+                <span class="wizard-label">Hasil Perhitungan</span>
             </div>
         </div>
 

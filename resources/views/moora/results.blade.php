@@ -203,8 +203,21 @@
                         @endphp
                         @foreach($results as $index => $res)
                             <tr>
-                                <td><div class="rank-badge {{ $index < 3 ? 'rank-'.($index+1) : 'rank-other' }}">{{ $index + 1 }}</div></td>
-                                <td class="font-extrabold text-slate-900">{{ $res['name'] }}</td>
+                                <td>
+                                    <div class="rank-badge {{ $index < 3 ? 'rank-'.($index+1) : 'rank-other' }}">
+                                        {{ $index + 1 }}
+                                    </div>
+                                </td>
+                                <td class="font-extrabold text-slate-900">
+                                    <div class="flex items-center gap-2">
+                                        {{ $res['name'] }}
+                                        @if($index === 0)
+                                            <span class="bg-amber-100 text-amber-700 text-[9px] font-black px-1.5 py-0.5 rounded border border-amber-200 uppercase tracking-tighter">Recommended</span>
+                                        @elseif($index < 3)
+                                            <span class="bg-slate-100 text-slate-600 text-[9px] font-black px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-tighter">Top Pick</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="flex items-center gap-3">
                                         <!-- Unified Visualization Logic: Min-Max Scaling Performance Index -->

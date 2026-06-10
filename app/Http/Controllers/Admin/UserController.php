@@ -39,12 +39,14 @@ class UserController extends Controller
             'password' => 'required|min:8',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'user',
         ]);
+
+        \App\Providers\ActivityLogServiceProvider::log('Created', 'Mahasiswa', "Menambah mahasiswa baru: {$user->name}.");
 
         return redirect()->route('admin.users.index')->with('success', 'Mahasiswa berhasil ditambahkan.');
     }
@@ -75,13 +77,20 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Mahasiswa', "Memperbarui data mahasiswa: {$user->name}.");
+
         return redirect()->route('admin.users.index')->with('success', 'Data mahasiswa berhasil diperbarui.');
     }
 
     public function destroy(User $user)
     {
         if ($user->role !== 'user') abort(403);
+        $name = $user->name;
         $user->delete();
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'Mahasiswa', "Menghapus mahasiswa: {$name}.");
+
         return redirect()->route('admin.users.index')->with('success', 'Mahasiswa berhasil dihapus.');
     }
 }

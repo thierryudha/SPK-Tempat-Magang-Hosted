@@ -28,7 +28,10 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|unique:categories']);
-        Category::create($request->all());
+        $category = Category::create($request->all());
+
+        \App\Providers\ActivityLogServiceProvider::log('Created', 'Bidang', "Menambah bidang baru: {$category->name}.");
+
         return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
@@ -41,12 +44,19 @@ class CategoryController extends Controller
     {
         $request->validate(['name' => 'required|unique:categories,name,' . $category->id]);
         $category->update($request->all());
+
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Bidang', "Memperbarui bidang: {$category->name}.");
+
         return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     public function destroy(Category $category)
     {
+        $name = $category->name;
         $category->delete();
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'Bidang', "Menghapus bidang: {$name}.");
+
         return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil dihapus.');
     }
 }

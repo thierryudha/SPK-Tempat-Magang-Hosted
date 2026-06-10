@@ -39,12 +39,14 @@ class AdministratorController extends Controller
             'password' => 'required|min:8',
         ]);
 
-        User::create([
+        $admin = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'admin',
         ]);
+
+        \App\Providers\ActivityLogServiceProvider::log('Created', 'Administrator', "Menambah administrator baru: {$admin->name}.");
 
         return redirect()->route('admin.administrators.index')->with('success', 'Administrator baru berhasil ditambahkan.');
     }
@@ -75,6 +77,9 @@ class AdministratorController extends Controller
         }
 
         $administrator->update($data);
+
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Administrator', "Memperbarui data administrator: {$administrator->name}.");
+
         return redirect()->route('admin.administrators.index')->with('success', 'Data administrator berhasil diperbarui.');
     }
 
@@ -83,7 +88,12 @@ class AdministratorController extends Controller
         if ($administrator->role !== 'admin' || $administrator->id === auth()->id()) {
             abort(403, 'Anda tidak bisa menghapus akun ini.');
         }
+
+        $name = $administrator->name;
         $administrator->delete();
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'Administrator', "Menghapus administrator: {$name}.");
+
         return redirect()->route('admin.administrators.index')->with('success', 'Administrator berhasil dihapus.');
     }
 }

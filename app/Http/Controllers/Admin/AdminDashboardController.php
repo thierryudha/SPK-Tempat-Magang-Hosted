@@ -86,11 +86,13 @@ class AdminDashboardController extends Controller
 
         $latest_users = User::where('role', 'user')->latest()->limit(5)->get();
         $latest_sessions = MooraSession::with('user')->latest()->limit(5)->get();
+        $latest_logs = \App\Models\ActivityLog::with('user')->latest()->limit(5)->get();
 
         return view('admin.dashboard', compact(
             'stats', 'latest_users', 'latest_sessions', 'categoryDist', 
             'sessionTrend', 'registrationTrends', 'topCompared', 
-            'criteriaWeights', 'topWinners', 'potentialWinners', 'topUserContributions'
+            'criteriaWeights', 'topWinners', 'potentialWinners', 'topUserContributions',
+            'latest_logs'
         ));
     }
 }

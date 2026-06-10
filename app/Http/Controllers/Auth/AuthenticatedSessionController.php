@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        \App\Providers\ActivityLogServiceProvider::log('Login', 'Auth', 'Masuk ke dalam sistem.');
+
         if ($request->user()->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
@@ -40,6 +42,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        \App\Providers\ActivityLogServiceProvider::log('Logout', 'Auth', 'Keluar dari sistem.');
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

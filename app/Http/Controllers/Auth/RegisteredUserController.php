@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        \App\Providers\ActivityLogServiceProvider::log('Register', 'Auth', 'Mendaftar akun baru sebagai mahasiswa.');
+
         return redirect(route('dashboard', absolute: false));
     }
 }

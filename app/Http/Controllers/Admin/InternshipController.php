@@ -43,7 +43,10 @@ class InternshipController extends Controller
             'website_link' => 'required|url',
         ]);
 
-        Internship::create($request->all());
+        $internship = Internship::create($request->all());
+
+        \App\Providers\ActivityLogServiceProvider::log('Created', 'Perusahaan', "Menambah perusahaan global baru: {$internship->name}.");
+
         return redirect()->route('admin.internships.index')->with('success', 'Perusahaan berhasil ditambahkan.');
     }
 
@@ -62,12 +65,19 @@ class InternshipController extends Controller
         ]);
 
         $internship->update($request->all());
+
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Perusahaan', "Memperbarui data perusahaan: {$internship->name}.");
+
         return redirect()->route('admin.internships.index')->with('success', 'Perusahaan berhasil diperbarui.');
     }
 
     public function destroy(Internship $internship)
     {
+        $name = $internship->name;
         $internship->delete();
+
+        \App\Providers\ActivityLogServiceProvider::log('Deleted', 'Perusahaan', "Menghapus perusahaan: {$name}.");
+
         return redirect()->route('admin.internships.index')->with('success', 'Perusahaan berhasil dihapus.');
     }
 }

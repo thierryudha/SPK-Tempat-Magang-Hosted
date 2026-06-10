@@ -375,6 +375,39 @@
                 </div>
             </div>
 
+            <!-- Aktivitas Terbaru -->
+            <div class="panel flex flex-col" style="height: 300px !important;">
+                <div class="panel-header flex-shrink-0">
+                    <div>
+                        <div class="panel-title">Aktivitas Terbaru</div>
+                        <div class="panel-subtitle">Tindakan terakhirmu</div>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-0">
+                    @forelse($recentActivities as $activity)
+                        <div class="px-5 py-3 border-b border-slate-50 last:border-0 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 flex-shrink-0 mt-0.5">
+                                @if($activity->action == 'Created') <i class="ti ti-plus text-emerald-500"></i>
+                                @elseif($activity->action == 'Updated') <i class="ti ti-edit text-blue-500"></i>
+                                @elseif($activity->action == 'Deleted') <i class="ti ti-trash text-rose-500"></i>
+                                @elseif($activity->action == 'Calculation') <i class="ti ti-calculator text-indigo-500"></i>
+                                @else <i class="ti ti-history text-slate-400"></i>
+                                @endif
+                            </div>
+                            <div class="min-width-0">
+                                <p class="text-[12px] font-bold text-slate-800 leading-snug">{{ $activity->description }}</p>
+                                <p class="text-[10px] text-slate-400 font-medium mt-0.5">{{ $activity->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="h-full flex items-center justify-center p-6 text-center text-slate-400 text-xs italic">Belum ada aktivitas.</div>
+                    @endforelse
+                </div>
+                <div class="p-3 border-t border-slate-50 bg-slate-50/30 text-center flex-shrink-0">
+                    <a href="{{ route('moora.history') }}" class="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest">Lihat Semua Log</a>
+                </div>
+            </div>
+
             <!-- Kriteria paling sering digunakan -->
             <div class="panel">
                 <div class="panel-header">

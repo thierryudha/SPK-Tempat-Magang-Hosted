@@ -63,6 +63,8 @@ class ProfileController extends Controller
 
         $user->save();
 
+        \App\Providers\ActivityLogServiceProvider::log('Updated', 'Profil', 'Memperbarui informasi profil mahasiswa.');
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated')->with('tab', 'pribadi');
     }
 
@@ -76,6 +78,8 @@ class ProfileController extends Controller
             Storage::disk('public')->delete($user->photo);
             $user->photo = null;
             $user->save();
+            
+            \App\Providers\ActivityLogServiceProvider::log('Updated', 'Profil', 'Menghapus foto profil.');
         }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated')->with('tab', 'pribadi');

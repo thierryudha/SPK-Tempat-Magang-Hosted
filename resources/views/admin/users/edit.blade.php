@@ -36,24 +36,12 @@
                             @error('email') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label for="role" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Role Akses</label>
-                                <select id="role" name="role" 
-                                    class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all appearance-none" 
-                                    required>
-                                    <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>USER (Mahasiswa)</option>
-                                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>ADMIN (Pengelola)</option>
-                                </select>
-                                @error('role') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
-                            </div>
-                            <div class="space-y-2">
-                                <label for="password" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Password (Kosongkan jika tidak ganti)</label>
-                                <input type="password" id="password" name="password" 
-                                    class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all" 
-                                    placeholder="Min. 8 karakter">
-                                @error('password') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
-                            </div>
+                        <div class="space-y-2">
+                            <label for="password" class="text-[12px] font-bold text-[#64748B] uppercase tracking-wider">Password (Kosongkan jika tidak ganti)</label>
+                            <input type="password" id="password" name="password" 
+                                class="w-full h-[48px] px-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] text-[14px] font-semibold text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/5 transition-all" 
+                                placeholder="Min. 8 karakter">
+                            @error('password') <p class="text-rose-500 text-[11px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>

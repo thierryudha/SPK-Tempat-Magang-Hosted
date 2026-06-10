@@ -32,7 +32,6 @@
                             <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Role</th>
                             <th class="px-6 py-4 text-center text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Tindakan</th>
                             <th class="px-6 py-4 text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9]">Keterangan</th>
-                            <th class="px-6 py-4 text-right text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider border-b border-[#F1F5F9] w-[100px]">Detail</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#F1F5F9]">
@@ -77,15 +76,10 @@
                                 <td class="px-6 py-4">
                                     <p class="text-[13px] text-[#64748B] font-medium leading-relaxed max-w-[300px] line-clamp-2" title="{{ $log->description }}">{{ $log->description }}</p>
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F1F5F9] text-[#475569] text-[11px] font-bold rounded-lg hover:bg-[#E2E8F0] transition-all">
-                                        Detail
-                                    </button>
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-20 text-center">
+                                <td colspan="6" class="py-20 text-center">
                                     <div class="w-16 h-16 bg-[#F8FAFC] rounded-2xl flex items-center justify-center mx-auto mb-4">
                                         <i class="ti ti-history text-3xl text-[#94A3B8]"></i>
                                     </div>
