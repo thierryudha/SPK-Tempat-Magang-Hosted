@@ -159,12 +159,6 @@ class DashboardController extends Controller
             ];
         })->sortByDesc('count');
 
-        // 5. Recent Activities
-        $recentActivities = ActivityLog::where('user_id', $user->id)
-            ->latest()
-            ->limit(4)
-            ->get();
-
         $criterias = Criteria::all();
 
         return view('dashboard', compact(
@@ -176,8 +170,7 @@ class DashboardController extends Controller
             'totalSessions',
             'latestSessions',
             'popularCriteria',
-            'criterias',
-            'recentActivities'
+            'criterias'
         ));
     }
 }
