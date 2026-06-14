@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->statefulApi();
         $middleware->throttleApi();
+        $middleware->trustProxies(at: "*");
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
